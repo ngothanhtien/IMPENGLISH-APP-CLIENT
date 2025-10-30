@@ -12,6 +12,7 @@ import 'package:learning_app_client/presentation/screens/menu_screen/learn/detai
 import 'package:learning_app_client/presentation/screens/menu_screen/learn/learn_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_edit_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_screen.dart';
+import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_setting.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_detail_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_questions_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_results_screen.dart';
@@ -128,16 +129,20 @@ final GoRouter _router = GoRouter(
               ]
           ),
           StatefulShellBranch(
-              routes: [
-                GoRoute(
-                    path: '/profile',
-                    builder: (context,state) => ProfileScreen()
-                ),
-                GoRoute(
-                    path: '/edit-profile',
-                    pageBuilder: (context,state) => buildFadeTransitionPage(EditProfileScreen())
-                ),
-              ]
+            routes: [
+              GoRoute(
+                  path: '/profile',
+                  builder: (context,state) => ProfileScreen()
+              ),
+              GoRoute(
+                  path: '/profile/edit-profile',
+                  pageBuilder: (context,state) => buildFadeTransitionPage(EditProfileScreen())
+              ),
+              GoRoute(
+                  path: '/profile/setting',
+                  pageBuilder: (context,state) => buildFadeTransitionPage(SettingScreen())
+              ),
+            ]
           ),
         ]
       ),

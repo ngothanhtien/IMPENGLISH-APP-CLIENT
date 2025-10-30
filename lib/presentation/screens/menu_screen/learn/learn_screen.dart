@@ -22,17 +22,9 @@ class _LearnScreen extends State<LearnScreen>{
   bool _isSearching = false;
   String _searchQuery = '';
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    loadVocabCard();
-    _searchController = TextEditingController();
-  }
-
   Future<void> loadVocabCard () async {
     try{
-      final result = await vocabService().fetchVocabBrief(limit: 20);
+      final result = await vocabService().fetchVocabBrief(limit: 50);
       setState(() {
         get_vocabCards = result.data ?? [];
         filter_vocabCards = get_vocabCards.where((v) => v.audio != null&& v.audio!.isNotEmpty).toList();
@@ -65,6 +57,13 @@ class _LearnScreen extends State<LearnScreen>{
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _searchController = TextEditingController();
+    loadVocabCard();
   }
   List<IVocabBrief> dataMock = [
     IVocabBrief(
@@ -160,16 +159,17 @@ class _LearnScreen extends State<LearnScreen>{
                 onChanged: _onSearchChanged,
                 onClear: _clearSearch,
               ),
+              SizedBox(height: 20,),
               ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: filter_vocabCards.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final vocab = filter_vocabCards[index];
-                    return VocabularyCard(vocabularyWord: vocab,);
-                  },
-                ),
+                padding: const EdgeInsets.all(8),
+                itemCount: filter_vocabCards.length,
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final vocab = filter_vocabCards[index];
+                  return VocabularyCard(vocabularyWord: vocab,);
+                },
+              ),
             ],
           ),
         ),

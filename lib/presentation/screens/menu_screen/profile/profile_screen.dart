@@ -197,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             subtitle: 'Update your personal information',
                             icon: Icons.edit,
                             color: const Color(0xFF6366F1),
-                            onTap: () => context.push('/edit-profile'),
+                            onTap: () => context.push('/profile/edit-profile'),
                           ),
                           const SizedBox(height: 16),
                           ActionCard(
@@ -214,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             subtitle: 'Manage app preferences',
                             icon: Icons.settings,
                             color: const Color(0xFF64748B),
-                            onTap: () => _showComingSoon('Settings'),
+                            onTap: () => context.push('/profile/setting'),
                           ),
                           const SizedBox(height: 16),
 

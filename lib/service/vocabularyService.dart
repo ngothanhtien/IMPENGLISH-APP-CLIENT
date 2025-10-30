@@ -13,7 +13,7 @@ class vocabService {
   Future<Card_Vocabulary> fetchVocabBrief({int page = 1, int limit = 10}) async {
     try{
       final response = await http.get(
-        Uri.parse("${base_url}/vocabulary/flashCard"),
+        Uri.parse("${base_url}/vocabulary/flashCard?limit=$limit"),
         headers: headers,
       );
       if(response.statusCode == 200){

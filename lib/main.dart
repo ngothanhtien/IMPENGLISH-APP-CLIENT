@@ -10,6 +10,7 @@ import 'package:learning_app_client/presentation/screens/menu_screen/community/p
 import 'package:learning_app_client/presentation/screens/menu_screen/home/home_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/learn/detail_practice_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/learn/learn_screen.dart';
+import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_achievement.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_edit_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_setting.dart';
@@ -141,6 +142,10 @@ final GoRouter _router = GoRouter(
               GoRoute(
                   path: '/profile/setting',
                   pageBuilder: (context,state) => buildFadeTransitionPage(SettingScreen())
+              ),
+              GoRoute(
+                  path: '/profile/achievement',
+                  pageBuilder: (context,state) => buildFadeTransitionPage(AchievementScreen())
               ),
             ]
           ),

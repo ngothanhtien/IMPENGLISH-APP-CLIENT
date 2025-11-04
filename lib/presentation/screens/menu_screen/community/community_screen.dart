@@ -115,7 +115,6 @@ class _Community_Screen extends State<Community_Screen>
                 ]
               ),
             ),
-            const SizedBox(height: 10),
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
@@ -163,7 +162,7 @@ class _Community_Screen extends State<Community_Screen>
                   ],
                 ),
               )
-            )
+            ),
           ],
         )
       ),

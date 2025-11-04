@@ -103,18 +103,13 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       elevation: 0,
       leading: IconButton(
         onPressed: () => context.pop(),
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.arrow_back,
-            size: 22,
-            color: Colors.white,
+        style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(8),
+            backgroundColor: Colors.white.withOpacity(0.3),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
           ),
         ),
+        icon: const Icon(Icons.arrow_back, size: 24, color: Colors.white,),
       ),
       title: const Text(
         'Edit Profile',

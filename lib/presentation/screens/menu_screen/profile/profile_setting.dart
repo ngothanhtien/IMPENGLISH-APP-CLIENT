@@ -26,7 +26,14 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
         leading: IconButton(
             onPressed: ()=> context.pop(),
-            icon: Icon(Icons.arrow_back,size: 28,color: Colors.white,)
+            style: IconButton.styleFrom(
+                padding: const EdgeInsets.all(8),
+                backgroundColor: Colors.white.withOpacity(0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                )
+            ),
+            icon: Icon(Icons.arrow_back,size: 24,color: Colors.white,)
         ),
       ),
       body: CustomScrollView(
@@ -132,7 +139,7 @@ class _SettingScreenState extends State<SettingScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: Colors.black.withOpacity(0.15),
             blurRadius: 8,
             spreadRadius: 2,
           )

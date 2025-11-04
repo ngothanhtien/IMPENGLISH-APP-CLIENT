@@ -114,6 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         child: SlideTransition(
           position: _slideAnimation,
           child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom
             ),
@@ -129,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                     Container(
                       child: Column(
                         children: [
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 5),
                           // Avatar
                           _informationCard(),
                           const SizedBox(height: 16),
@@ -205,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             subtitle: 'View your badges and rewards',
                             icon: Icons.emoji_events,
                             color: const Color(0xFFF59E0B),
-                            onTap: () => _showComingSoon('Achievements'),
+                            onTap: () => context.push("/profile/achievement"),
                           ),
                           const SizedBox(height: 16),
 
@@ -357,18 +358,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
           color: color,
           fontSize: 15,
           fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature coming soon!'),
-        backgroundColor: const Color(0xFF6366F1),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );

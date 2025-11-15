@@ -4,7 +4,7 @@ import 'package:learning_app_client/component/widgets/filter_chip_widget.dart';
 import 'package:learning_app_client/component/widgets/learning_progress_chart.dart';
 import 'package:learning_app_client/component/widgets/search_input_field.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
-import 'package:learning_app_client/model/flash_card.dart';
+import 'package:learning_app_client/model/vocabulary/flash_card.dart';
 import 'package:learning_app_client/service/vocabularyService.dart';
 
 class LearnScreen extends StatefulWidget{
@@ -65,41 +65,6 @@ class _LearnScreen extends State<LearnScreen>{
     _searchController = TextEditingController();
     loadVocabCard();
   }
-  List<IVocabBrief> dataMock = [
-    IVocabBrief(
-      id: "123",
-      audio: "223312",
-      word: "Hello",
-      definition: "dsfdsfdsfdsfdsfdsfds",
-      example: "123123124124",
-      level: "C1",
-      partOfSpeech: "ef/sd/fsd",
-      pronunciation: "ádsfffffds",
-      topic: "general"
-    ),
-    IVocabBrief(
-        id: "124",
-        audio: "223312",
-        word: "Hello",
-        definition: "dsfdsfdsfdsfdsfdsfds",
-        example: "123123124124",
-        level: "A1",
-        partOfSpeech: "ef/sd/fsd",
-        pronunciation: "ádsfffffds",
-        topic: "general"
-    ),
-    IVocabBrief(
-        id: "124",
-        audio: "223312",
-        word: "Hello",
-        definition: "dsfdsfdsfdsfdsfdsfds",
-        example: "123123124124",
-        level: "B1",
-        partOfSpeech: "ef/sd/fsd",
-        pronunciation: "ádsfffffds",
-        topic: "general"
-    )
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,6 +125,12 @@ class _LearnScreen extends State<LearnScreen>{
                 onClear: _clearSearch,
               ),
               SizedBox(height: 20,),
+              isLoading ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  color: const Color(0xFF4F46E5),
+                ),
+              ):
               ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: filter_vocabCards.length,

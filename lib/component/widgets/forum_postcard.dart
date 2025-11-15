@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 
 class ForumPostCard extends StatelessWidget {
+  final String id;
+  final String fullName;
+  final String level;
+  final int streakDay;
+  final String date;
+  final String title;
+  final String content;
+  final int likes;
+  final String category;
   final VoidCallback? onTap;
-  const ForumPostCard({super.key, this.onTap});
+
+  const ForumPostCard({
+    super.key,
+    this.onTap,
+    required this.id,
+    required this.fullName,
+    required this.level,
+    required this.streakDay,
+    required this.date,
+    required this.title,
+    required this.content,
+    required this.likes,
+    required this.category,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +69,8 @@ class ForumPostCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Text(
-                          "David Ngo",
+                         Text(
+                          fullName ?? '',
                           style: TextStyle(
                             color: Colors.black87,
                             fontSize: 20,
@@ -68,8 +90,8 @@ class ForumPostCard extends StatelessWidget {
                               width: 1,
                             ),
                           ),
-                          child: const Text(
-                            "Advanced",
+                          child: Text(
+                            level ?? '',
                             style: TextStyle(
                               fontSize: 14,
                               color: Color(0xFF22C55E),
@@ -86,7 +108,7 @@ class ForumPostCard extends StatelessWidget {
                             size: 20, color: Colors.orange),
                         const SizedBox(width: 4),
                         Text(
-                          "32-day streak",
+                          "${streakDay}-day streak",
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.grey.shade700,
@@ -97,7 +119,7 @@ class ForumPostCard extends StatelessWidget {
                             size: 20, color: Colors.blueGrey),
                         const SizedBox(width: 4),
                         Text(
-                          "2h ago",
+                          date.split(' ')[0] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.grey.shade700,
@@ -113,8 +135,8 @@ class ForumPostCard extends StatelessWidget {
             const SizedBox(height: 20),
       
             // 📝 Title + Content
-            const Text(
-              "Best strategies for learning business English?",
+            Text(
+              title ?? '',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -124,7 +146,7 @@ class ForumPostCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              "I'm preparing for a job interview and need to improve my business vocabulary. What are your favorite resources?",
+              content??'',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey.shade800,
@@ -143,11 +165,11 @@ class ForumPostCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.favorite_border,
-                        size: 24, color: Colors.grey.shade700),
+                        size: 28, color: Colors.grey.shade700),
                     const SizedBox(width: 6),
-                    Text("32",
+                    Text("${likes}",
                         style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade800)),
+                            fontSize: 18, color: Colors.grey.shade800)),
                   ],
                 ),
       
@@ -155,30 +177,30 @@ class ForumPostCard extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.mode_comment_outlined,
-                        size: 24, color: Colors.grey.shade700),
+                        size: 28, color: Colors.grey.shade700),
                     const SizedBox(width: 6),
                     Text("6",
                         style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade800)),
+                            fontSize: 18, color: Colors.grey.shade800)),
                   ],
                 ),
       
                 // 🔄 Share
                 Icon(Icons.share_outlined,
-                    size: 24, color: Colors.grey.shade700),
+                    size: 28, color: Colors.grey.shade700),
       
                 // 🏷️ Tag
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEEF2FF),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    "Business",
+                  child: Text(
+                    category ?? '',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 17,
                       color: Color(0xFF565563),
                       fontWeight: FontWeight.w600,
                     ),

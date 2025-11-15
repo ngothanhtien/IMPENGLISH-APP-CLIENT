@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/audio/custom_audio_widget.dart';
 import 'package:learning_app_client/component/record/CustomRecord.dart';
-import 'package:learning_app_client/model/flash_card.dart';
+import 'package:learning_app_client/model/vocabulary/flash_card.dart';
+import 'package:learning_app_client/model/vocabulary/vocab_detail.dart';
+import 'package:learning_app_client/service/vocabularyService.dart';
 
 class DetailPracticeScreen extends StatefulWidget {
-  final IVocabBrief vocab;
+  final String vocab_id;
 
-  const DetailPracticeScreen({super.key, required this.vocab});
+  const DetailPracticeScreen({super.key, required this.vocab_id});
 
   @override
   State<StatefulWidget> createState() => _DetailPracticeScreen();
@@ -18,7 +20,20 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   int _currentStep = 0;
+  bool _isloading = true;
   bool _isRecorded = false;
+  IVocabDetail? vocab;
+
+  Future<IVocabDetail> fetchDetailVocab() async {
+    try {
+      final vocabDetail =
+      await vocabService().fetchVocabDetail(id: widget.vocab_id);
+
+      return vocabDetail.detail!;
+    } catch (e) {
+      throw Exception("Failed fetch detail vocab: $e");
+    }
+  }
 
   @override
   void initState() {
@@ -31,6 +46,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
+    fetchDetailVocab();
   }
 
   @override
@@ -88,48 +104,57 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
         ],
       ),
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom
+      body: FutureBuilder<IVocabDetail>(
+        future: fetchDetailVocab(),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return const Center(child: CircularProgressIndicator(),);
+          }
+          if(snapshot.hasError){
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: TextStyle(color: Colors.red),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Progress indicator
-                    _buildProgressIndicator(),
-                    const SizedBox(height: 24),
-
-                    // Main vocabulary card
-                    _buildVocabularyCard(),
-                    const SizedBox(height: 24),
-
-                    // Word details section
-                    _buildWordDetails(),
-                    const SizedBox(height: 24),
-
-                    // Practice steps
-                    _buildPracticeSteps(),
-                    const SizedBox(height: 24),
-
-                    // Record section
-                    _buildRecordSection(),
-                    const SizedBox(height: 24),
-
-                    // Action buttons
-                    _buildActionButtons(),
-                  ],
+            );
+          }
+          if(!snapshot.hasData) {
+            return const Center(child: Text("No data"),);
+          }
+          final vocab = snapshot.data!;
+          return SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProgressIndicator(),
+                        const SizedBox(height: 24),
+                        _buildVocabularyCard(vocab),
+                        const SizedBox(height: 24),
+                        _buildWordDetails(vocab),
+                        const SizedBox(height: 24),
+                        _buildPracticeSteps(),
+                        const SizedBox(height: 24),
+                        _buildRecordSection(),
+                        const SizedBox(height: 24),
+                        _buildActionButtons(),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
+          );
+        }
+      )
     );
   }
 
@@ -186,7 +211,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 const Text(
                   '3 of 5 steps completed',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     color: Color(0xFF64748B),
                   ),
                 ),
@@ -198,7 +223,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     );
   }
 
-  Widget _buildVocabularyCard() {
+  Widget _buildVocabularyCard(IVocabDetail vocab) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -230,7 +255,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  widget.vocab.level ?? '',
+                  vocab?.level ?? '',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -254,7 +279,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
           const SizedBox(height: 20),
           Text(
-            widget.vocab.word ?? '',
+            vocab?.word ?? '',
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w700,
@@ -264,7 +289,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
           const SizedBox(height: 12),
           Text(
-            widget.vocab.pronunciation ?? '',
+            vocab?.phonetics?[0].text ?? '',
             style: TextStyle(
               fontSize: 18,
               color: Colors.white.withOpacity(0.9),
@@ -281,7 +306,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               borderRadius: BorderRadius.circular(16),
             ),
             child: AudioPlayerWidget(
-              url: widget.vocab.audio ?? '',
+              url: vocab?.phonetics?[0].audio ?? '',
               inactiveColor: Colors.white.withOpacity(0.3),
             ),
           ),
@@ -290,7 +315,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     );
   }
 
-  Widget _buildWordDetails() {
+  Widget _buildWordDetails(IVocabDetail vocab) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -333,13 +358,73 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            widget.vocab.definition ?? '',
-            style: TextStyle(
-              fontSize: 17,
-              color: Color(0xFF475569),
-              height: 1.5
-            ),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: "Meaning: ",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: const Color(0xFF475569),
+                      fontWeight: FontWeight.w600
+                    )
+                ),
+                TextSpan(text: '"${vocab?.meanings?[0].definitions?[0].definition ?? ''}"',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF64748B),
+                    fontStyle: FontStyle.italic,
+                    height: 1.5,
+                    letterSpacing: -0.2,
+                  )
+                ),
+              ]
+            )
+          ),
+          const SizedBox(height: 12),
+          RichText(
+            text: TextSpan(
+                children: [
+                  TextSpan(text: "MeaningVN: ",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: const Color(0xFF475569),
+                        fontWeight: FontWeight.w600
+                      )
+                  ),
+                  TextSpan(text: '"${vocab?.meaningVN ?? ''}"',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xFF64748B),
+                      fontStyle: FontStyle.italic,
+                      height: 1.5,
+                      letterSpacing: -0.2,
+                    )
+                  ),
+                ]
+            )
+          ),
+          const SizedBox(height: 12),
+          RichText(
+              text: TextSpan(
+                  children: [
+                    TextSpan(text: "Part Of Speech: ",
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: const Color(0xFF475569),
+                            fontWeight: FontWeight.w600
+                        )
+                    ),
+                    TextSpan(text: '${vocab?.meanings?[0].partOfSpeech?? ''}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Color(0xFF64748B),
+                          fontStyle: FontStyle.italic,
+                          height: 1.5,
+                          letterSpacing: -0.2,
+                        )
+                    ),
+                  ]
+              )
           ),
           const SizedBox(height: 16),
           Container(
@@ -358,12 +443,12 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF475569),
+                    color: const Color(0xFF475569),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '"${widget.vocab.example ?? ''}"',
+                  '"${vocab?.meanings?[0].definitions?[0].example ?? ''}"',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

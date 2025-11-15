@@ -155,8 +155,8 @@ final GoRouter _router = GoRouter(
           path: '/practice',
           builder: (context,state) {
             final data = state.extra as Map<String,dynamic>;
-            final vocab = data['vocab'];
-            return DetailPracticeScreen(vocab: vocab,);
+            final vocab_id = data['vocab_id'];
+            return DetailPracticeScreen(vocab_id: vocab_id,);
           }
       ),
       GoRoute(

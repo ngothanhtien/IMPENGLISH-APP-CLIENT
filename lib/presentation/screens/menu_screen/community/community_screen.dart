@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/forum_postcard.dart';
+import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/community/leader_board_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/community/post_detail_screen.dart';
+import 'package:learning_app_client/service/postService.dart';
 
 class Community_Screen extends StatefulWidget {
   @override
@@ -14,6 +16,19 @@ class _Community_Screen extends State<Community_Screen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
+  List<Post> posts = [];
+
+  Future<void> getListPost() async {
+    try{
+      final response = await postService().fetchPosts();
+      setState(() {
+        posts = response;
+        print(posts.map((m) => m.id));
+      });
+    }catch(e){
+      debugPrint("$e");
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -25,6 +40,7 @@ class _Community_Screen extends State<Community_Screen>
         });
       }
     });
+    getListPost();
   }
   Widget _buildAnimatedTabContent(Widget child) {
     // hiệu ứng fade + slide nhẹ
@@ -140,13 +156,23 @@ class _Community_Screen extends State<Community_Screen>
                             bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
                           child: Column(
-                            children: List.generate(5, (index){
+                            children: List.generate(posts.length, (index){
+                              final post = posts[index];
                               return ForumPostCard(
+                                id: post.id ?? '',
+                                fullName: post.userId!.fullName ?? '',
+                                title: post.title ?? '',
+                                level: post.userId!.level ?? '',
+                                content: post.content ?? '',
+                                category: post.category ?? '',
+                                date: post.createdAt.toString() ?? '',
+                                likes: post.countLike ?? 0,
+                                streakDay: post.userId!.streakDay ?? 0,
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => const PostDetailScreen(),
+                                      builder: (_) => PostDetailScreen(post_id: post.id.toString(),),
                                     ),
                                   );
                                 },

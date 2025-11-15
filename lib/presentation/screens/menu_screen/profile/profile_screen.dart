@@ -368,17 +368,23 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Row(
             children: [
-              Icon(Icons.logout, color: Color(0xFFEF4444), size: 28),
+              Icon(Icons.logout, color: Color(0xFF373636), size: 28),
               SizedBox(width: 12),
-              Text('Logout'),
+              Text('Logout',style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700),),
             ],
           ),
-          content: const Text('Are you sure you want to logout?'),
+          content: const Text('Are you sure you want to logout?',
+            style: TextStyle(
+              fontSize: 17,
+              color: Colors.black87
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

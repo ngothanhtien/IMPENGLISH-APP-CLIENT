@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/audio/custom_audio_widget.dart';
-import 'package:learning_app_client/model/flash_card.dart';
+import 'package:learning_app_client/model/vocabulary/flash_card.dart';
 
 class VocabularyCard extends StatelessWidget {
   final IVocabBrief vocabularyWord;
@@ -93,19 +93,20 @@ class VocabularyCard extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(text: "Meaning: ",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[600]
-                              )
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: const Color(0xFF475569),
+                              fontWeight: FontWeight.w600
+                            )
                           ),
                           TextSpan(text: '"${vocabularyWord.definition ?? ''}"',
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: const Color(0xFF4F46E5),
-                                height: 1.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.2
-                              )
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: Color(0xFF64748B),
+                              fontStyle: FontStyle.italic,
+                              height: 1.5,
+                              letterSpacing: -0.2,
+                            )
                           ),
                         ]
                       )
@@ -117,14 +118,17 @@ class VocabularyCard extends StatelessWidget {
                           TextSpan(text: "Part Of Speech: ",
                             style: TextStyle(
                                 fontSize: 17,
-                                color: Colors.grey[600]
+                                color: const Color(0xFF475569),
+                                fontWeight: FontWeight.w600
                             )
                           ),
                           TextSpan(text: '${vocabularyWord.partOfSpeech ?? ''}',
                             style: TextStyle(
-                                fontSize: 18,
-                                color: const Color(0xFF4F46E5),
-                                fontWeight: FontWeight.w700,
+                              fontSize: 17,
+                              color: Color(0xFF64748B),
+                              fontStyle: FontStyle.italic,
+                              height: 1.5,
+                              letterSpacing: -0.2,
                             )
                           ),
                         ]
@@ -140,7 +144,7 @@ class VocabularyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: ()=> context.push('/practice',extra: {'vocab': vocabularyWord}),
+                  onPressed: ()=> context.push('/practice',extra: {'vocab_id': vocabularyWord.id.toString()}),
                   icon: const Icon(Icons.edit, size: 24,color: Colors.white,),
                   label: const Text('Practice',
                     style: TextStyle(

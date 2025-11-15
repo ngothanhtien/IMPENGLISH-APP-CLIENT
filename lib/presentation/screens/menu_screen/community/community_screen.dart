@@ -168,14 +168,7 @@ class _Community_Screen extends State<Community_Screen>
                                 date: post.createdAt.toString() ?? '',
                                 likes: post.countLike ?? 0,
                                 streakDay: post.userId!.streakDay ?? 0,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => PostDetailScreen(post_id: post.id.toString(),),
-                                    ),
-                                  );
-                                },
+                                onTap: ()=> context.push("/posts/detail/${post.id.toString()}"),
                               );
                             }),
                           )

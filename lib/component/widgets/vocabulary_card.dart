@@ -144,7 +144,7 @@ class VocabularyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: ()=> context.push('/practice',extra: {'vocab_id': vocabularyWord.id.toString()}),
+                  onPressed: ()=> context.push('/learning/practice/${vocabularyWord.id.toString()}'),
                   icon: const Icon(Icons.edit, size: 24,color: Colors.white,),
                   label: const Text('Practice',
                     style: TextStyle(

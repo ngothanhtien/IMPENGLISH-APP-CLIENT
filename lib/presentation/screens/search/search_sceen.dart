@@ -1,3 +1,6 @@
+
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/recent_search.dart';
@@ -20,7 +23,7 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
 
   bool _isSearching = false;
   String _searchQuery = '';
-
+  Timer? _debounce;
   @override
   void initState() {
     super.initState();
@@ -45,6 +48,7 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
   void dispose() {
     _animationController.dispose();
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -52,6 +56,15 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
     setState(() {
       _searchQuery = query;
       _isSearching = query.isNotEmpty;
+    });
+    if(_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), (){
+      if(query.isNotEmpty){
+        setState(() {
+
+        });
+      }
     });
   }
 

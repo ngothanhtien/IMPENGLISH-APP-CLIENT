@@ -29,10 +29,15 @@ class SearchInputField extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            color: Color(0xFF64748B),
-            size: 28,
+          GestureDetector(
+            onTap: (){
+
+            },
+            child: Icon(
+              Icons.search,
+              color: Color(0xFF64748B),
+              size: 28,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

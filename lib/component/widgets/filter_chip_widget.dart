@@ -23,13 +23,13 @@ class FilterChipWidget extends StatelessWidget {
           onTap: () => onSelected(option),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding:  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding:  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
                 color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
-                width: 2.2,
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
@@ -44,7 +44,7 @@ class FilterChipWidget extends StatelessWidget {
               style: TextStyle(
                 color: isSelected ? Colors.white : const Color(0xFF64748B),
                 fontWeight: isSelected ? FontWeight.w900: FontWeight.w700,
-                fontSize: isSelected ? 18 : 16,
+                fontSize: isSelected ? 16 : 14,
               ),
             ),
           ),

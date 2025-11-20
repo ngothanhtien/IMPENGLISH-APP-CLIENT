@@ -17,7 +17,7 @@ class QuizDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -33,8 +33,8 @@ class QuizDetailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 45,
-            height: 45,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -42,14 +42,14 @@ class QuizDetailCard extends StatelessWidget {
             child: Icon(
               icon,
               color: color,
-              size: 30,
+              size: 24,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,
             ),
@@ -58,7 +58,7 @@ class QuizDetailCard extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: Color(0xFF1E293B),
             ),

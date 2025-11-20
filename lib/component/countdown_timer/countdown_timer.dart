@@ -45,10 +45,10 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          strokeWidth: 6,
+          strokeWidth: 4,
           strokeCap: StrokeCap.round,
           textStyle: TextStyle(
-            fontSize: 18,
+            fontSize: 15,
             color: Colors.grey.shade600,
             fontWeight: FontWeight.bold,
           ),

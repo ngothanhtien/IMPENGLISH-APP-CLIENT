@@ -239,10 +239,10 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
           ),
           title: const Row(
             children: [
-              Icon(Icons.close, color: Color(0xFF4F46E5), size: 28),
+              Icon(Icons.close, color: Color(0xFF4F46E5), size: 24),
               SizedBox(width: 12),
               Text('Exit Quiz?',style: TextStyle(fontWeight: FontWeight.w700,
-              color: Color(0xFF4F46E5)
+              color: Color(0xFF4F46E5),fontSize: 18
               ),),
             ],
           ),
@@ -250,7 +250,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
             'Do you really want to get out of the Quiz?',
             style: TextStyle(
                 letterSpacing: -0.2,
-                fontSize: 17,
+                fontSize: 15,
                 height: 1.5
             ),
           ),
@@ -259,7 +259,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
               onPressed: () => context.pop(),
               child: const Text('Cancel',
                 style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.black54
                 ),
               ),
@@ -273,9 +273,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                 backgroundColor: const Color(0xFF4F46E5),
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Yes',
+              child: const Text('Confirm',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700
                 ),
               ),
@@ -326,7 +326,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
               title: Text(
                 'Quiz in ${widget.category} - Level: ${widget.level}',
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                   letterSpacing: -0.5
@@ -334,7 +334,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
               ),
               centerTitle: true,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
                 onPressed: _showDialogCancel,
               ),
             ),
@@ -344,8 +344,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 30,
+                      vertical: 12,
+                      horizontal: 8,
                     ),
                     child: Column(
                       children: [
@@ -353,11 +353,12 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                             ? CountdownTimerWidget(
                           minutes: timePractice,
                           onComplete: () => _showDialogTimeOut(questions),
+                          size: 60,
                         )
                             : const Text(
                           "Don't limit time",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.red,
                             fontWeight: FontWeight.w700,
                           ),
@@ -369,15 +370,16 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                             Text(
                               'Question ${currentQuestionIndex + 1} of ${questions.length}',
                               style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                                 color: Color(0xFF374151),
+                                height: 1.5
                               ),
                             ),
                             Text(
                               '${(progress * 100).toInt()}%',
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF6366F1),
                               ),
@@ -393,7 +395,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                   // 🧠 Question Section
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: AnimatedBuilder(
                         animation: _cardFlipAnimation,
                         builder: (context, child) {
@@ -443,14 +445,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                     child: SafeArea(
                       child: SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: (isAnswerSelected && !_isAnimating)
                               ? () => _nextQuestion(questions)
                               : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isAnswerSelected
-                                ? const Color(0xFF6366F1)
+                                ? const Color(0xFF4F46E5)
                                 : Colors.grey[300],
                             foregroundColor: isAnswerSelected
                                 ? Colors.white
@@ -468,7 +470,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                                     ? 'Finish Quiz'
                                     : 'Next Question',
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

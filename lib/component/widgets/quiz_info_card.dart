@@ -17,7 +17,7 @@ class QuizInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF4F46E5),
         borderRadius: BorderRadius.circular(24),
@@ -35,8 +35,8 @@ class QuizInfoCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
@@ -52,7 +52,7 @@ class QuizInfoCard extends StatelessWidget {
                 child: Text(
                   'Quiz Information',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -60,18 +60,18 @@ class QuizInfoCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           Text(
             _getQuizDescription(),
             style: TextStyle(
-              fontSize: 17,
+              fontSize: 16,
               color: Colors.white.withOpacity(0.9),
               fontWeight: FontWeight.w400,
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // Quick stats
           Row(
@@ -100,7 +100,7 @@ class QuizInfoCard extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: Colors.white.withOpacity(0.8),
             fontWeight: FontWeight.w500,
           ),

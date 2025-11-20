@@ -57,7 +57,7 @@ class _LearnScreen extends State<LearnScreen>{
         backgroundColor: const Color(0xFF4F46E5),
         title: Text("Vocabulary & Progress",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5
@@ -65,7 +65,7 @@ class _LearnScreen extends State<LearnScreen>{
         ),
         leading: IconButton(
             onPressed: () => context.go('/home'),
-            icon: Icon(Icons.arrow_back,size: 28,color: Colors.white,)
+            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
@@ -81,24 +81,25 @@ class _LearnScreen extends State<LearnScreen>{
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 12,),
               Text("Current Progress",
                 style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black
                 ),
               ),
               SizedBox(height: 12,),
               const LearningProgressChart(),
               SizedBox(height: 20,),
-              Text("Vocabulary Cards",
+              Text("New Vocabulary",
                 style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black
                 ),
               ),

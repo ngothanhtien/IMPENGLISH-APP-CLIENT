@@ -53,6 +53,7 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
   }
 
   void _onSearchChanged(String query) {
+    if(query.trim().isEmpty) query = '';
     setState(() {
       _searchQuery = query;
       _isSearching = query.isNotEmpty;
@@ -87,14 +88,14 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
             children: [
               // Search Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   children: [
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Container(
-                        width: 40,
-                        height: 40,
+                        width: 35,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -108,12 +109,12 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
                         ),
                         child: const Icon(
                           Icons.arrow_back_ios_new,
-                          size: 20,
+                          size: 16,
                           color: Color(0xFF64748B),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: SearchInputField(
                         controller: _searchController,
@@ -130,14 +131,14 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
                 child: _isSearching
                     ? SearchResults(query: _searchQuery)
                     : const SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RecentSearches(),
-                      SizedBox(height: 32),
+                      SizedBox(height: 12),
                       SuggestedCategories(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 24),
                     ],
                   ),
                 ),

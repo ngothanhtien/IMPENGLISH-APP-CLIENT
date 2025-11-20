@@ -47,9 +47,9 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
           ),
           strokeWidth: 6,
           strokeCap: StrokeCap.round,
-          textStyle: const TextStyle(
-            fontSize: 20,
-            color: Colors.black87,
+          textStyle: TextStyle(
+            fontSize: 18,
+            color: Colors.grey.shade600,
             fontWeight: FontWeight.bold,
           ),
           textFormat: CountdownTextFormat.MM_SS,

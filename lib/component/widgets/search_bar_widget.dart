@@ -13,7 +13,7 @@ class SearchBarWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -32,12 +32,12 @@ class SearchBarWidget extends StatelessWidget {
               color: Colors.grey[400],
               size: 24,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Search vocabulary or topic...',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   color: Colors.grey[500],
                   fontWeight: FontWeight.w500,
                 ),

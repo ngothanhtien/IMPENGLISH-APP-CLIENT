@@ -43,14 +43,14 @@ class AchievementScreen extends StatelessWidget {
           "Achievements",
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 24,
+            fontSize: 18,
             color: Colors.white,
             letterSpacing: -0.5,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
           style: IconButton.styleFrom(
             padding: const EdgeInsets.all(8),
             backgroundColor: Colors.white.withOpacity(0.3),
@@ -63,7 +63,7 @@ class AchievementScreen extends StatelessWidget {
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.emoji_events, color: Colors.amber, size: 40),
+            child: Icon(Icons.emoji_events, color: Colors.amber, size: 32),
           ),
         ],
       ),
@@ -73,7 +73,7 @@ class AchievementScreen extends StatelessWidget {
           children: [
             // --- Tổng quan ---
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
@@ -120,12 +120,12 @@ class AchievementScreen extends StatelessWidget {
   Widget _buildStat(String title, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 40),
+        Icon(icon, color: Colors.white, size: 24),
         const SizedBox(height: 12),
         Text(
           value,
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -133,7 +133,7 @@ class AchievementScreen extends StatelessWidget {
         SizedBox(height: 8,),
         Text(
           title,
-          style: const TextStyle(fontSize: 15, color: Colors.white70),
+          style: const TextStyle(fontSize: 14, color: Colors.white70),
         ),
       ],
     );
@@ -157,13 +157,13 @@ class AchievementScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
               color: item['color'].withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(item['icon'], color: item['color'], size: 32),
+            child: Icon(item['icon'], color: item['color'], size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -173,7 +173,7 @@ class AchievementScreen extends StatelessWidget {
                 Text(
                   item['title'],
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
@@ -182,7 +182,7 @@ class AchievementScreen extends StatelessWidget {
                 Text(
                   item['description'],
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     color: Colors.black54,
                   ),
                 ),

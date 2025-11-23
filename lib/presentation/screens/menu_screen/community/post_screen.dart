@@ -66,14 +66,14 @@ class _Post_Screen extends State<Post_Screen>{
         backgroundColor: const Color(0xFF4F46E5),
         title: Text("Create Post",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
             color: Colors.white
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
           onPressed: ()=> context.pop(),
         ),
         actions: [
@@ -87,7 +87,7 @@ class _Post_Screen extends State<Post_Screen>{
             ),
             child: Text("Publish",
               style: TextStyle(
-                fontSize: 17,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.white
               ),
@@ -103,7 +103,7 @@ class _Post_Screen extends State<Post_Screen>{
             bottom: MediaQuery.of(context).viewInsets.bottom
           ),
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -113,7 +113,7 @@ class _Post_Screen extends State<Post_Screen>{
                   controller: titleController,
                   isPassword: false,
                   titleColor: const Color(0xFF1E293B),
-                  titleSize: 20,
+                  titleSize: 16,
                   prefixIcon: Icons.title,
                 ),
                 SizedBox(height: 5,),
@@ -123,14 +123,14 @@ class _Post_Screen extends State<Post_Screen>{
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       color: Colors.grey.shade800,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                  ),
-                SizedBox(height: 20,),
+                SizedBox(height: 12,),
                 const Text("Category",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     color: Color(0xFF1E293B),
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.2
@@ -148,7 +148,7 @@ class _Post_Screen extends State<Post_Screen>{
                 SizedBox(height: 20,),
                 const Text("Content",
                   style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       color: Color(0xFF1E293B),
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.2
@@ -172,7 +172,7 @@ class _Post_Screen extends State<Post_Screen>{
                     maxLines: null,
                     minLines: null,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       color: Colors.black
                     ),
                     controller: contentController,
@@ -191,7 +191,7 @@ class _Post_Screen extends State<Post_Screen>{
                       ),
                       hintStyle: const TextStyle(
                         color: Color(0xFF858597),
-                        fontSize: 18,
+                        fontSize: 15,
                       ),
                     ),
                   ),
@@ -203,7 +203,7 @@ class _Post_Screen extends State<Post_Screen>{
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       color: Colors.grey.shade800,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -218,14 +218,14 @@ class _Post_Screen extends State<Post_Screen>{
                         controller: tagController,
                         isPassword: false,
                         titleColor: const Color(0xFF1E293B),
-                        titleSize: 20,
+                        titleSize: 16,
                         prefixIcon: Icons.tag,
                       ),
                     ),
                     SizedBox(width: 10,),
                     SizedBox(
-                      height: 68,
-                      width: 80,
+                      height: 55,
+                      width: 65,
                       child: ElevatedButton(
                         onPressed: (){
                           if(listTag.length > 5){
@@ -248,7 +248,7 @@ class _Post_Screen extends State<Post_Screen>{
                         ),
                         child: Text("Add",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             color: Colors.white,
                             fontWeight: FontWeight.w600
                           ),
@@ -276,7 +276,7 @@ class _Post_Screen extends State<Post_Screen>{
                         children: [
                           Text('#${tag}',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 13,
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500
                             ),
@@ -297,7 +297,7 @@ class _Post_Screen extends State<Post_Screen>{
                 ),
                 SizedBox(height: 20,),
                 Container(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(12),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -316,7 +316,7 @@ class _Post_Screen extends State<Post_Screen>{
                     children: [
                       const Text("Add to your post",
                         style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 16,
                             color: Color(0xFF1E293B),
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.2
@@ -332,10 +332,10 @@ class _Post_Screen extends State<Post_Screen>{
                                 borderRadius: BorderRadius.circular(12)
                               ),
                               child: ListTile(
-                                leading: Icon(Icons.image,size: 32,),
+                                leading: Icon(Icons.image,size: 24,),
                                 title: Text("Image",
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: Colors.black54,
                                     fontWeight: FontWeight.w700
                                   ),
@@ -351,10 +351,10 @@ class _Post_Screen extends State<Post_Screen>{
                                     borderRadius: BorderRadius.circular(12)
                                 ),
                                 child: ListTile(
-                                  leading: Icon(Icons.link,size: 32,),
+                                  leading: Icon(Icons.link,size: 24,),
                                   title: Text("Link",
                                     style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 14,
                                         color: Colors.black54,
                                         fontWeight: FontWeight.w700
                                     ),
@@ -367,7 +367,7 @@ class _Post_Screen extends State<Post_Screen>{
                       SizedBox(height: 20,),
                       Text("Comming soon!",
                         style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             color: Colors.black54,
                         ),
                       ),

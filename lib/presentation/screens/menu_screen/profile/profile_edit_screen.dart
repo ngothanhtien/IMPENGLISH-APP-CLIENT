@@ -109,12 +109,12 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
           ),
         ),
-        icon: const Icon(Icons.arrow_back, size: 24, color: Colors.white,),
+        icon: const Icon(Icons.arrow_back, size: 22, color: Colors.white,),
       ),
       title: const Text(
         'Edit Profile',
         style: TextStyle(
-          fontSize: 24,
+          fontSize: 18,
           fontWeight: FontWeight.w700,
           color: Colors.white,
           letterSpacing: -0.2
@@ -137,24 +137,25 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         children: [
           _buildProfileHeader(),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(8),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 12),
                   _buildSectionTitle('Personal Information'),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _buildPersonalInfoSection(),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Contact Information'),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _buildContactInfoSection(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   _buildPasswordSection(),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 12),
                   _buildSaveButton(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -184,7 +185,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 // Handle image upload
               },
               child: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF667EEA),
                   shape: BoxShape.circle,
@@ -200,13 +201,13 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 child: const Icon(
                   Icons.camera_alt,
                   color: Colors.white,
-                  size: 18,
+                  size: 16,
                 ),
               ),
             ),
             child: Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(
@@ -226,7 +227,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 child: Text(
                   'JD',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -238,7 +239,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           const Text(
             'Change Profile Picture',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF667EEA),
             ),
@@ -252,8 +253,8 @@ class _EditProfileScreen extends State<EditProfileScreen> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
         color: Color(0xFF1E293B),
       ),
     );
@@ -378,7 +379,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
               label: Text(
                 _isChangePassword ? 'Cancel' : 'Change Password',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF667EEA),
                 ),
@@ -386,7 +387,6 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -471,7 +471,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             ),
           )
               : Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -506,7 +506,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                         'Password is secure',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: Color(0xFF1E293B),
                         ),
                       ),
@@ -532,7 +532,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   Widget _buildSaveButton() {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 55,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _saveProfile,
         style: ElevatedButton.styleFrom(
@@ -547,12 +547,12 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.save_outlined, size: 24),
+            Icon(Icons.save_outlined, size: 22),
             SizedBox(width: 12),
             Text(
               'Save Changes',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -625,7 +625,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -640,7 +640,7 @@ class CustomTextField extends StatelessWidget {
             child: Icon(
               icon,
               color: enabled ? const Color(0xFF667EEA) : const Color(0xFF94A3B8),
-              size: 26,
+              size: 22,
             ),
           ),
           const SizedBox(width: 16),
@@ -651,7 +651,7 @@ class CustomTextField extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: enabled ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                     letterSpacing: 0.5
@@ -666,7 +666,7 @@ class CustomTextField extends StatelessWidget {
                   keyboardType: keyboardType,
                   maxLines: maxLines,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: enabled ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
                   ),
@@ -676,7 +676,7 @@ class CustomTextField extends StatelessWidget {
                     border: InputBorder.none,
                     hintText: 'Enter $label',
                     hintStyle: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       color: Color(0xFFB7BFC8),
                     ),
                     suffixIcon: suffixIcon != null
@@ -684,7 +684,7 @@ class CustomTextField extends StatelessWidget {
                       icon: Icon(
                         suffixIcon,
                         color: const Color(0xFF94A3B8),
-                        size: 22,
+                        size: 20,
                       ),
                       onPressed: enabled ? onSuffixIconTap : null,
                     ) : null,

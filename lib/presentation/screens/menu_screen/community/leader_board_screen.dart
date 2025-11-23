@@ -57,17 +57,16 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
           children: [
             /// 🧠 Summary cards
             Row(
-              spacing: 20,
+              spacing: 6,
               children: [
                 Expanded(
                   child: ProfileCard(
                     title: '2.4K',
-                    value: 'Active Learners',
+                    value: 'Learners',
                     icon: Icons.group,
                     color: const Color(0xFF11AFE8),
-                    spacing: 30,
-                    titleSize: 24,
-                    valueSize: 18,
+                    titleSize: 18,
+                    valueSize: 14,
                   ),
                 ),
                 Expanded(
@@ -76,9 +75,8 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                     value: 'Avg Progress',
                     icon: Icons.trending_up,
                     color: const Color(0xFF10B981),
-                    spacing: 30,
-                    titleSize: 24,
-                    valueSize: 18,
+                    titleSize: 18,
+                    valueSize: 14,
                   ),
                 ),
                 Expanded(
@@ -87,9 +85,8 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                     value: 'Top Scores',
                     icon: Icons.star_border,
                     color: const Color(0xFFCD730C),
-                    spacing: 30,
-                    titleSize: 24,
-                    valueSize: 18,
+                    titleSize: 18,
+                    valueSize: 14,
                   ),
                 ),
               ],
@@ -117,12 +114,12 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                     leading: const Icon(
                       Icons.emoji_events,
                       color: Color(0xFFF59E0B),
-                      size: 40,
+                      size: 32,
                     ),
                     title: const Text(
                       "Top Learners This Week",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.4,
                       ),
@@ -139,7 +136,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                       final item = top_learnings[index];
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 10),
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade50,
                           borderRadius: BorderRadius.circular(12),
@@ -155,8 +152,8 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                           children: [
                             /// 🥇 Top rank number
                             Container(
-                              width: 40,
-                              height: 40,
+                              width: 35,
+                              height: 35,
                               decoration: BoxDecoration(
                                 color: Colors.orange.shade100,
                                 shape: BoxShape.circle,
@@ -171,15 +168,14 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 6),
 
                             /// 👤 Avatar
                             CircleAvatar(
                               radius: 28,
                               backgroundImage: NetworkImage(item['avatar']),
                             ),
-                            const SizedBox(width: 16),
-
+                            const SizedBox(width: 6),
                             /// 🧩 Info
                             Expanded(
                               child: Column(
@@ -188,7 +184,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                   Text(
                                     item['fullname'],
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: -0.1
                                     ),
@@ -203,8 +199,8 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                     child: Text(
                                       item['level'],
                                       style: TextStyle(
-                                        color: Colors.grey.shade800,
-                                        fontSize: 15,
+                                        color: const Color(0xFF525E71),
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w500
                                       ),
                                     ),
@@ -220,13 +216,14 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                 Row(
                                   children: [
                                     const Icon(Icons.local_fire_department,
-                                        color: Colors.deepOrange, size: 20),
+                                        color: Colors.deepOrange, size: 18),
                                     const SizedBox(width: 4),
                                     Text("${item['streak']} day streak",
                                       style: const TextStyle(
-                                        fontSize: 17,
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w700
+                                        fontSize: 13,
+                                        color: const Color(0xFF525E71),
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.5
                                       )
                                     ),
                                   ],
@@ -235,11 +232,11 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                 Row(
                                   children: [
                                     const Icon(Icons.star,
-                                        color: Colors.amber, size: 22),
+                                        color: Colors.amber, size: 18),
                                     const SizedBox(width: 4),
                                     Text("${item['exp']} XP",
                                       style: const TextStyle(
-                                        fontSize: 17,
+                                        fontSize: 13,
                                         color: Colors.black87,
                                         fontWeight: FontWeight.w700
                                       )

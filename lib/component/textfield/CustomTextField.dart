@@ -51,7 +51,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, size: 22)
+                ? Icon(widget.prefixIcon, size: 20)
                 : null,
             // thêm suffixIcon nếu là password
             suffixIcon: widget.isPassword

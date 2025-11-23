@@ -30,7 +30,7 @@ class AppSnackBar {
                   message,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 3,

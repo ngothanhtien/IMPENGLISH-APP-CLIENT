@@ -185,7 +185,7 @@ class _LoginScreen extends State<LoginScreen> {
                                       fontWeight: FontWeight.w800
                                     ),
                                   recognizer: TapGestureRecognizer()
-                                    ..onTap = () => context.go('/register')
+                                    ..onTap = () => context.push('/register')
                                 )
                               ]
                           )

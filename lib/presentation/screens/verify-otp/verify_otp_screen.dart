@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learning_app_client/component/countdown_timer/countdown_timer.dart';
 import 'package:learning_app_client/component/otp-verify/custom_otp_field.dart';
 import 'package:learning_app_client/service/userService.dart';
 import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
@@ -69,31 +70,41 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        actionsPadding: EdgeInsets.symmetric(vertical: 20),
         title: Text("Verify OTP",
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w800,
-            fontSize: 30
+            fontWeight: FontWeight.w700,
+            fontSize: 18
         ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color(0xFF4F46E5),
         leading: GestureDetector(
-          onTap: () => context.go('/register'),
-          child: Icon(Icons.cancel,size: 35,color: Colors.white,),
+          onTap: () => context.pop(),
+          child: Icon(Icons.cancel,size: 24,color: Colors.white,),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+        padding: const EdgeInsets.all(8),
         child: Stack(
           children: [
             Column(
               children: [
+                SizedBox(height: 12,),
+                CountdownTimerWidget(
+                  minutes: 1,
+                  onComplete: () => AppSnackBar.showError(context,"Time is up"),
+                  size: 60,
+                ),
+                const SizedBox(height: 24),
                 const Text(
                   "Enter the 6-digit code sent to your email",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 21, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    height: 1.5
+                  ),
                 ),
                 const SizedBox(height: 30),
                 /// OTP Input
@@ -110,15 +121,15 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     });
                   },
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
                 /// Verify Button
                 SizedBox(
                   width: double.infinity,
-                  height: 75,
+                  height: 55,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _verifyOtp,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: const Color(0xFF4F46E5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -136,31 +147,31 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     :
                     const Text(
                       "Verify and Create Account",
-                      style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold,color: Colors.white),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 const Text("Code will expire in 1 minute",
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      fontSize: 21,
+                      fontSize: 14,
                       color: Colors.black54,
                       fontStyle: FontStyle.italic
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: _resendOTP,
                   child: const Text(
                     "Resend Code",
                     style: TextStyle(
-                      fontSize: 19,
-                      color: Colors.blueAccent,
+                      fontSize: 16,
+                      color: const Color(0xFF4F46E5),
                       decoration: TextDecoration.underline,
                       decorationStyle: TextDecorationStyle.solid,
                       decorationThickness: 2,
-                      decorationColor: Colors.blueAccent,
+                      decorationColor: const Color(0xFF4F46E5),
                     ),
                   ),
                 )

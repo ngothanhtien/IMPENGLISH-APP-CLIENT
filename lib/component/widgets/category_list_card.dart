@@ -26,8 +26,8 @@ class _CategorySelectorState extends State<CategorySelector>
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, // chia 2 hàng
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
         childAspectRatio: 3.5,
       ),
       itemCount: categories.length,
@@ -73,14 +73,14 @@ class _CategorySelectorState extends State<CategorySelector>
                 Icon(
                   item['icon'],
                   color: isSelected ? Colors.white : item['color'],
-                  size: isSelected ? 26 : 24,
+                  size: isSelected ? 18 : 16,
                 ),
                 const SizedBox(width: 10),
                 Text(
                   item['title'],
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.black87,
-                    fontSize: 18,
+                    fontSize: isSelected ? 16 : 15,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),

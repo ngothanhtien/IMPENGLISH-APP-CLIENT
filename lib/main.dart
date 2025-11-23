@@ -6,12 +6,15 @@ import 'package:learning_app_client/core/prefs.dart';
 import 'package:learning_app_client/presentation/screens/Onboarding/onboarding_start_run1.dart';
 import 'package:learning_app_client/presentation/screens/login/login_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/community/community_screen.dart';
+import 'package:learning_app_client/presentation/screens/menu_screen/community/post_detail_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/community/post_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/home/home_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/learn/detail_practice_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/learn/learn_screen.dart';
+import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_achievement.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_edit_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_screen.dart';
+import 'package:learning_app_client/presentation/screens/menu_screen/profile/profile_setting.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_detail_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_questions_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_results_screen.dart';
@@ -41,10 +44,6 @@ final GoRouter _router = GoRouter(
                     path: '/home',
                     builder: (context,state) => const HomeScreen()
                 ),
-                GoRoute(
-                    path: '/home/search',
-                    builder: (context,state) => const SearchScreen()
-                )
               ]
           ),
           StatefulShellBranch(
@@ -56,97 +55,115 @@ final GoRouter _router = GoRouter(
               ]
           ),
           StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/quiz',
-                  builder: (context,state) =>  QuizScreen()
-                ),
-                GoRoute(
-                  path: '/quiz/detail',
-                  builder: (context,state)  {
-                    final data = state.extra as Map<String,dynamic>;
-                    final level = data['level'];
-                    final category = data['category'];
-                    final questions = data['questions'];
-                    final timeLimit = data['timeLimit'];
-                    return QuizDetailScreen(
-                        level: level,
-                        category: category,
-                        questions: questions,
-                        timeLimit: timeLimit
-                    );
-                  }
-                ),
-                GoRoute(
-                  path: '/quiz/detail/practice',
-                  builder: (context,state)  {
-                    final data = state.extra as Map<String,dynamic>;
-                    final level = data['level'];
-                    final category = data['category'];
-                    final questions = data['questions'];
-                    final timeLimit = data['timeLimit'];
-                    return QuizQuestionsScreen(
-                        level: level,
-                        category: category,
-                        questions: questions,
-                        timeLimit: timeLimit
-                    );
-                  }
-                ),
-                GoRoute(
-                    path: '/quiz/detail/practice/result',
-                    builder: (context,state)  {
-                      final data = state.extra as Map<String,dynamic>;
-                      final level = data['level'];
-                      final category = data['category'];
-                      final questions = data['questions'];
-                      final timeLimit = data['timeLimit'];
-                      final userAnswers = data['userAnswers'];
-                      final quizQuestions = data['quizQuestions'];
-                      return QuizResultsScreen(
-                          level: level,
-                          category: category,
-                          questions: questions,
-                          timeLimit: timeLimit,
-                          userAnswers: userAnswers,
-                          quizQuestions: quizQuestions
-                      );
-                    }
-                ),
-              ]
+            routes: [
+              GoRoute(
+                path: '/quiz',
+                builder: (context,state) =>  QuizScreen()
+              ),
+            ]
           ),
           StatefulShellBranch(
               routes: [
                 GoRoute(
                     path: '/community',
                     builder: (context,state) =>  Community_Screen()
-                ),
-                GoRoute(
-                    path: '/community/post',
-                    builder: (context,state) =>  Post_Screen()
                 )
               ]
           ),
           StatefulShellBranch(
-              routes: [
-                GoRoute(
-                    path: '/profile',
-                    builder: (context,state) => ProfileScreen()
-                ),
-                GoRoute(
-                    path: '/edit-profile',
-                    pageBuilder: (context,state) => buildFadeTransitionPage(EditProfileScreen())
-                ),
-              ]
+            routes: [
+              GoRoute(
+                  path: '/profile',
+                  builder: (context,state) => ProfileScreen()
+              ),
+            ]
           ),
         ]
       ),
       GoRoute(
-          path: '/practice',
-          builder: (context,state) {
+          path: '/posts/detail/:id',
+          builder: (context,state){
+            final post_id = state.pathParameters['id'];
+            return PostDetailScreen(post_id: post_id.toString());
+          }
+      ),
+      GoRoute(
+          path: '/quiz/detail',
+          builder: (context,state)  {
             final data = state.extra as Map<String,dynamic>;
-            final vocab = data['vocab'];
-            return DetailPracticeScreen(vocab: vocab,);
+            final level = data['level'];
+            final category = data['category'];
+            final questions = data['questions'];
+            final timeLimit = data['timeLimit'];
+            return QuizDetailScreen(
+                level: level,
+                category: category,
+                questions: questions,
+                timeLimit: timeLimit
+            );
+          }
+      ),
+      GoRoute(
+          path: '/quiz/detail/practice',
+          builder: (context,state)  {
+            final data = state.extra as Map<String,dynamic>;
+            final level = data['level'];
+            final category = data['category'];
+            final questions = data['questions'];
+            final timeLimit = data['timeLimit'];
+            return QuizQuestionsScreen(
+                level: level,
+                category: category,
+                questions: questions,
+                timeLimit: timeLimit
+            );
+          }
+      ),
+      GoRoute(
+          path: '/quiz/detail/practice/result',
+          builder: (context,state)  {
+            final data = state.extra as Map<String,dynamic>;
+            final level = data['level'];
+            final category = data['category'];
+            final questions = data['questions'];
+            final timeLimit = data['timeLimit'];
+            final userAnswers = data['userAnswers'];
+            final quizQuestions = data['quizQuestions'];
+            return QuizResultsScreen(
+                level: level,
+                category: category,
+                questions: questions,
+                timeLimit: timeLimit,
+                userAnswers: userAnswers,
+                quizQuestions: quizQuestions
+            );
+          }
+      ),
+      GoRoute(
+          path: '/community/post',
+          builder: (context,state) =>  Post_Screen()
+      ),
+      GoRoute(
+          path: '/profile/edit-profile',
+          pageBuilder: (context,state) => buildFadeTransitionPage(EditProfileScreen())
+      ),
+      GoRoute(
+          path: '/profile/setting',
+          pageBuilder: (context,state) => buildFadeTransitionPage(SettingScreen())
+      ),
+      GoRoute(
+          path: '/profile/achievement',
+          pageBuilder: (context,state) => buildFadeTransitionPage(AchievementScreen())
+      ),
+      GoRoute(
+          path: '/home/search',
+          builder: (context,state) => const SearchScreen()
+      ),
+      GoRoute(
+          path: '/learning/practice/:id',
+          builder: (context,state) {
+            final vocab_id = state.pathParameters["id"];
+            return DetailPracticeScreen(vocab_id: vocab_id.toString(),);
           }
       ),
       GoRoute(

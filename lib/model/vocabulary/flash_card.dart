@@ -34,6 +34,7 @@ class Card_Vocabulary {
 class IVocabBrief {
   String? id;
   String? word;
+  String? meaningVN;
   String? pronunciation;
   String? audio;
   String? definition;
@@ -45,6 +46,7 @@ class IVocabBrief {
   IVocabBrief({
     this.id,
     this.word,
+    this.meaningVN,
     this.pronunciation,
     this.audio,
     this.definition,
@@ -57,6 +59,7 @@ class IVocabBrief {
   IVocabBrief.fromJson(Map<String,dynamic> json){
     id = json['id'];
     word = json['word'];
+    meaningVN = json['meaningVN'];
     pronunciation = json['pronunciation'];
     audio = json['audio'];
     definition = json['definition'];
@@ -70,6 +73,7 @@ class IVocabBrief {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = id;
     data['word'] = word;
+    data['meaningVN'] = meaningVN;
     data['pronunciation'] = pronunciation;
     data['audio'] = audio;
     data['definition'] = definition;

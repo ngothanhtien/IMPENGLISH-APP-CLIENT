@@ -4,7 +4,7 @@ import 'package:learning_app_client/component/widgets/filter_chip_widget.dart';
 import 'package:learning_app_client/component/widgets/learning_progress_chart.dart';
 import 'package:learning_app_client/component/widgets/search_input_field.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
-import 'package:learning_app_client/model/flash_card.dart';
+import 'package:learning_app_client/model/vocabulary/flash_card.dart';
 import 'package:learning_app_client/service/vocabularyService.dart';
 
 class LearnScreen extends StatefulWidget{
@@ -22,17 +22,9 @@ class _LearnScreen extends State<LearnScreen>{
   bool _isSearching = false;
   String _searchQuery = '';
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    loadVocabCard();
-    _searchController = TextEditingController();
-  }
-
   Future<void> loadVocabCard () async {
     try{
-      final result = await vocabService().fetchVocabBrief(limit: 20);
+      final result = await vocabService().fetchVocabBrief(limit: 50);
       setState(() {
         get_vocabCards = result.data ?? [];
         filter_vocabCards = get_vocabCards.where((v) => v.audio != null&& v.audio!.isNotEmpty).toList();
@@ -66,41 +58,13 @@ class _LearnScreen extends State<LearnScreen>{
     _searchController.dispose();
     super.dispose();
   }
-  List<IVocabBrief> dataMock = [
-    IVocabBrief(
-      id: "123",
-      audio: "223312",
-      word: "Hello",
-      definition: "dsfdsfdsfdsfdsfdsfds",
-      example: "123123124124",
-      level: "C1",
-      partOfSpeech: "ef/sd/fsd",
-      pronunciation: "ádsfffffds",
-      topic: "general"
-    ),
-    IVocabBrief(
-        id: "124",
-        audio: "223312",
-        word: "Hello",
-        definition: "dsfdsfdsfdsfdsfdsfds",
-        example: "123123124124",
-        level: "A1",
-        partOfSpeech: "ef/sd/fsd",
-        pronunciation: "ádsfffffds",
-        topic: "general"
-    ),
-    IVocabBrief(
-        id: "124",
-        audio: "223312",
-        word: "Hello",
-        definition: "dsfdsfdsfdsfdsfdsfds",
-        example: "123123124124",
-        level: "B1",
-        partOfSpeech: "ef/sd/fsd",
-        pronunciation: "ádsfffffds",
-        topic: "general"
-    )
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _searchController = TextEditingController();
+    loadVocabCard();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,16 +124,23 @@ class _LearnScreen extends State<LearnScreen>{
                 onChanged: _onSearchChanged,
                 onClear: _clearSearch,
               ),
-              ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: filter_vocabCards.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final vocab = filter_vocabCards[index];
-                    return VocabularyCard(vocabularyWord: vocab,);
-                  },
+              SizedBox(height: 20,),
+              isLoading ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  color: const Color(0xFF4F46E5),
                 ),
+              ):
+              ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: filter_vocabCards.length,
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final vocab = filter_vocabCards[index];
+                  return VocabularyCard(vocabularyWord: vocab,);
+                },
+              ),
             ],
           ),
         ),

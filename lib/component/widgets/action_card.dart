@@ -21,7 +21,7 @@ class ActionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -45,10 +45,10 @@ class ActionCard extends StatelessWidget {
               child: Icon(
                 icon,
                 color: color,
-                size: 35,
+                size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +56,7 @@ class ActionCard extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF1E293B),
                       letterSpacing: -0.3
@@ -66,10 +66,11 @@ class ActionCard extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w400,
-                      letterSpacing: -0.3
+                      letterSpacing: -0.3,
+                      height: 1.5
                     ),
                   ),
                 ],

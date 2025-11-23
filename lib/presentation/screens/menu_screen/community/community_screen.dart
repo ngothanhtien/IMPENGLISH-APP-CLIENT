@@ -72,14 +72,14 @@ class _Community_Screen extends State<Community_Screen>
           title: Text(
             'Community',
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.white,
               letterSpacing: -0.5
             ),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
             onPressed: (){},
           ),
           actions: [
@@ -88,7 +88,7 @@ class _Community_Screen extends State<Community_Screen>
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 5
+                  vertical: 2
                 ),
                 backgroundColor: Colors.orange.shade700,
                 shape: RoundedRectangleBorder(
@@ -98,11 +98,11 @@ class _Community_Screen extends State<Community_Screen>
               label: Text("Post",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700
                 )
               ),
-              icon: Icon(Icons.add,size: 28,color: Colors.white,),
+              icon: Icon(Icons.add,size: 22,color: Colors.white,),
             ),
             SizedBox(width: 10,),
           ],
@@ -119,7 +119,7 @@ class _Community_Screen extends State<Community_Screen>
                 labelColor: const Color(0xFF4F46E5),
                 unselectedLabelColor: Colors.grey.shade500,
                 labelStyle: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w700
+                    fontSize: 16, fontWeight: FontWeight.w700
                 ),
                 tabs: [
                   Tab(
@@ -160,14 +160,14 @@ class _Community_Screen extends State<Community_Screen>
                               final post = posts[index];
                               return ForumPostCard(
                                 id: post.id ?? '',
-                                fullName: post.userId!.fullName ?? '',
+                                fullName: post.userId?.fullName ?? '',
                                 title: post.title ?? '',
-                                level: post.userId!.level ?? '',
+                                level: post.userId?.level ?? '',
                                 content: post.content ?? '',
                                 category: post.category ?? '',
                                 date: post.createdAt.toString() ?? '',
                                 likes: post.countLike ?? 0,
-                                streakDay: post.userId!.streakDay ?? 0,
+                                streakDay: post.userId?.streakDay ?? 0,
                                 onTap: ()=> context.push("/posts/detail/${post.id.toString()}"),
                               );
                             }),

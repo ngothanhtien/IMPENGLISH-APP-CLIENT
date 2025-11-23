@@ -52,7 +52,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
             contentPadding: const EdgeInsets.all(20),
             hintText: widget.hintText,
             prefixIcon: widget.prefixIcon != null
+<<<<<<< Updated upstream
                 ? Icon(widget.prefixIcon, size: 25)
+=======
+                ? Icon(widget.prefixIcon, size: 20)
+>>>>>>> Stashed changes
                 : null,
             // thêm suffixIcon nếu là password
             suffixIcon: widget.isPassword

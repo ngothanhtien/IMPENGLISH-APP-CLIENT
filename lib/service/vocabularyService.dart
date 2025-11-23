@@ -11,10 +11,10 @@ class vocabService {
     'Accept': 'application/json'
   };
 
-  Future<Card_Vocabulary> fetchVocabBrief({int page = 1, int limit = 10}) async {
+  Future<Card_Vocabulary> fetchVocabBrief({int page = 1, int limit = 10,String? topic}) async {
     try{
       final response = await http.get(
-        Uri.parse("${base_url}/vocabulary/flashCard?limit=$limit"),
+        Uri.parse("${base_url}/vocabulary/flashCard?page=$page&topic=$topic"),
         headers: headers,
       );
       if(response.statusCode == 200){
@@ -40,6 +40,26 @@ class vocabService {
         return datafromJson;
       }else {
         throw Exception('Failed to load vocab detail. StatusCode: ${response.statusCode}');
+      }
+    }catch(e){
+      throw Exception("Error at get Vocabulary brief: $e");
+    }
+  }
+  Map<String,Card_Vocabulary> cache = {};
+  Future<Card_Vocabulary> searchVocab({required String keyword,String? topic, String? level}) async {
+    try{
+      if(cache.containsKey(keyword)) return cache[keyword]!;
+      final response = await http.get(
+        Uri.parse("${base_url}/vocabulary/search?keyword=$keyword&topic=$topic&level=$level"),
+        headers: headers,
+      );
+      if(response.statusCode == 200){
+        final jsondata = json.decode(response.body);
+        final result = Card_Vocabulary.fromJson(jsondata);
+        cache[keyword] = result;
+        return result;
+      }else {
+        throw Exception('Failed to load vocab. StatusCode: ${response.statusCode}');
       }
     }catch(e){
       throw Exception("Error at get Vocabulary brief: $e");

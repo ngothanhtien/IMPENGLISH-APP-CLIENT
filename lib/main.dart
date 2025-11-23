@@ -20,6 +20,7 @@ import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_q
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_results_screen.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_screen.dart';
 import 'package:learning_app_client/presentation/screens/register/register_screen.dart';
+import 'package:learning_app_client/presentation/screens/search/search_detail_screen.dart';
 import 'package:learning_app_client/presentation/screens/search/search_sceen.dart';
 import 'package:learning_app_client/presentation/screens/verify-otp/verify_otp_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -158,6 +159,13 @@ final GoRouter _router = GoRouter(
       GoRoute(
           path: '/home/search',
           builder: (context,state) => const SearchScreen()
+      ),
+      GoRoute(
+          path: '/home/vocabulary-topic/:topic',
+          builder: (context,state){
+            final topic = state.pathParameters['topic'];
+            return SearchDetail_Screen(topic: topic.toString() ?? '');
+          }
       ),
       GoRoute(
           path: '/learning/practice/:id',

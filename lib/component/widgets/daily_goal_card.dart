@@ -6,7 +6,10 @@ class DailyGoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 14
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -21,8 +24,8 @@ class DailyGoalCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 55,
+            height: 55,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
@@ -32,10 +35,10 @@ class DailyGoalCard extends StatelessWidget {
             child: const Icon(
               Icons.emoji_events,
               color: Colors.white,
-              size: 28,
+              size: 24,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,8 +46,8 @@ class DailyGoalCard extends StatelessWidget {
                 const Text(
                   'Daily Goal',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF1E293B),
                   ),
                 ),
@@ -52,17 +55,17 @@ class DailyGoalCard extends StatelessWidget {
                 Text(
                   '7 out of 10 words learned',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 LinearProgressIndicator(
-                  value: 0.7,
+                  value: 0.8,
                   backgroundColor: const Color(0xFFE2E8F0),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
                   borderRadius: BorderRadius.circular(4),
-                  minHeight: 8,
+                  minHeight: 6,
                 ),
               ],
             ),

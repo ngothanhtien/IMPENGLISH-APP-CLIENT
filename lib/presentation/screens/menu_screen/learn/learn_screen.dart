@@ -19,8 +19,6 @@ class _LearnScreen extends State<LearnScreen>{
   String filterSelected = "All";
 
   late TextEditingController _searchController;
-  bool _isSearching = false;
-  String _searchQuery = '';
 
   Future<void> loadVocabCard () async {
     try{
@@ -38,20 +36,6 @@ class _LearnScreen extends State<LearnScreen>{
     }
   }
 
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-      _isSearching = query.isNotEmpty;
-    });
-  }
-
-  void _clearSearch() {
-    setState(() {
-      _searchController.clear();
-      _searchQuery = '';
-      _isSearching = false;
-    });
-  }
 
   @override
   void dispose() {
@@ -117,12 +101,6 @@ class _LearnScreen extends State<LearnScreen>{
                     fontWeight: FontWeight.w500,
                     color: Colors.black
                 ),
-              ),
-              SizedBox(height: 12,),
-              SearchInputField(
-                controller: _searchController,
-                onChanged: _onSearchChanged,
-                onClear: _clearSearch,
               ),
               SizedBox(height: 20,),
               isLoading ? Center(

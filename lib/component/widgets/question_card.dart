@@ -17,8 +17,8 @@ class QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -37,13 +37,13 @@ class QuestionCard extends StatelessWidget {
           Text(
             "${question.questionText}",
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
               color: Color(0xFF1E293B),
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Answer Options
           ...question.options!.asMap().entries.map((entry) {
@@ -56,7 +56,7 @@ class QuestionCard extends StatelessWidget {
                 onTap: () => onAnswerSelected(option),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? const Color(0xFF6366F1).withOpacity(0.1)
@@ -99,11 +99,12 @@ class QuestionCard extends StatelessWidget {
                         child: Text(
                           option,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: isSelected
                                 ? const Color(0xFF6366F1)
                                 : const Color(0xFF374151),
+                            height: 1.5,
                           ),
                         ),
                       ),

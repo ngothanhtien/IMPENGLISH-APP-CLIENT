@@ -122,7 +122,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
         backgroundColor: const Color(0xFF4F46E5),
         title: const Text('Quiz Results',
           style: TextStyle(
-            fontSize: 26,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5
@@ -130,7 +130,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close,size: 30,color: Colors.white,),
+          icon: const Icon(Icons.close,size: 22,color: Colors.white,),
           onPressed: () => context.go('/quiz'),
         ),
         bottom: PreferredSize(
@@ -146,17 +146,18 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
         child: Transform.translate(
           offset: Offset(0, _slideAnimation.value * 50),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10,),
                 // Celebration Header
                 Center(
                   child: Column(
                     children: [
                       Container(
-                        width: 100,
-                        height: 100,
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
@@ -187,7 +188,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                               : percentage >= 50
                               ? Icons.thumb_up
                               : Icons.refresh,
-                          size: 50,
+                          size: 40,
                           color: Colors.white,
                         ),
                       ),
@@ -199,7 +200,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                             ? 'Good Job!'
                             : 'Keep Trying!',
                         style: const TextStyle(
-                          fontSize: 28,
+                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1E293B),
                         ),
@@ -208,7 +209,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                       Text(
                         'You scored ${percentage.toInt()}% in this quiz',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w400,
                         ),
@@ -253,8 +254,8 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                 const Text(
                   'Question Breakdown',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF374151),
                   ),
                 ),
@@ -296,12 +297,12 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                       children: [
                         Text(isExpandedResult ? "Show less": "Show More",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             color: const Color(0xFF4F46E5)
                           ),
                         ),
                         Icon(isExpandedResult ? Icons.expand_less : Icons.expand_more,
-                          size: 20,
+                          size: 18,
                           color: const Color(0xFF4F46E5),
                         )
                       ],
@@ -313,7 +314,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                   children: [
                     SizedBox(
                       width: double.infinity,
-                      height: 56,
+                      height: 50,
                       child: ElevatedButton(
                         onPressed: () => _retryQuiz(),
                         style: ElevatedButton.styleFrom(
@@ -327,12 +328,12 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.refresh, size: 20),
+                            Icon(Icons.refresh, size: 18),
                             SizedBox(width: 8),
                             Text(
                               'Retry Quiz',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -359,13 +360,14 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.home, size: 20),
+                            Icon(Icons.home, size: 18),
                             SizedBox(width: 8),
                             Text(
                               'Back to Quiz Screen',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2
                               ),
                             ),
                           ],
@@ -388,6 +390,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2
                               ),
                             ),
                           ],

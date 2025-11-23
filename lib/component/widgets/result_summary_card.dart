@@ -23,7 +23,7 @@ class ResultSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -45,12 +45,12 @@ class ResultSummaryCard extends StatelessWidget {
           const Text(
             'Quiz Summary',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // Quiz Details
           Row(
@@ -75,7 +75,7 @@ class ResultSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
 
           // Results
           Container(
@@ -113,7 +113,7 @@ class ResultSummaryCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 color: Colors.white.withOpacity(0.8),
                 fontWeight: FontWeight.w500,
               ),
@@ -121,7 +121,7 @@ class ResultSummaryCard extends StatelessWidget {
             Text(
               value,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
@@ -138,7 +138,7 @@ class ResultSummaryCard extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),

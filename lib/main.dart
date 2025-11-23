@@ -31,7 +31,7 @@ void main() async {
   runApp(MyApp(seenOnboarding: seenOnboarding,));
 }
 final GoRouter _router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/onboarding',
     routes: [
       // menu item
       StatefulShellRoute.indexedStack(

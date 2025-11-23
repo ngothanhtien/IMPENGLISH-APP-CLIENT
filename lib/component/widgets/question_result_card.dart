@@ -31,8 +31,8 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: widget.isCorrect
-              ? const Color(0xFF10B981).withOpacity(0.3)
-              : const Color(0xFFEF4444).withOpacity(0.3),
+              ? const Color(0xFF10B981).withOpacity(0.5)
+              : const Color(0xFFDF1414).withOpacity(0.5),
           width: 1.5,
         ),
         boxShadow: [
@@ -48,8 +48,9 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
           GestureDetector(
             onTap: () => setState(() => isExpanded = !isExpanded),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Status Icon
                   Container(
@@ -77,18 +78,20 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
                         Text(
                           'Question ${widget.questionNumber}',
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF6B7280),
+                            height: 1.5
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           widget.question,
                           style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF374151),
+                            height: 1.5
                           ),
                           maxLines: isExpanded ? null : 2,
                           overflow: isExpanded ? null : TextOverflow.ellipsis,
@@ -147,7 +150,7 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
             color: Color(0xFF6B7280),
           ),
@@ -157,10 +160,12 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
           child: Text(
             answer,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: color,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 3,
           ),
         ),
       ],

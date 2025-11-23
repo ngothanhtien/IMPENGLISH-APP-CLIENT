@@ -64,7 +64,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         title: const Text(
           'Vocabulary Practice',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5,
@@ -80,7 +80,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             ),
             child: const Icon(
               Icons.arrow_back_ios_new,
-              size: 22,
+              size: 18,
               color: Colors.white,
             ),
           ),
@@ -97,7 +97,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               ),
               child: const Icon(
                 Icons.bookmark_border,
-                size: 24,
+                size: 20,
                 color: Colors.white,
               ),
             ),
@@ -131,10 +131,11 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                       bottom: MediaQuery.of(context).viewInsets.bottom
                   ),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 12),
                         _buildProgressIndicator(),
                         const SizedBox(height: 24),
                         _buildVocabularyCard(vocab),
@@ -160,7 +161,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
 
   Widget _buildProgressIndicator() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -183,7 +184,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             child: const Icon(
               Icons.school,
               color: Color(0xFF4F46E5),
-              size: 28,
+              size: 32,
             ),
           ),
           const SizedBox(width: 16),
@@ -194,8 +195,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 const Text(
                   'Practice Progress',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black,
                   ),
                 ),
@@ -205,13 +206,13 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   backgroundColor: const Color(0xFFDEE6ED),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
                   borderRadius: BorderRadius.circular(8),
-                  minHeight: 6,
+                  minHeight: 5,
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   '3 of 5 steps completed',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 12,
                     color: Color(0xFF64748B),
                   ),
                 ),
@@ -226,7 +227,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
   Widget _buildVocabularyCard(IVocabDetail vocab) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -249,7 +250,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
@@ -259,7 +260,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -272,7 +273,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 child: const Icon(
                   Icons.star_outline,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
                 ),
               ),
             ],
@@ -281,7 +282,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           Text(
             vocab?.word ?? '',
             style: TextStyle(
-              fontSize: 36,
+              fontSize: 28,
               fontWeight: FontWeight.w700,
               color: Colors.white,
               letterSpacing: -0.5,
@@ -291,7 +292,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           Text(
             vocab?.phonetics?[0].text ?? '',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: Colors.white.withOpacity(0.9),
               fontWeight: FontWeight.w500,
               fontStyle: FontStyle.italic,
@@ -317,7 +318,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
 
   Widget _buildWordDetails(IVocabDetail vocab) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -350,8 +351,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               const Text(
                 'Definition',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                   color: Color(0xFF1E293B),
                 ),
               ),
@@ -362,16 +363,16 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             text: TextSpan(
               children: [
                 TextSpan(text: "Meaning: ",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: const Color(0xFF475569),
-                      fontWeight: FontWeight.w600
-                    )
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xFF475569),
+                    fontWeight: FontWeight.w600
+                  )
                 ),
                 TextSpan(text: '"${vocab?.meanings?[0].definitions?[0].definition ?? ''}"',
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Color(0xFF64748B),
+                    fontSize: 15,
+                    color: const Color(0xFF525E71),
                     fontStyle: FontStyle.italic,
                     height: 1.5,
                     letterSpacing: -0.2,
@@ -383,52 +384,52 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           const SizedBox(height: 12),
           RichText(
             text: TextSpan(
-                children: [
-                  TextSpan(text: "MeaningVN: ",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: const Color(0xFF475569),
-                        fontWeight: FontWeight.w600
-                      )
-                  ),
-                  TextSpan(text: '"${vocab?.meaningVN ?? ''}"',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF64748B),
-                      fontStyle: FontStyle.italic,
-                      height: 1.5,
-                      letterSpacing: -0.2,
-                    )
-                  ),
-                ]
+              children: [
+                TextSpan(text: "MeaningVN: ",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xFF475569),
+                    fontWeight: FontWeight.w600
+                  )
+                ),
+                TextSpan(text: '"${vocab?.meaningVN ?? ''}"',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xFF525E71),
+                    fontStyle: FontStyle.italic,
+                    height: 1.5,
+                    letterSpacing: -0.2,
+                  )
+                ),
+              ]
             )
           ),
           const SizedBox(height: 12),
           RichText(
-              text: TextSpan(
-                  children: [
-                    TextSpan(text: "Part Of Speech: ",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: const Color(0xFF475569),
-                            fontWeight: FontWeight.w600
-                        )
-                    ),
-                    TextSpan(text: '${vocab?.meanings?[0].partOfSpeech?? ''}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF64748B),
-                          fontStyle: FontStyle.italic,
-                          height: 1.5,
-                          letterSpacing: -0.2,
-                        )
-                    ),
-                  ]
-              )
+            text: TextSpan(
+              children: [
+                TextSpan(text: "Part Of Speech: ",
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: const Color(0xFF475569),
+                      fontWeight: FontWeight.w600
+                  )
+                ),
+                TextSpan(text: '${vocab?.meanings?[0].partOfSpeech?? ''}',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xFF525E71),
+                    fontStyle: FontStyle.italic,
+                    height: 1.5,
+                    letterSpacing: -0.2,
+                  )
+                ),
+              ]
+            )
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
@@ -441,7 +442,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 const Text(
                   'Example:',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF475569),
                   ),
@@ -452,8 +453,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF64748B),
+                    fontSize: 15,
+                    color: const Color(0xFF525E71),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -474,7 +475,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     ];
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -492,13 +493,14 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           const Text(
             'Learning Steps',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
               color: Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: steps.map((step) {
               final index = steps.indexOf(step);
               final isCompleted = step['completed'] as bool;
@@ -546,12 +548,13 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                     Text(
                       step['title'] as String,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        letterSpacing: -0.5,
+                        letterSpacing: -0.2,
                         color: isCompleted || isActive
                             ? const Color(0xFF1E293B)
                             : const Color(0xFF94A3B8),
+                        height: 1.1
                       ),
                     ),
                   ],
@@ -566,7 +569,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
 
   Widget _buildRecordSection() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -599,8 +602,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               const Text(
                 'Record Your Pronunciation',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
                   color: Color(0xFF1E293B),
                 ),
               ),
@@ -610,7 +613,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           Text(
             'Tap and hold the microphone to record your pronunciation. We\'ll help you improve!',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: const Color(0xFF64748B),
               height: 1.4,
               fontStyle: FontStyle.italic
@@ -657,7 +660,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
       children: [
         SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 50,
           child: ElevatedButton(
             onPressed: () {
               setState(() {
@@ -680,7 +683,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 const Text(
                   'Continue to Next Word',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -703,7 +706,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             child: const Text(
               'Skip this word',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),

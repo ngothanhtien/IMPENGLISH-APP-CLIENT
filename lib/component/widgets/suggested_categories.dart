@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SuggestedCategories extends StatelessWidget {
   const SuggestedCategories({super.key});
@@ -44,9 +45,11 @@ class SuggestedCategories extends StatelessWidget {
         const Text(
           'Suggested Categories',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
             color: Color(0xFF1E293B),
+            height: 1.1
           ),
         ),
         const SizedBox(height: 16),
@@ -55,53 +58,58 @@ class SuggestedCategories extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             childAspectRatio: 2.5,
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final category = categories[index];
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: category['color'].withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+            return GestureDetector(
+              onTap: () => context.push("/home/vocabulary-topic/${category['title']}"),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
                     ),
-                    child: Icon(
-                      category['icon'],
-                      color: category['color'],
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      category['title'],
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF1E293B),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        color: category['color'].withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        category['icon'],
+                        color: category['color'],
+                        size: 24,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        category['title'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },

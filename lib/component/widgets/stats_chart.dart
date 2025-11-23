@@ -19,7 +19,7 @@ class StatsChart extends StatelessWidget {
     final incorrectPercentage = total > 0 ? incorrect / total : 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -37,12 +37,12 @@ class StatsChart extends StatelessWidget {
           const Text(
             'Performance Overview',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
               color: Color(0xFF374151),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // Correct Answers Bar
           _buildStatBar(
@@ -93,7 +93,7 @@ class StatsChart extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF6B7280),
               ),
@@ -101,7 +101,7 @@ class StatsChart extends StatelessWidget {
             Text(
               count.toString(),
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: color,
               ),
@@ -110,7 +110,7 @@ class StatsChart extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 8,
+          height: 5,
           decoration: BoxDecoration(
             color: const Color(0xFFF3F4F6),
             borderRadius: BorderRadius.circular(4),
@@ -136,7 +136,7 @@ class StatsChart extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontSize: 28,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: color,
           ),
@@ -144,7 +144,7 @@ class StatsChart extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: Color(0xFF6B7280),
             fontWeight: FontWeight.w500,
           ),

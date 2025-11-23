@@ -104,23 +104,23 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
         title:  Text('Quiz Details',
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 24,
+            fontSize: 18,
             color: Colors.white,
             letterSpacing: -0.5
           ),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,size: 28,color: Colors.white,),
+          icon: const Icon(Icons.arrow_back,size: 22,color: Colors.white,),
           onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bookmark_outline,size: 30,color: Colors.white),
+            icon: const Icon(Icons.bookmark_outline,size: 22,color: Colors.white),
             onPressed: () => _showFeatureComingSoon('Bookmark'),
           ),
           IconButton(
-            icon: const Icon(Icons.share_outlined,size: 30,color: Colors.white),
+            icon: const Icon(Icons.share_outlined,size: 22,color: Colors.white),
             onPressed: () => _showFeatureComingSoon('Share'),
           ),
         ],
@@ -133,15 +133,15 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Quiz illustration
                       Center(
                         child: Container(
-                          width: 110,
-                          height: 110,
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               begin: Alignment.topLeft,
@@ -162,7 +162,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                           ),
                           child: const Icon(
                             Icons.quiz,
-                            size: 60,
+                            size: 40,
                             color: Colors.white,
                           ),
                         ),
@@ -173,7 +173,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       const Text(
                         'Your Quiz is Ready!',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1E293B),
                         ),
@@ -184,11 +184,11 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       Text(
                         'Test your knowledge in ${widget.category} with ${widget.questions} exciting questions!',
                         style: TextStyle(
-                          fontSize: 17,
-                          color: Colors.grey[600],
+                          fontSize: 16,
+                          color: const Color(0xFF525E71),
                           fontWeight: FontWeight.w400,
                         ),
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.start,
                       ),
                       const SizedBox(height: 32),
 
@@ -196,9 +196,9 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       const Text(
                         'Quiz Summary',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF374151),
+                          color: Color(0xFF1E293B),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -287,7 +287,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                           // Start Quiz Button
                           SizedBox(
                             width: double.infinity,
-                            height: 56,
+                            height: 45,
                             child: ElevatedButton(
                               onPressed: () => _startQuiz(),
                               style: ElevatedButton.styleFrom(
@@ -306,7 +306,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                                   Text(
                                     'Start Quiz',
                                     style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -319,7 +319,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                           // Edit Filters Button
                           SizedBox(
                             width: double.infinity,
-                            height: 48,
+                            height: 40,
                             child: OutlinedButton(
                               onPressed: () => context.pop(),
                               style: OutlinedButton.styleFrom(
@@ -340,7 +340,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                                   Text(
                                     'Edit Filters',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -385,16 +385,21 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
           ),
           title: const Row(
             children: [
-              Icon(Icons.play_circle, color: Color(0xFF4F46E5), size: 40),
+              Icon(Icons.play_circle, color: Color(0xFF4F46E5), size: 32),
               SizedBox(width: 12),
-              Text('Ready to Start?',style: TextStyle(fontWeight: FontWeight.w700),),
+              Text('Ready to Start?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18
+                ),
+              ),
             ],
           ),
           content: Text(
             'You\'re about to start a ${widget.level} ${widget.category} quiz with ${widget.questions} questions. You have ${widget.timeLimit} to complete it. Good luck!',
             style: TextStyle(
               letterSpacing: -0.2,
-              fontSize: 17,
+              fontSize: 14,
               height: 1.5
             ),
           ),
@@ -403,7 +408,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
               onPressed: () => context.pop(),
               child: const Text('Cancel',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.black54
                 ),
               ),
@@ -426,7 +431,8 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
               ),
               child: const Text('Start Now',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700
                 ),
               ),
             ),

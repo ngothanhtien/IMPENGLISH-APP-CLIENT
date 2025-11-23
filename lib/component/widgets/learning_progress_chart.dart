@@ -6,7 +6,7 @@ class LearningProgressChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -27,7 +27,7 @@ class LearningProgressChart extends StatelessWidget {
               const Text(
                 'Weekly Progress',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF1E293B),
                 ),
@@ -41,7 +41,7 @@ class LearningProgressChart extends StatelessWidget {
                 child: const Text(
                   '+15% this week',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF10B981),
                   ),
@@ -99,7 +99,7 @@ class LearningProgressChart extends StatelessWidget {
         Text(
           day,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             color: Color(0xFF64748B),
             fontWeight: FontWeight.w500
           ),
@@ -114,7 +114,7 @@ class LearningProgressChart extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: color,
           ),
@@ -122,7 +122,7 @@ class LearningProgressChart extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: Color(0xFF64748B),
           ),
         ),

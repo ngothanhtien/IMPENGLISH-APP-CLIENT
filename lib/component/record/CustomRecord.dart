@@ -109,11 +109,11 @@ class _RecorderScreenState extends State<RecorderScreen>
                 ),
                 child: Icon(
                   _isRecording ? Icons.mic : Icons.mic_none,
-                  size: 32,
+                  size: 24,
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
             /// Text trạng thái
             Text(
@@ -123,7 +123,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                   ? "Recording complete ✅"
                   : "Press to record",
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
                 letterSpacing: -0.5
               ),
@@ -166,7 +166,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                       color: const Color(0xFF4F46E5),
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
-                      fontSize: 32
+                      fontSize: 24
                   ),
                 ),
               ),
@@ -177,7 +177,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                       color: Colors.black54,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.2,
-                      fontSize: 18
+                      fontSize: 16
                   ),
                 ),
               ),
@@ -187,7 +187,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                 children: [
                   Text("Clarity",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 15,
                       color: Colors.black.withOpacity(0.7),
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.2,
@@ -197,8 +197,8 @@ class _RecorderScreenState extends State<RecorderScreen>
                     children: List.generate(5, (index){
                       final isActive = index < 3;
                       return Container(
-                        height: 10,
-                        width: 10,
+                        height: 8,
+                        width: 8,
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -215,7 +215,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                 children: [
                   Text("Fluency",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 15,
                       color: Colors.black.withOpacity(0.7),
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.2,
@@ -225,8 +225,8 @@ class _RecorderScreenState extends State<RecorderScreen>
                     children: List.generate(5, (index){
                       final isActive = index < 3;
                       return Container(
-                        height: 10,
-                        width: 10,
+                        height: 8,
+                        width: 8,
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -256,17 +256,17 @@ class _RecorderScreenState extends State<RecorderScreen>
                     children: <TextSpan>[
                       TextSpan(text: 'Tip: ',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue
                         )
                       ),
                       TextSpan(text: 'Try to emphasize the "dip" in "serendipity" for better pronunciation.',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.blue,
-                            letterSpacing: -0.5,
-                            height: 1.4
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blue,
+                          letterSpacing: -0.5,
+                          height: 1.4
                         )
                       )
                     ]
@@ -281,7 +281,7 @@ class _RecorderScreenState extends State<RecorderScreen>
                   icon: const Icon(Icons.restart_alt,size: 24,color: Colors.grey,),
                   label: const Text("Try again",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       color: Colors.grey,
                       letterSpacing: -0.2
                     ),

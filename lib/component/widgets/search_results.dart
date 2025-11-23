@@ -1,144 +1,244 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:learning_app_client/component/widgets/filter_dropdown.dart';
+import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
+import 'package:learning_app_client/model/vocabulary/flash_card.dart';
+import 'package:learning_app_client/presentation/screens/search/search_detail_screen.dart';
+import 'package:learning_app_client/service/vocabularyService.dart';
 
-class SearchResults extends StatelessWidget {
+class SearchResults extends StatefulWidget {
   final String query;
-
-  const SearchResults({
+  SearchResults({
     super.key,
-    required this.query,
+    required this.query
   });
+  @override
+  State<StatefulWidget> createState() => _SearchResults();
+}
 
-  final List<Map<String, dynamic>> mockResults = const [
-    {
-      'word': 'serendipity',
-      'meaning': 'A pleasant surprise or fortunate accident',
-      'level': 'C1',
-    },
-    {
-      'word': 'ephemeral',
-      'meaning': 'Lasting for a very short time',
-      'level': 'B2',
-    },
-    {
-      'word': 'resilience',
-      'meaning': 'The ability to recover quickly from difficulties',
-      'level': 'B1',
-    },
-  ];
+class _SearchResults extends State<SearchResults>{
+  Card_Vocabulary? card_vocabulary;
+  List<IVocabBrief>? results;
+  bool isLoading = false;
+  String? error;
+  int? total_vocab_find;
+  Timer? _debounce;
+
+  String selectedTopic = '';
+  String selectedLevel = '';
+
+  void _runDebounce(){
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _search();   // gọi API sau khi dừng 400ms
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant SearchResults oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Khi query thay đổi → search lại
+    if (oldWidget.query != widget.query) {
+      _runDebounce();
+    }
+  }
+  Future<void> _search() async {
+    if(widget.query.trim().isEmpty) return;
+    
+    setState(() {
+      isLoading = true;
+    });
+    
+    try{
+      final data_response = await vocabService().searchVocab(
+        keyword: widget.query.toString(),
+        topic: selectedTopic.toLowerCase().toString(),
+        level: selectedLevel.toString()
+      );
+      setState(() {
+        results = data_response.data;
+        card_vocabulary = data_response;
+        total_vocab_find = data_response.pagination?.total;
+        isLoading = false;
+        error = null;
+      });
+    }catch(e){
+      setState(() {
+        isLoading = false;
+        error = e.toString();
+      });
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    _search();
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _debounce?.cancel();
+  }
+  @override
+  Widget build(BuildContext context) {
+    if(isLoading){
+      return const Center(child: CircularProgressIndicator(),);
+    }
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Results for "${widget.query}"',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: Offset(0, 4)
+                  )
+                ]
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Topic",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87
+                          ),
+                        ),
+                        SizedBox(height: 8,),
+                        FilterDropdown(
+                          value: selectedTopic,
+                          options: const [
+                            '', 'Technology', 'Business', 'Education', 'Sports',
+                            'Entertainment', 'Science', 'History',"General",
+                          ],
+                          onChanged: (value){
+                            setState(() {
+                              selectedTopic = value!;
+                              _runDebounce();
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  ),
+                  SizedBox(width: 10,),
+                  Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Level",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87
+                            ),
+                          ),
+                          SizedBox(height: 8,),
+                          FilterDropdown(
+                            value: selectedLevel,
+                            options: const [
+                              '', "A1", "A2", "B1", "B2", "C1", "C2"
+                            ],
+                            onChanged: (value){
+                              setState(() {
+                                selectedLevel = value!;
+                                _runDebounce();
+                              });
+                            },
+                          ),
+                        ],
+                      )
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: SearchResultList(
+                isLoading: isLoading,
+                error: error,
+                results: results,
+                total: total_vocab_find,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class SearchResultList extends StatelessWidget {
+  final bool isLoading;
+  final String? error;
+  final List<IVocabBrief>? results;
+  final int? total;
+
+  const SearchResultList({
+    super.key,
+    required this.isLoading,
+    required this.error,
+    required this.results,
+    required this.total,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final filteredResults = mockResults
-        .where((result) => result['word']
-        .toString()
-        .toLowerCase()
-        .contains(query.toLowerCase()))
-        .toList();
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Results for "$query"',
+    if(results == null || results!.isEmpty || error != null){
+      return Align(
+        alignment: Alignment.topLeft,
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Text(
+            'Not Found Any Vocabulary',
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredResults.length,
-              itemBuilder: (context, index) {
-                final result = filteredResults[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  result['word'],
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1E293B),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF4F46E5).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Text(
-                                    result['level'],
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF4F46E5),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              result['meaning'],
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('🔊 Playing pronunciation...'),
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.volume_up,
-                          color: Color(0xFF4F46E5),
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: total! > 10 ? 10 : total,
+      padding: const EdgeInsets.all(4),
+      itemBuilder: (context, index) {
+        final item = results![index];
+        return VocabularyCard(vocabularyWord: item);
+      },
     );
   }
 }

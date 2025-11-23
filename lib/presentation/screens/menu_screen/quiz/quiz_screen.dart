@@ -62,14 +62,14 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
         backgroundColor: const Color(0xFF4F46E5),
         title: const Text('Create Quiz',
           style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
             color: Colors.white
           ),
         ),
         leading: IconButton(
             onPressed: () => context.go("/home"),
-            icon: Icon(Icons.arrow_back,size: 28,color: Colors.white,)
+            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
         ),
       ),
       body: FadeTransition(
@@ -80,22 +80,22 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Header illustration
                         Center(
                           child: Container(
-                            width: 120,
-                            height: 120,
+                            width: 80,
+                            height: 80,
                             decoration: BoxDecoration(
                               color: const Color(0xFF6366F1).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(60),
                             ),
                             child: const Icon(
                               Icons.quiz,
-                              size: 60,
+                              size: 40,
                               color: Color(0xFF4F46E5),
                             ),
                           ),
@@ -106,7 +106,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                         const Text(
                           'Customize Your Quiz',
                           style: TextStyle(
-                            fontSize: 26,
+                            fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1E293B),
                           ),
@@ -115,12 +115,12 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                         Text(
                           'Set your preferences to create the perfect quiz experience',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
                         // Level Filter
                         _buildFilterSection(
@@ -169,12 +169,12 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                             onSelected: (value) => setState(() => selectedTime = value),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
                         SafeArea(
                           child: SizedBox(
                             width: double.infinity,
-                            height: 56,
-                            child: ElevatedButton(
+                            height: 45,
+                            child: ElevatedButton.icon(
                               onPressed:()=> context.push("/quiz/detail",
                                 extra: {
                                   "level": selectedLevel,
@@ -186,21 +186,25 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF4F46E5),
                                 foregroundColor: Colors.white,
-                                elevation: 0,
+                                shadowColor: Colors.black,
+                                elevation: 2,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
-                              child: const Text(
+                              label: const Text(
                                 'Create Quiz',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
+                              icon: Icon(Icons.arrow_forward,size: 18,),
+                              iconAlignment: IconAlignment.end,
                             ),
                           ),
                         ),
+                        SizedBox(height: 30,)
                       ],
                     ),
                   ),
@@ -219,9 +223,9 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E293B),
           ),
         ),
         const SizedBox(height: 12),

@@ -43,7 +43,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       onPressed: _togglePlay,
       icon: Icon(
         _isPlaying ? Icons.stop : Icons.volume_up,
-        size: 28,
+        size: 24,
         color: Colors.white,
       ),
       style: IconButton.styleFrom(

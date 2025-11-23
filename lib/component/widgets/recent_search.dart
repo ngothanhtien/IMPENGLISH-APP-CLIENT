@@ -22,9 +22,11 @@ class RecentSearches extends StatelessWidget {
             const Text(
               'Recent Searches',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF1E293B),
+                letterSpacing: -0.2,
+                height: 1.1
               ),
             ),
             TextButton(
@@ -32,17 +34,15 @@ class RecentSearches extends StatelessWidget {
               child: const Text(
                 'Clear All',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Color(0xFF64748B),
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
         ...recentSearches.map((search) => Container(
           margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -58,7 +58,7 @@ class RecentSearches extends StatelessWidget {
             title: Text(
               search,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 color: Color(0xFF1E293B),
               ),
             ),
@@ -70,7 +70,7 @@ class RecentSearches extends StatelessWidget {
             trailing: const Icon(
               Icons.north_west,
               color: Color(0xFF64748B),
-              size: 18,
+              size: 16,
             ),
           ),
         )).toList(),

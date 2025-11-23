@@ -19,8 +19,6 @@ class _LearnScreen extends State<LearnScreen>{
   String filterSelected = "All";
 
   late TextEditingController _searchController;
-  bool _isSearching = false;
-  String _searchQuery = '';
 
   Future<void> loadVocabCard () async {
     try{
@@ -38,20 +36,6 @@ class _LearnScreen extends State<LearnScreen>{
     }
   }
 
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-      _isSearching = query.isNotEmpty;
-    });
-  }
-
-  void _clearSearch() {
-    setState(() {
-      _searchController.clear();
-      _searchQuery = '';
-      _isSearching = false;
-    });
-  }
 
   @override
   void dispose() {
@@ -73,7 +57,7 @@ class _LearnScreen extends State<LearnScreen>{
         backgroundColor: const Color(0xFF4F46E5),
         title: Text("Vocabulary & Progress",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5
@@ -81,7 +65,7 @@ class _LearnScreen extends State<LearnScreen>{
         ),
         leading: IconButton(
             onPressed: () => context.go('/home'),
-            icon: Icon(Icons.arrow_back,size: 28,color: Colors.white,)
+            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
@@ -97,32 +81,27 @@ class _LearnScreen extends State<LearnScreen>{
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 12,),
               Text("Current Progress",
                 style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black
                 ),
               ),
               SizedBox(height: 12,),
               const LearningProgressChart(),
               SizedBox(height: 20,),
-              Text("Vocabulary Cards",
+              Text("New Vocabulary",
                 style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black
                 ),
-              ),
-              SizedBox(height: 12,),
-              SearchInputField(
-                controller: _searchController,
-                onChanged: _onSearchChanged,
-                onClear: _clearSearch,
               ),
               SizedBox(height: 20,),
               isLoading ? Center(

@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
+import 'package:learning_app_client/presentation/screens/search/search_detail_screen.dart';
 
 class RecommendedTopics extends StatelessWidget {
   const RecommendedTopics({super.key});
 
   final List<Map<String, dynamic>> topics = const [
     {
-      'title': 'Business English',
+      'title': 'Business',
       'icon': Icons.business_center,
       'color': Color(0xFF4F46E5),
-      'words': 45,
+      'words': 30,
     },
     {
-      'title': 'Travel & Tourism',
-      'icon': Icons.flight,
+      'title': 'Sports',
+      'icon': Icons.sports_basketball,
       'color': Color(0xFF10B981),
       'words': 32,
     },
@@ -24,10 +26,10 @@ class RecommendedTopics extends StatelessWidget {
       'words': 28,
     },
     {
-      'title': 'Daily Conversation',
-      'icon': Icons.chat,
+      'title': 'Education',
+      'icon': Icons.school_outlined,
       'color': Color(0xFFEF4444),
-      'words': 56,
+      'words': 22,
     },
   ];
 
@@ -38,21 +40,24 @@ class RecommendedTopics extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
         childAspectRatio: 1.2,
       ),
       itemCount: topics.length,
       itemBuilder: (context, index) {
         final topic = topics[index];
-        return ProfileCard(
-          icon: topic['icon'],
-          color: topic['color'],
-          title: topic['title'],
-          value: '${topic['words']} words',
-          space: 15,
-          titleSize: 18,
-          valueSize: 16,
+        return GestureDetector(
+          onTap: ()=> context.push("/home/vocabulary-topic/${topic['title']}"),
+          child: ProfileCard(
+            icon: topic['icon'],
+            color: topic['color'],
+            title: topic['title'],
+            value: '+${topic['words']} words',
+            spacing: 10,
+            titleSize: 16,
+            valueSize: 13,
+          ),
         );
       },
     );

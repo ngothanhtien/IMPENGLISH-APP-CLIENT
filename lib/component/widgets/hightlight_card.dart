@@ -19,13 +19,16 @@ class HighlightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: gradient),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: gradient[1].withOpacity(0.5),
+            color: gradient[1].withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -43,7 +46,7 @@ class HighlightCard extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -52,15 +55,15 @@ class HighlightCard extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey.shade400,
                     ),
                   ),
                 ],
               ),
               Container(
-                width: 48,
-                height: 48,
+                width: 45,
+                height: 45,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
@@ -83,7 +86,7 @@ class HighlightCard extends StatelessWidget {
                   const Text(
                     'Progress',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.white,
                       fontWeight: FontWeight.w500
                     ),
@@ -91,7 +94,7 @@ class HighlightCard extends StatelessWidget {
                   Text(
                     '${(progress * 100).toInt()}%',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -104,7 +107,7 @@ class HighlightCard extends StatelessWidget {
                 backgroundColor: Colors.white.withOpacity(0.3),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 borderRadius: BorderRadius.circular(4),
-                minHeight: 8,
+                minHeight: 6,
               ),
             ],
           ),

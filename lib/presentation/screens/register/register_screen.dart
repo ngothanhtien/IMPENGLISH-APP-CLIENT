@@ -95,41 +95,39 @@ class _RegisterScreen extends State<RegisterScreen> {
                 child: Column(
                     children: [
                       Container(
-                        height: 200,
+                        height: 130,
                         width: double.infinity,
+                        alignment: Alignment.bottomCenter,
                         color: const Color(0xFF3D5CFF),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text(
                               "Create an account",
                               style: TextStyle(
-                                fontSize: 40,
+                                fontSize: 28,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white
                               ),
                             ),
                             const SizedBox(height: 10,),
-                            const Text(
+                            Text(
                               "Connect with IMPEnglish today!",
                               style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white60,
+                                  fontSize: 16,
+                                  color: Colors.grey.shade400,
                                   fontWeight: FontWeight.w500
                               ),
                             ),
-                            const SizedBox(height: 50,),
                           ],
                         ),
                       ),
                       // ---------- HEADER ----------
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 40
-                        ),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           children: [
-                            // ---------- FORM ----------
+                            SizedBox(height: 12,),
                             Container(
                               child: Column(
                                 children: [
@@ -139,35 +137,39 @@ class _RegisterScreen extends State<RegisterScreen> {
                                     controller: fullnameController,
                                     prefixIcon: Icons.account_box,
                                     isPassword: false,
+                                    titleSize: 15,
                                   ),
-                                  const SizedBox(height: 15),
+                                  const SizedBox(height: 16),
                                   CustomTextField(
                                     nameTextField: "Email",
                                     hintText: "Enter your email",
                                     controller: emailController,
                                     prefixIcon: Icons.email_outlined,
                                     isPassword: false,
+                                    titleSize: 15,
                                   ),
-                                  const SizedBox(height: 15),
+                                  const SizedBox(height: 16),
                                   CustomTextField(
                                     nameTextField: "Password",
                                     hintText: "Enter password for your account",
                                     controller: passwordController,
                                     prefixIcon: Icons.lock,
                                     isPassword: true,
+                                    titleSize: 15,
                                   ),
-                                  const SizedBox(height: 15),
+                                  const SizedBox(height: 16),
                                   CustomTextField(
                                     nameTextField: "Confirm Password",
-                                    hintText: "Password confirm have to same with password",
+                                    hintText: "Password confirm",
                                     controller: confirmPasswordController,
                                     prefixIcon: Icons.lock,
                                     isPassword: true,
+                                    titleSize: 15,
                                   ),
-                                  const SizedBox(height: 35),
+                                  const SizedBox(height: 24),
                                   SizedBox(
                                     width: double.infinity,
-                                    height: 72,
+                                    height: 55,
                                     child: ElevatedButton(
                                       onPressed: _isLoading ? null : _handlerRegister,
                                       style: ElevatedButton.styleFrom(
@@ -180,14 +182,14 @@ class _RegisterScreen extends State<RegisterScreen> {
                                       child: const Text(
                                         "Create Account",
                                         style: TextStyle(
-                                          fontSize: 24,
+                                          fontSize: 16,
                                           color: Colors.white,
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 16),
                                   SizedBox(
                                     width: double.infinity,
                                     child: CheckboxListTile(
@@ -200,8 +202,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                                       title: const Text(
                                         "By creating an account you have to agree\nwith our terms & conditions.",
                                         style: TextStyle(
-                                          fontSize: 18,
-                                          color: Color(0xFF858597),
+                                          fontSize: 14,
+                                          color: const Color(0xFF525E71),
                                         ),
                                       ),
                                       controlAffinity: ListTileControlAffinity.leading,
@@ -221,19 +223,19 @@ class _RegisterScreen extends State<RegisterScreen> {
                                           text: "Already have an account? ",
                                           style: TextStyle(
                                             color: Color(0xFF858597),
-                                            fontSize: 19,
+                                            fontSize: 14,
                                           ),
                                         ),
                                         TextSpan(
                                           text: "Log in",
                                           style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 16,
                                             color: Color(0xFF3D5CFF),
                                             fontWeight: FontWeight.w800,
                                             decoration: TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
-                                            ..onTap = () => context.go('/login'),
+                                            ..onTap = () => context.pop(),
                                         ),
                                       ],
                                     ),

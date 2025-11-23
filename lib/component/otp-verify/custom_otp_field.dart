@@ -20,6 +20,10 @@ class CustomOtpField extends StatelessWidget {
       length: length,
       obscureText: false,
       keyboardType: TextInputType.number,
+      textStyle: TextStyle(
+        fontSize: 16,
+        color: const Color(0xFF4F46E5)
+      ),
       animationType: AnimationType.fade,
       animationDuration: const Duration(milliseconds: 300),
       onCompleted: onCompleted,
@@ -28,14 +32,14 @@ class CustomOtpField extends StatelessWidget {
       pinTheme: PinTheme(
         shape: PinCodeFieldShape.box,
         borderRadius: BorderRadius.circular(15),
-        fieldHeight: 75,
-        fieldWidth: 70,
+        fieldHeight: 55,
+        fieldWidth: 50,
         activeFillColor: Colors.white,
         inactiveFillColor: Colors.white,
         selectedFillColor: Colors.white,
-        inactiveColor: Colors.grey,
-        selectedColor: Colors.blueAccent,
-        activeColor: Colors.blueAccent,
+        inactiveColor: Colors.grey.shade400,
+        selectedColor: const Color(0xFF4F46E5),
+        activeColor: const Color(0xFF4F46E5),
       ),
     );
   }

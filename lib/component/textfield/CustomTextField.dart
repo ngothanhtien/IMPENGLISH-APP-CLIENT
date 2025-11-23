@@ -16,7 +16,7 @@ class CustomTextField extends StatefulWidget {
     required this.controller,
     required this.isPassword,
     this.titleSize = 18,
-    this.titleColor = const Color(0xFF858597),
+    this.titleColor = const Color(0xFF525E71),
     this.prefixIcon,
     this.errorText,
   }) : super(key: key);
@@ -38,21 +38,20 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: TextStyle(
             fontSize: widget.titleSize,
             color: widget.titleColor,
-            fontWeight: FontWeight.w500
+            fontWeight: FontWeight.w500,
           ),
         ),
         TextField(
           controller: widget.controller,
           obscureText: widget.isPassword ? _obscureText : false,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             color: Colors.black,
           ),
           decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(20),
             hintText: widget.hintText,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, size: 25)
+                ? Icon(widget.prefixIcon, size: 22)
                 : null,
             // thêm suffixIcon nếu là password
             suffixIcon: widget.isPassword
@@ -60,6 +59,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               icon: Icon(
                 _obscureText ? Icons.visibility_off : Icons.visibility,
                 color: Colors.grey,
+                size: 22,
               ),
               onPressed: () {
                 setState(() {
@@ -79,7 +79,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             hintStyle: const TextStyle(
               color: Color(0xFF858597),
-              fontSize: 18,
+              fontSize: 14,
             ),
             filled: true,
             fillColor: Colors.white,

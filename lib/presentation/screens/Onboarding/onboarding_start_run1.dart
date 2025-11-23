@@ -17,8 +17,8 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
   }
   Widget _buildIllustration(String logoPath,
   {
-    double w = 460,
-    double h = 420
+    double w = 320,
+    double h = 320
   }){
     return Align(
       alignment: Alignment.center,
@@ -60,8 +60,9 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                   SizedBox(height: 30,),
                   const Text("From Beginner to Fluent, Together.",
                     style: TextStyle(
-                        color: Color(0xFF858597),
-                        fontSize: 22,
+                      color: Color(0xFF858597),
+                      fontSize: 16,
+                      height: 1.5
                     ),
                   ),
                 ],
@@ -77,8 +78,9 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                    Text("Easy and fast learning at any time to help you improve "
                       "various" " skills",
                   style: TextStyle(
-                      color: Color(0xFF858597),
-                      fontSize: 22,
+                    color: Color(0xFF858597),
+                    fontSize: 16,
+                    height: 1.5
                   ),
                     textAlign: TextAlign.center,
                   )
@@ -98,7 +100,8 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                     " more motivated",
                   style: TextStyle(
                     color: Color(0xFF858597),
-                    fontSize: 22
+                    fontSize: 16,
+                    height: 1.5
                   ),
                   textAlign: TextAlign.center,
                 )
@@ -111,50 +114,56 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                      onPressed: () => context.go('/register'),
-                      child: const Text("Sign up",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
+                  SizedBox(
+                    height: 40,
+                    width: 150 ,
+                    child: ElevatedButton(
+                        onPressed: () => context.go('/register'),
+                        child: const Text("Sign up",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF3D5CFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)
                         ),
                       ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF3D5CFF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 60),
                     ),
                   ),
                   SizedBox(width: 20,),
-                  ElevatedButton(
-                    onPressed: () => context.go('/login'),
-                    child: const Text("Log in",
-                      style: TextStyle(
-                        color: Color(0xFF3D5CFF),
-                        fontSize: 24,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                  SizedBox(
+                    height: 40,
+                    width: 150 ,
+                    child: ElevatedButton(
+                      onPressed: () => context.go('/login'),
+                      child: const Text("Log in",
+                        style: TextStyle(
+                          color: Color(0xFF3D5CFF),
+                          fontSize: 16,
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 60),
-                      side: BorderSide(color: Color(0xFF3D5CFF),width: 1.5)
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                          ),
+                        side: BorderSide(color: Color(0xFF3D5CFF),width: 1.5)
+                      ),
                     ),
                   )
                 ],
               )
             ),
-            image: _buildIllustration("assets/images/logos/logo_app2.jpg",h: 370,w: 420),
+            image: _buildIllustration("assets/images/logos/logo_app2.jpg",h: 250,w: 280),
           ),
         ],
         showSkipButton: true,
-        skip: const Text('Skip',style: TextStyle(fontSize: 22,color: Color(0xFF858597),fontWeight: FontWeight.bold),),
-        next: const Icon(Icons.arrow_forward,size: 33,color: Color(0xFF858597),),
-        done: const Text('Done', style: TextStyle(fontSize: 22,color: Colors.grey,fontWeight: FontWeight.w600)),
+        skip: const Text('Skip',style: TextStyle(fontSize: 16,color: Color(0xFF858597),fontWeight: FontWeight.bold),),
+        next: const Icon(Icons.arrow_forward,size: 24,color: Color(0xFF858597),),
+        done: const Text('Done', style: TextStyle(fontSize: 16,color: Colors.grey,fontWeight: FontWeight.w600)),
 
         onDone: () => _onIntroEnd(context),
         onSkip: () => _onIntroEnd(context),

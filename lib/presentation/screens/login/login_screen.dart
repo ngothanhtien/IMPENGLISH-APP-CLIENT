@@ -75,10 +75,9 @@ class _LoginScreen extends State<LoginScreen> {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(12),
                   alignment: Alignment.bottomCenter,
                   width: double.infinity,
-                  height: 200,
+                  height: 120,
                   color: const Color(0xFF3D5CFF),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -88,13 +87,13 @@ class _LoginScreen extends State<LoginScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 40
+                          fontSize: 28
                         ),
                       ),
-                      const Text("Enter your details below",
+                      Text("Enter your details below",
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 22,
+                          color: Colors.grey.shade400,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500
                         ),
                       )
@@ -102,44 +101,44 @@ class _LoginScreen extends State<LoginScreen> {
                   )
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 40,
-                    horizontal: 40
-                  ),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     children: [
+                      SizedBox(height: 12,),
                       CustomTextField(
                         nameTextField: "Email",
                         hintText: "Enter your email",
                         controller: emailController,
                         prefixIcon: Icons.email_outlined,
                         isPassword: false,
+                        titleSize: 15,
                       ),
-                      SizedBox(height: 25,),
+                      SizedBox(height: 16,),
                       CustomTextField(
                         nameTextField: "Password",
                         hintText: "Enter your password",
                         controller: passwordController,
                         prefixIcon: Icons.password,
                         isPassword: true,
+                        titleSize: 15,
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(height: 5,),
                       Container(
                         alignment: Alignment.bottomRight,
                         child: TextButton(
                             onPressed: () => context.go('/fg-password'),
                             child: Text("Forget password?",
                               style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.red.shade500
+                                  fontSize: 14,
+                                  color: const Color(0xFF525E71)
                               ),
                             )
                         ),
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(height: 8,),
                       SizedBox(
                         width: double.infinity,
-                        height: 70,
+                        height: 50,
                         child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
@@ -160,14 +159,14 @@ class _LoginScreen extends State<LoginScreen> {
                             :
                             Text("Log In",
                               style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800
                               ),
                             )
                         ),
                       ),
-                      SizedBox(height: 30,),
+                      SizedBox(height: 24,),
                       RichText(
                           text: TextSpan(
                               children: <TextSpan>[
@@ -175,13 +174,13 @@ class _LoginScreen extends State<LoginScreen> {
                                     text: "Don’t have an account?",
                                     style: TextStyle(
                                         color: Color(0xFF858597),
-                                        fontSize: 19
+                                        fontSize: 14
                                     )
                                 ),
                                 TextSpan(
                                     text: " Sign up",
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       color: Color(0xFF3D5CFF),
                                       fontWeight: FontWeight.w800
                                     ),
@@ -205,7 +204,7 @@ class _LoginScreen extends State<LoginScreen> {
                             "Or login with",
                             style: TextStyle(
                               color: Color(0xFF858597),
-                              fontSize: 19,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600
                             ),
                           ),
@@ -218,13 +217,13 @@ class _LoginScreen extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 60),
-                      Row(
+                      SizedBox(height: 40),
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // Nút Google
                           SizedBox(
-                            height: 60,
+                            height: 55,
                             child: ElevatedButton(
                               onPressed: () => context.go('/register'),
                               style: ElevatedButton.styleFrom(
@@ -241,14 +240,14 @@ class _LoginScreen extends State<LoginScreen> {
                                 children: [
                                   Image.asset(
                                     "assets/images/logos/logo_gg.png",
-                                    height: 40,
-                                    width: 35,
+                                    height: 28,
+                                    width: 28,
                                   ),
                                   const SizedBox(width: 8),
                                   const Text(
                                     "Login with Google",
                                     style: TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 15,
                                         color: Colors.black54,
                                     ),
                                   ),
@@ -256,11 +255,11 @@ class _LoginScreen extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-
+                          const SizedBox(height: 12),
                           // Nút Facebook
                           SizedBox(
-                            height: 60,
+                            height: 55,
+                            width: double.infinity,
                             child: ElevatedButton.icon(
                               icon: Icon(Icons.facebook,size: 40,),
                               onPressed: () => context.go('/login'),
@@ -275,7 +274,7 @@ class _LoginScreen extends State<LoginScreen> {
                               label: const Text(
                                 "Login with Facebook",
                                 style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 15,
                                     color: Colors.white
                                 ),
                               ),

@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         backgroundColor: const Color(0xFF4F46E5),
         title: const Text("Profile",
           style: TextStyle(
-            fontSize: 26,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5
@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         ),
         leading: IconButton(
             onPressed: () => context.go("/home"),
-            icon: Icon(Icons.arrow_back,size: 28,color: Colors.white,)
+            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
         ),
       ),
       body: FadeTransition(
@@ -114,15 +114,12 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         child: SlideTransition(
           position: _slideAnimation,
           child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 20
-              ),
+              padding: EdgeInsets.all(8),
               child: SafeArea(
                   child: Column(
                     children: [
@@ -144,24 +141,30 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                   value: 'Advanced',
                                   icon: Icons.trending_up,
                                   color: const Color(0xFF10B981),
+                                  titleSize: 14,
+                                  valueSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: ProfileCard(
                                   title: 'Day Streak',
                                   value: '36',
                                   icon: Icons.local_fire_department,
                                   color: const Color(0xFFD7E37431),
+                                  titleSize: 14,
+                                  valueSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: ProfileCard(
                                   title: 'Quizzes',
                                   value: '47',
                                   icon: Icons.quiz,
                                   color: const Color(0xFF6366F1),
+                                  titleSize: 14,
+                                  valueSize: 16,
                                 ),
                               ),
                             ],
@@ -176,21 +179,25 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                   value: '85%',
                                   icon: Icons.star,
                                   color: const Color(0xFFF59E0B),
+                                  titleSize: 14,
+                                  valueSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: ProfileCard(
                                   title: 'Vocabulary Learned',
                                   value: '180',
                                   icon: Icons.school_outlined,
                                   color: const Color(0xFFF59E0B),
+                                  titleSize: 14,
+                                  valueSize: 16,
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           // Action Cards
                           ActionCard(
@@ -200,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             color: const Color(0xFF6366F1),
                             onTap: () => context.push('/profile/edit-profile'),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           ActionCard(
                             title: 'Achievements',
                             subtitle: 'View your badges and rewards',
@@ -208,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             color: const Color(0xFFF59E0B),
                             onTap: () => context.push("/profile/achievement"),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           ActionCard(
                             title: 'Settings',
@@ -217,7 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             color: const Color(0xFF64748B),
                             onTap: () => context.push('/profile/setting'),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           ActionCard(
                             title: 'Logout',
@@ -227,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             onTap: () => _showLogoutDialog(),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
@@ -244,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   Widget _informationCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF4239DA), Color(0xFF4F46E1)], // nền nhạt
@@ -265,8 +272,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         children: [
           // Avatar
           Container(
-            width: 90,
-            height: 90,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const LinearGradient(
@@ -295,14 +302,14 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               child: Text(
                 'TT',
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
           // Info
           Expanded(
@@ -312,7 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 Text(
                   'Thành Tiến',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -320,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 Text(
                   'ngothanhtien1406@gmail.com',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 15,
                     color: Colors.white70,
                     fontWeight: FontWeight.w400,
                     letterSpacing: -0.5
@@ -346,7 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   Widget _buildChip(String text, Color color, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
@@ -356,8 +363,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         text,
         style: TextStyle(
           color: color,
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

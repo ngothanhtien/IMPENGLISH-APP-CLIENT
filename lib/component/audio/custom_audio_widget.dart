@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final String url;
@@ -21,6 +22,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   final AudioPlayer _player = AudioPlayer();
   bool _isPlaying = false;
   Future<void> _togglePlay() async {
+    if(widget.url.isEmpty){
+      AppSnackBar.showInfo(context, "We're really sorry. There are currently no audio tracks with this word.");
+      return;
+    }
     if (_isPlaying) {
       await _player.stop();
     } else {

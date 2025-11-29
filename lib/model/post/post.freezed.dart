@@ -405,6 +405,7 @@ mixin _$UserPost {
   String? get fullName => throw _privateConstructorUsedError;
   int? get streakDay => throw _privateConstructorUsedError;
   String? get level => throw _privateConstructorUsedError;
+  String? get avatar => throw _privateConstructorUsedError;
 
   /// Serializes this UserPost to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -426,6 +427,7 @@ abstract class $UserPostCopyWith<$Res> {
     String? fullName,
     int? streakDay,
     String? level,
+    String? avatar,
   });
 }
 
@@ -448,6 +450,7 @@ class _$UserPostCopyWithImpl<$Res, $Val extends UserPost>
     Object? fullName = freezed,
     Object? streakDay = freezed,
     Object? level = freezed,
+    Object? avatar = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -471,6 +474,11 @@ class _$UserPostCopyWithImpl<$Res, $Val extends UserPost>
                     ? _value.level
                     : level // ignore: cast_nullable_to_non_nullable
                         as String?,
+            avatar:
+                freezed == avatar
+                    ? _value.avatar
+                    : avatar // ignore: cast_nullable_to_non_nullable
+                        as String?,
           )
           as $Val,
     );
@@ -491,6 +499,7 @@ abstract class _$$UserPostImplCopyWith<$Res>
     String? fullName,
     int? streakDay,
     String? level,
+    String? avatar,
   });
 }
 
@@ -512,6 +521,7 @@ class __$$UserPostImplCopyWithImpl<$Res>
     Object? fullName = freezed,
     Object? streakDay = freezed,
     Object? level = freezed,
+    Object? avatar = freezed,
   }) {
     return _then(
       _$UserPostImpl(
@@ -535,6 +545,11 @@ class __$$UserPostImplCopyWithImpl<$Res>
                 ? _value.level
                 : level // ignore: cast_nullable_to_non_nullable
                     as String?,
+        avatar:
+            freezed == avatar
+                ? _value.avatar
+                : avatar // ignore: cast_nullable_to_non_nullable
+                    as String?,
       ),
     );
   }
@@ -548,6 +563,7 @@ class _$UserPostImpl implements _UserPost {
     this.fullName,
     this.streakDay,
     this.level,
+    this.avatar,
   });
 
   factory _$UserPostImpl.fromJson(Map<String, dynamic> json) =>
@@ -562,10 +578,12 @@ class _$UserPostImpl implements _UserPost {
   final int? streakDay;
   @override
   final String? level;
+  @override
+  final String? avatar;
 
   @override
   String toString() {
-    return 'UserPost(id: $id, fullName: $fullName, streakDay: $streakDay, level: $level)';
+    return 'UserPost(id: $id, fullName: $fullName, streakDay: $streakDay, level: $level, avatar: $avatar)';
   }
 
   @override
@@ -578,12 +596,14 @@ class _$UserPostImpl implements _UserPost {
                 other.fullName == fullName) &&
             (identical(other.streakDay, streakDay) ||
                 other.streakDay == streakDay) &&
-            (identical(other.level, level) || other.level == level));
+            (identical(other.level, level) || other.level == level) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, fullName, streakDay, level);
+  int get hashCode =>
+      Object.hash(runtimeType, id, fullName, streakDay, level, avatar);
 
   /// Create a copy of UserPost
   /// with the given fields replaced by the non-null parameter values.
@@ -605,6 +625,7 @@ abstract class _UserPost implements UserPost {
     final String? fullName,
     final int? streakDay,
     final String? level,
+    final String? avatar,
   }) = _$UserPostImpl;
 
   factory _UserPost.fromJson(Map<String, dynamic> json) =
@@ -619,6 +640,8 @@ abstract class _UserPost implements UserPost {
   int? get streakDay;
   @override
   String? get level;
+  @override
+  String? get avatar;
 
   /// Create a copy of UserPost
   /// with the given fields replaced by the non-null parameter values.

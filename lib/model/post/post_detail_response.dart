@@ -27,11 +27,11 @@ class PostDetailData with _$PostDetailData {
 }
 
 @freezed
-class Comment with _$Comment {
+class  Comment with _$Comment {
   const factory Comment({
     @JsonKey(name: '_id') String? id,
     String? postId,
-    String? userId,
+    UserPost? userId,
     int? countLike,
     String? content,
     DateTime? createdAt,

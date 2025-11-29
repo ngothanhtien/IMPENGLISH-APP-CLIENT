@@ -27,6 +27,7 @@ class UserPost with _$UserPost {
     String? fullName,
     int? streakDay,
     String? level,
+    String? avatar
   }) = _UserPost;
 
   factory UserPost.fromJson(Map<String, dynamic> json) =>

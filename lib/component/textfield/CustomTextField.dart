@@ -9,6 +9,8 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final double titleSize;
   final Color titleColor;
+  final bool showTitle;
+  final Function(String)? onchanged;
   const CustomTextField({
     Key? key,
     this.nameTextField,
@@ -19,6 +21,8 @@ class CustomTextField extends StatefulWidget {
     this.titleColor = const Color(0xFF525E71),
     this.prefixIcon,
     this.errorText,
+    this.onchanged,
+    this.showTitle = true
   }) : super(key: key);
 
   @override
@@ -33,15 +37,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.nameTextField ?? "",
-          style: TextStyle(
-            fontSize: widget.titleSize,
-            color: widget.titleColor,
-            fontWeight: FontWeight.w500,
+        if (widget.showTitle)
+          Text(
+            widget.nameTextField ?? "",
+            style: TextStyle(
+              fontSize: widget.titleSize,
+              color: widget.titleColor,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
+
+        if (widget.showTitle) const SizedBox(height: 6),
         TextField(
+          onChanged: widget.onchanged,
           controller: widget.controller,
           obscureText: widget.isPassword ? _obscureText : false,
           style: const TextStyle(

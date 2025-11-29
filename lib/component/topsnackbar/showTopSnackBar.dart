@@ -15,8 +15,8 @@ class AppSnackBar {
         borderRadius: BorderRadius.circular(12),
         color: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
@@ -41,7 +41,7 @@ class AppSnackBar {
           ),
         ),
       ),
-      displayDuration: const Duration(seconds: 3),
+      displayDuration: const Duration(seconds: 2),
     );
   }
 

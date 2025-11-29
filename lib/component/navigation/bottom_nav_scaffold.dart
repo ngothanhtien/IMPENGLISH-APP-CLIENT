@@ -20,7 +20,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
         backgroundColor: Colors.white,
         color: Colors.grey, // màu khi chưa chọn
         activeColor: const Color(0xFF3D5CFF), // màu tab đang chọn
-        style: TabStyle.flip, // kiểu hiện đại, có animation
+        style: TabStyle.fixed, // kiểu hiện đại, có animation
         initialActiveIndex: navigationShell.currentIndex,
         items: const [
           TabItem(icon: Icons.home, title: 'Home'),

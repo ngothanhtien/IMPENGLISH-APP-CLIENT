@@ -17,16 +17,22 @@ class _Community_Screen extends State<Community_Screen>
   late TabController _tabController;
   int _currentIndex = 0;
   List<Post> posts = [];
+  bool isLoadingPost = true;
 
   Future<void> getListPost() async {
+    setState(() {
+      isLoadingPost = true;
+    });
     try{
       final response = await postService().fetchPosts();
       setState(() {
         posts = response;
-        print(posts.map((m) => m.id));
+        isLoadingPost = false;
       });
     }catch(e){
-      debugPrint("$e");
+      setState(() {
+        isLoadingPost = false;
+      });
     }
   }
   @override
@@ -72,15 +78,11 @@ class _Community_Screen extends State<Community_Screen>
           title: Text(
             'Community',
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
               color: Colors.white,
               letterSpacing: -0.5
             ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-            onPressed: (){},
           ),
           actions: [
             ElevatedButton.icon(
@@ -110,16 +112,15 @@ class _Community_Screen extends State<Community_Screen>
         ),
         body: Column(
           children: [
-            SizedBox(height: 10,),
             Container(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(8),
               child: TabBar(
                 padding: EdgeInsets.all(10),
                 controller: _tabController,
                 labelColor: const Color(0xFF4F46E5),
                 unselectedLabelColor: Colors.grey.shade500,
                 labelStyle: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w700
+                    fontSize: 15, fontWeight: FontWeight.w700
                 ),
                 tabs: [
                   Tab(
@@ -156,21 +157,50 @@ class _Community_Screen extends State<Community_Screen>
                             bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
                           child: Column(
-                            children: List.generate(posts.length, (index){
-                              final post = posts[index];
-                              return ForumPostCard(
-                                id: post.id ?? '',
-                                fullName: post.userId?.fullName ?? '',
-                                title: post.title ?? '',
-                                level: post.userId?.level ?? '',
-                                content: post.content ?? '',
-                                category: post.category ?? '',
-                                date: post.createdAt.toString() ?? '',
-                                likes: post.countLike ?? 0,
-                                streakDay: post.userId?.streakDay ?? 0,
-                                onTap: ()=> context.push("/posts/detail/${post.id.toString()}"),
-                              );
-                            }),
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                alignment: Alignment.topRight,
+                                margin: EdgeInsets.only(right: 14),
+                                child: ElevatedButton(
+                                  onPressed: getListPost,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF4F46E5),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)
+                                    )
+                                  ),
+                                  child: const Text("Reload",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700
+                                    ),
+                                  )
+                                ),
+                              ),
+                              SizedBox(height: 12,),
+                              isLoadingPost ? Center(child: CircularProgressIndicator(),):
+                              Column(
+                                children: List.generate(posts.length, (index){
+                                  final post = posts[index];
+                                  return ForumPostCard(
+                                    id: post.id ?? '',
+                                    fullName: post.userId?.fullName ?? '',
+                                    title: post.title ?? '',
+                                    level: post.userId?.level ?? '',
+                                    content: post.content ?? '',
+                                    category: post.category ?? '',
+                                    date: post.createdAt.toString() ?? '',
+                                    likes: post.countLike ?? 0,
+                                    streakDay: post.userId?.streakDay ?? 0,
+                                    tags: post.tags ?? [],
+                                    onTap: ()=> context.push("/posts/detail/${post.id.toString()}"),
+                                  );
+                                }),
+                              ),
+                              SizedBox(height: 24,)
+                            ],
                           )
                         )
                       )

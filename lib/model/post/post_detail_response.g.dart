@@ -40,7 +40,10 @@ _$CommentImpl _$$CommentImplFromJson(Map<String, dynamic> json) =>
     _$CommentImpl(
       id: json['_id'] as String?,
       postId: json['postId'] as String?,
-      userId: json['userId'] as String?,
+      userId:
+          json['userId'] == null
+              ? null
+              : UserPost.fromJson(json['userId'] as Map<String, dynamic>),
       countLike: (json['countLike'] as num?)?.toInt(),
       content: json['content'] as String?,
       createdAt:

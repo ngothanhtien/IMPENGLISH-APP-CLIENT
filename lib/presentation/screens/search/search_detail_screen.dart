@@ -22,7 +22,8 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
   List<IVocabBrief> vocabs = [];
   int currentPage = 1;
   int totalPages = 1;
-  bool isLoading = true;
+  bool isLoading = false;
+  bool isLoadingChangePage = false;
   Timer? _debounce;
 
   String? selectedTopic;
@@ -35,7 +36,6 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
     try{
       final response_data = await vocabService().fetchVocabBrief(
         topic: widget.topic.toString().toLowerCase(),
-
       );
       setState(() {
         vocabs = response_data.data ?? [];
@@ -57,16 +57,12 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
     fetchVocabByTopic();
   }
 
-  Future<void> _onFilterChanged() async {
-    // TODO: Gọi API search lại với filter + page = 1
-    print("FILTER: $selectedTopic - $selectedLevel");
-  }
-
   Future<void> _changePage(int newPage) async {
     if (newPage < 1 || newPage > totalPages) return;
 
     setState(() {
       currentPage = newPage;
+      isLoadingChangePage = true;
     });
 
     try{
@@ -74,13 +70,17 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
         topic: widget.topic.toString().toLowerCase(),
         page: newPage
       );
+      await Future.delayed(Duration(milliseconds: 800));
       setState(() {
         currentPage = newPage;
         vocabs = response_data.data ?? [];
         totalPages = response_data.pagination?.pages ?? totalPages;
+        isLoadingChangePage =false;
       });
     }catch(e){
-      print("Error at fetch vocab changePage: $e");
+      setState(() {
+        isLoadingChangePage =false;
+      });
     }
   }
   void _runDebounce(int newPage){
@@ -92,6 +92,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
   }
   @override
   Widget build(BuildContext context) {
+    if(isLoading) Center(child: CircularProgressIndicator(),);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -116,13 +117,15 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
         ),
       ),
 
-      body: Padding(
+      body: isLoading ? Center(child: CircularProgressIndicator(),)
+        : Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
             const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
+              child: isLoadingChangePage ? Center(child: CircularProgressIndicator(),)
+                : ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: vocabs.length,
                 shrinkWrap: true,

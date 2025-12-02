@@ -65,4 +65,21 @@ class vocabService {
       throw Exception("Error at get Vocabulary brief: $e");
     }
   }
+  Future<VocabDetailResponse> getRandomVocab({required String topic,required String word}) async {
+    try{
+      final response = await http.get(
+        Uri.parse("${base_url}/vocabulary/randomword?topic=$topic&word=$word"),
+        headers: headers
+      );
+      if(response.statusCode ==200){
+        final dataResponse = json.decode(response.body);
+        final datafromJson = VocabDetailResponse.fromJson(dataResponse);
+        return datafromJson;
+      }else{
+        throw Exception("Error at get random vocab at service: ${response.statusCode}");
+      }
+    }catch(e){
+      throw Exception("Error at get random vocab at service: $e");
+    }
+  }
 }

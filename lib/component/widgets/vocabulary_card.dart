@@ -91,6 +91,7 @@ class VocabularyCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       RichText(
+                        textAlign: TextAlign.justify,
                         text: TextSpan(
                           children: [
                             TextSpan(text: "Meaning: ",

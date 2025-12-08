@@ -68,7 +68,7 @@ class Question{
     options = List<String>.from(json['options']);
     correctAnswer = json['correctAnswer'];
     level = json['level'];
-    qsId = json['qsId'];
+    qsId = json['_id'];
   }
 
   Map<String,dynamic> toJson(){
@@ -77,7 +77,7 @@ class Question{
     data['options'] = options;
     data['correctAnswer'] = correctAnswer;
     data['level'] = level;
-    data['qsId'] = qsId;
+    data['_id'] = qsId;
     return data;
   }
 }

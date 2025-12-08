@@ -1,5 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/quiz_detail_card.dart';
 import 'package:learning_app_client/component/widgets/quiz_info_card.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_questions_screen.dart';
@@ -7,14 +10,14 @@ import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_q
 class QuizDetailScreen extends StatefulWidget {
   final String level;
   final String category;
-  final String questions;
+  final int totalQuestions;
   final String timeLimit;
 
   const QuizDetailScreen({
     super.key,
     required this.level,
     required this.category,
-    required this.questions,
+    required this.totalQuestions,
     required this.timeLimit,
   });
 
@@ -104,7 +107,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
         title:  Text('Quiz Details',
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 18,
+            fontSize: 20,
             color: Colors.white,
             letterSpacing: -0.5
           ),
@@ -117,11 +120,15 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmark_outline,size: 22,color: Colors.white),
-            onPressed: () => _showFeatureComingSoon('Bookmark'),
+            onPressed: () => {
+              AppSnackBar.showInfo(context, "Bookmark feature comming soon")
+            },
           ),
           IconButton(
             icon: const Icon(Icons.share_outlined,size: 22,color: Colors.white),
-            onPressed: () => _showFeatureComingSoon('Share'),
+            onPressed: () => {
+              AppSnackBar.showInfo(context, "Share feature comming soon")
+            },
           ),
         ],
       ),
@@ -182,11 +189,13 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       const SizedBox(height: 8),
 
                       Text(
-                        'Test your knowledge in ${widget.category} with ${widget.questions} exciting questions!',
+                        'Test your knowledge in ${widget.category} with ${widget.totalQuestions} exciting questions!',
                         style: TextStyle(
                           fontSize: 16,
-                          color: const Color(0xFF525E71),
+                          color: const Color(0xFF4C525A),
                           fontWeight: FontWeight.w400,
+                          letterSpacing: 0.3,
+                          height: 1.5
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -233,7 +242,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                             child: QuizDetailCard(
                               icon: Icons.quiz,
                               label: 'Questions',
-                              value: widget.questions,
+                              value: widget.totalQuestions.toString(),
                               color: const Color(0xFF8B5CF6),
                             ),
                           ),
@@ -254,7 +263,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       QuizInfoCard(
                         category: widget.category,
                         level: widget.level,
-                        questions: widget.questions,
+                        questions: widget.totalQuestions.toString(),
                         timeLimit: widget.timeLimit,
                       ),
 
@@ -270,7 +279,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                 child: SlideTransition(
                   position: _buttonSlideAnimation,
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
@@ -375,83 +384,27 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
   }
 
   void _startQuiz() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.play_circle, color: Color(0xFF4F46E5), size: 32),
-              SizedBox(width: 12),
-              Text('Ready to Start?',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            'You\'re about to start a ${widget.level} ${widget.category} quiz with ${widget.questions} questions. You have ${widget.timeLimit} to complete it. Good luck!',
-            style: TextStyle(
-              letterSpacing: -0.2,
-              fontSize: 14,
-              height: 1.5
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(),
-              child: const Text('Cancel',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.pop();
-                context.push('/quiz/detail/practice',
-                  extra: {
-                    "level": widget.level,
-                    "category": widget.category,
-                    "questions": widget.questions,
-                    "timeLimit": widget.timeLimit
-                  }
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Start Now',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700
-                ),
-              ),
-            ),
-          ],
+    showAppDialog(
+      context,
+      icon: Icons.play_circle,
+      title: 'Ready to Start?',
+      message: 'You\'re about to start a ${widget.level} ${widget.category} '
+          'quiz with ${widget.totalQuestions} questions. You have ${widget.timeLimit} '
+          'to complete it. Good luck!',
+      onOk: (){
+        context.pop();
+        context.push('/quiz/detail/practice',
+            extra: {
+              "level": widget.level,
+              "category": widget.category,
+              "totalQuestions": widget.totalQuestions,
+              "timeLimit": widget.timeLimit
+            }
         );
       },
-    );
-  }
-
-  void _showFeatureComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature feature coming soon!'),
-        backgroundColor: const Color(0xFF6366F1),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      animType: AnimType.scale,
+      okText: "Start Now",
+      align: TextAlign.justify
     );
   }
 }

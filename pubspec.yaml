@@ -55,6 +55,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   path_provider: ^2.1.5
+  awesome_dialog: ^3.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

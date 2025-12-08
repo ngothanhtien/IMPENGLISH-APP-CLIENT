@@ -64,10 +64,6 @@ class _LearnScreen extends State<LearnScreen>{
             letterSpacing: -0.5
           ),
         ),
-        leading: IconButton(
-            onPressed: () => context.go('/home'),
-            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
-        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(

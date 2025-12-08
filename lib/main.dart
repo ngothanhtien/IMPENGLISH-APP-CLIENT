@@ -94,12 +94,12 @@ final GoRouter _router = GoRouter(
             final data = state.extra as Map<String,dynamic>;
             final level = data['level'];
             final category = data['category'];
-            final questions = data['questions'];
+            final totalQuestions = data['totalQuestions'];
             final timeLimit = data['timeLimit'];
             return QuizDetailScreen(
                 level: level,
                 category: category,
-                questions: questions,
+                totalQuestions: totalQuestions,
                 timeLimit: timeLimit
             );
           }
@@ -110,12 +110,12 @@ final GoRouter _router = GoRouter(
             final data = state.extra as Map<String,dynamic>;
             final level = data['level'];
             final category = data['category'];
-            final questions = data['questions'];
+            final totalQuestions = data['totalQuestions'];
             final timeLimit = data['timeLimit'];
             return QuizQuestionsScreen(
                 level: level,
                 category: category,
-                questions: questions,
+                totalQuestions: totalQuestions,
                 timeLimit: timeLimit
             );
           }
@@ -124,19 +124,11 @@ final GoRouter _router = GoRouter(
           path: '/quiz/detail/practice/result',
           builder: (context,state)  {
             final data = state.extra as Map<String,dynamic>;
-            final level = data['level'];
-            final category = data['category'];
-            final questions = data['questions'];
+            final quizResultId = data['quizResultId'];
             final timeLimit = data['timeLimit'];
-            final userAnswers = data['userAnswers'];
-            final quizQuestions = data['quizQuestions'];
             return QuizResultsScreen(
-                level: level,
-                category: category,
-                questions: questions,
-                timeLimit: timeLimit,
-                userAnswers: userAnswers,
-                quizQuestions: quizQuestions
+              quizResultId: quizResultId,
+              timeLimit: timeLimit,
             );
           }
       ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ResultSummaryCard extends StatelessWidget {
   final String level;
   final String category;
-  final String questions;
+  final int totalQuestions;
   final String timeLimit;
   final String score;
   final String percentage;
@@ -13,7 +13,7 @@ class ResultSummaryCard extends StatelessWidget {
     super.key,
     required this.level,
     required this.category,
-    required this.questions,
+    required this.totalQuestions,
     required this.timeLimit,
     required this.score,
     required this.percentage,
@@ -68,7 +68,7 @@ class ResultSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildDetailItem('Questions', questions, Icons.quiz),
+                child: _buildDetailItem('Questions', totalQuestions.toString(), Icons.quiz),
               ),
               Expanded(
                 child: _buildDetailItem('Time Limit', timeLimit, Icons.timer),

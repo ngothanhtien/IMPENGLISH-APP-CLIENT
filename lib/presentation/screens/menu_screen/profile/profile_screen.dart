@@ -1,10 +1,14 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/action_card.dart';
+import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
+import 'package:learning_app_client/model/user/user.dart';
 import 'package:learning_app_client/service/auth_service.dart';
+import 'package:learning_app_client/service/user_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,7 +22,29 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _isLoggingOut = false;
+  User? user;
+  bool isLoadingProfile = false;
 
+  Future<void> _getProfile() async {
+    setState(() {
+      isLoadingProfile = true;
+    });
+    try{
+      final response = await UserService().getProfile();
+      if(!mounted) return;
+
+      await Future.delayed(Duration(milliseconds: 400));
+      setState(() {
+        user = response;
+        isLoadingProfile = false;
+      });
+    }catch(e){
+      setState(() {
+        isLoadingProfile = false;
+      });
+      debugPrint("Error at _getProfile: $e");
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -44,7 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     ));
 
     _animationController.forward();
+    _getProfile();
   }
+
   Future<void> handleLogout() async {
     if (!mounted) return;
 
@@ -58,7 +86,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       if (refreshToken == null || refreshToken.isEmpty) {
         await _clearTokens(storage);
         if (!mounted) return;
-        AppSnackBar.showSuccess(context, "Logged out");
         context.go('/login');
         return;
       }
@@ -111,18 +138,16 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         backgroundColor: const Color(0xFF4F46E5),
         title: const Text("Profile",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5
           ),
         ),
-        leading: IconButton(
-            onPressed: () => context.go("/home"),
-            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
-        ),
       ),
-      body: FadeTransition(
+      body: isLoadingProfile || user == null ?
+      Center(child: CircularProgressIndicator(),):
+      FadeTransition(
         opacity: _fadeAnimation,
         child: SlideTransition(
           position: _slideAnimation,
@@ -141,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                       children: [
                         const SizedBox(height: 5),
                         // Avatar
-                        _informationCard(),
+                        _informationCard(user!),
                         const SizedBox(height: 16),
 
                         // Stats Cards
@@ -150,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             Expanded(
                               child: ProfileCard(
                                 title: 'Level',
-                                value: 'Advanced',
+                                value: user?.level ?? 'Anonymous',
                                 icon: Icons.trending_up,
                                 color: const Color(0xFF10B981),
                                 titleSize: 14,
@@ -161,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             Expanded(
                               child: ProfileCard(
                                 title: 'Day Streak',
-                                value: '36',
+                                value: user?.streakDay.toString() ?? 'N/A',
                                 icon: Icons.local_fire_department,
                                 color: const Color(0xFFEA8E31),
                                 titleSize: 14,
@@ -172,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             Expanded(
                               child: ProfileCard(
                                 title: 'Quizzes',
-                                value: '47',
+                                value: '7',
                                 icon: Icons.quiz,
                                 color: const Color(0xFF6366F1),
                                 titleSize: 14,
@@ -259,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     );
   }
 
-  Widget _informationCard() {
+  Widget _informationCard(User user) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -311,7 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 borderRadius: BorderRadius.circular(50)
               ),
               child: Text(
-                'TT',
+                user.fullName?.split("")[0] ?? 'A',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -328,7 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Thành Tiến',
+                  user.fullName ?? '',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -336,7 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   ),
                 ),
                 Text(
-                  'ngothanhtien1406@gmail.com',
+                  user.email ?? '',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white70,
@@ -349,9 +374,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 // Badges
                 Row(
                   children: [
-                    _buildChip("Beginner", Colors.green, Colors.green.shade50),
+                    _buildChip(user.level ?? '', Colors.green, Colors.green.shade50),
                     const SizedBox(width: 8),
-                    _buildChip("Joined Sep 2025", Colors.indigo, Colors.indigo.shade50),
+                    _buildChip(user.createdAt.toString().split(' ')[0], Colors.indigo, Colors.indigo.shade50),
                   ],
                 )
               ],
@@ -382,43 +407,16 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   }
 
   void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.logout, color: Color(0xFF373636), size: 28),
-              SizedBox(width: 12),
-              Text('Logout',style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700),),
-            ],
-          ),
-          content: const Text('Are you sure you want to logout?',
-            style: TextStyle(
-              fontSize: 17,
-              color: Colors.black87
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: handleLogout,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Logout'),
-            ),
-          ],
-        );
-      },
+    showAppDialog(
+      context,
+      icon: Icons.logout,
+      title: 'Log out',
+      message: 'Do you really want to logout the App?',
+      onOk: handleLogout,
+      titleColor: Colors.red,
+      primaryColor: Colors.red,
+      align: TextAlign.center,
+      animType: AnimType.scale
     );
   }
 }

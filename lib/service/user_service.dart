@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:learning_app_client/model/user.dart';
+import 'package:learning_app_client/model/user/user.dart';
 
 class UserService {
   static String? baseUrl = dotenv.env['BASE_URL_SML_3'];
@@ -118,9 +118,11 @@ class UserService {
   Future<User> getProfile() async {
     try{
       final accessToken = await storage.read(key: "accessToken");
+
       if (accessToken == null) {
         throw Exception("Access token not found");
       }
+
       final response = await http.get(
         Uri.parse("$baseUrl/users/profile"),
         headers: {
@@ -129,18 +131,17 @@ class UserService {
           'Authorization': 'Bearer $accessToken',
         },
       );
+      print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         final Map<String,dynamic> data = json.decode(response.body);
-        final userJson = data['user'];
-        final user = User.fromJson(userJson);
-        return user;
-      }else if (response.statusCode == 401) {
-        throw Exception("Unauthorized: Token may be expired");
-      } else {
-        throw Exception(
-          "Failed to get profile: ${response.statusCode} ${response.reasonPhrase}",
-        );
+        return User.fromJson(data['user']);
       }
+
+      if (response.statusCode == 401) {
+        throw Exception("Unauthorized");
+      }
+
+      throw Exception("Error: ${response.statusCode}");
     }catch(e){
       throw Exception("Error in get profile: $e");
     }

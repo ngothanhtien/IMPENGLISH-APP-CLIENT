@@ -11,12 +11,12 @@ class Quiz {
     if(json['data'] != null){
       data = <Data>[];
       json['data'].forEach((d){
-        data!.add(new Data.fromJson(d));
+        data!.add(Data.fromJson(d));
       });
     }
   }
   Map<String,dynamic> toJson(){
-    Map<String,dynamic> data = new Map<String,dynamic>();
+    Map<String,dynamic> data = {};
     data['status'] = status;
     data['message'] = message;
     if (this.data != null) {
@@ -38,13 +38,13 @@ class Data {
     if(json['question'] != null){
       question = <Question>[];
       json['question'].forEach((q){
-        question!.add(new Question.fromJson(q));
+        question!.add(Question.fromJson(q));
       });
     }
   }
 
   Map<String,dynamic> toJson(){
-    Map<String,dynamic> data = new Map<String,dynamic>();
+    Map<String,dynamic> data = {};
     data['_id'] = id;
     data['topic'] = topic;
     if(question != null){
@@ -72,7 +72,7 @@ class Question{
   }
 
   Map<String,dynamic> toJson(){
-    Map<String,dynamic> data = new Map<String,dynamic>();
+    Map<String,dynamic> data = {};
     data['questionText'] = questionText;
     data['options'] = options;
     data['correctAnswer'] = correctAnswer;

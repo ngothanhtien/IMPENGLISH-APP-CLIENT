@@ -4,7 +4,6 @@ import 'package:learning_app_client/component/widgets/daily_goal_card.dart';
 import 'package:learning_app_client/component/widgets/hightlight_card.dart';
 import 'package:learning_app_client/component/widgets/recommend_topics.dart';
 import 'package:learning_app_client/component/widgets/search_bar_widget.dart';
-import 'package:learning_app_client/presentation/screens/search/search_sceen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -114,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4F46E5).withOpacity(0.3),
+                              color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),

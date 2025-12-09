@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
-import 'package:learning_app_client/presentation/screens/search/search_detail_screen.dart';
 
 class RecommendedTopics extends StatelessWidget {
   const RecommendedTopics({super.key});

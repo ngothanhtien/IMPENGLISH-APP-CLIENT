@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/learning_progress_chart.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
 import 'package:learning_app_client/model/vocabulary/flash_card.dart';
-import 'package:learning_app_client/service/vocabularyService.dart';
+import 'package:learning_app_client/service/vocabulary_service.dart';
 
 class LearnScreen extends StatefulWidget{
+  const LearnScreen({super.key});
   @override
   State<StatefulWidget> createState() => _LearnScreen();
 }
 class _LearnScreen extends State<LearnScreen>{
   final TextEditingController searchWordsController = TextEditingController();
-  List<IVocabBrief> get_vocabCards = [];
-  List<IVocabBrief> filter_vocabCards = [];
+  List<IVocabBrief> getVocabCards = [];
+  List<IVocabBrief> filterVocabCards = [];
   bool isLoading = true;
 
   late TextEditingController _searchController;
 
   Future<void> loadVocabCard () async {
     try{
-      final result = await vocabService().fetchVocabBrief(
+      final result = await VocabService().fetchVocabBrief(
         limit: 10,
         topic: '',
         page: 1
       );
       setState(() {
-        get_vocabCards = result.data ?? [];
-        filter_vocabCards = get_vocabCards.where((v) => v.audio != null&& v.audio!.isNotEmpty).toList();
+        getVocabCards = result.data ?? [];
+        filterVocabCards = getVocabCards.where((v) => v.audio != null&& v.audio!.isNotEmpty).toList();
         isLoading = false;
       });
     }catch(e){
@@ -109,11 +109,11 @@ class _LearnScreen extends State<LearnScreen>{
               ):
               ListView.builder(
                 padding: const EdgeInsets.all(8),
-                itemCount: filter_vocabCards.length,
+                itemCount: filterVocabCards.length,
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  final vocab = filter_vocabCards[index];
+                  final vocab = filterVocabCards[index];
                   return VocabularyCard(vocabularyWord: vocab,);
                 },
               ),

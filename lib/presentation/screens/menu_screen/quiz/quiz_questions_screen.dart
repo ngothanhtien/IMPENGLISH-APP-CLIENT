@@ -2,14 +2,14 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/countdown_timer/countdown_timer.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/progress_indicator_widget.dart';
 import 'package:learning_app_client/component/widgets/question_card.dart';
 import 'package:learning_app_client/model/quiz.dart';
 import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
-import 'package:learning_app_client/service/quizResultService.dart';
-import 'package:learning_app_client/service/quizService.dart';
+import 'package:learning_app_client/service/quiz_result_service.dart';
+import 'package:learning_app_client/service/quiz_service.dart';
 import 'dart:math';
 
 class QuizQuestionsScreen extends StatefulWidget {
@@ -51,14 +51,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   int totalQuestions = 0;
   int correctAnswers = 0;
   int incorrectAnswers = 0;
-  List<QuestionQuizResult> questions_quiz_result = [];
+  List<QuestionQuizResult> questionsQuizResult = [];
   DateTime completeAt = DateTime.now();
 
   late Future<List<Question>> futureQuestions;
 
   Future<List<Question>> _generateQuestions() async {
     try {
-      final quiz = await quizService().fetchQuiz(
+      final quiz = await QuizService().fetchQuiz(
         level: widget.level,
         topic: widget.category,
         numberQuestions: widget.totalQuestions,
@@ -67,7 +67,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
       if (quiz.data != null && quiz.data!.isNotEmpty) {
         final questions = quiz.data!.first.question;
         userAnswers = List.filled(questions!.length, '');
-        return questions!;
+        return questions;
       } else {
         throw Exception("Error: Can't fetch data quiz!");
       }
@@ -80,31 +80,34 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
     _calculateResults();
     _generateQuestionQuizResult();
     try{
-      final quiz_rs = QuizResult(
+      final quizResult = QuizResult(
         level: widget.level,
         category: widget.category,
         correctAnswers: correctAnswers,
         totalQuestions: totalQuestions,
         incorrectAnswers: incorrectAnswers,
         statusFinish: true,
-        questions: questions_quiz_result,
+        questions: questionsQuizResult,
       );
 
-      final response = await quizResultService().createQuizResult(
-        quiz: quiz_rs,
+      final response = await QuizResultService().createQuizResult(
+        quiz: quizResult,
         userId: '68cd5981cf94a9641d3e9391',
       );
 
-      if (response != null && response['status'] == 'Success') {
+      if (!mounted) return null;
+
+      if (response['status'] == 'Success') {
         final data = response['data'];
         final id = data?['_id'] as String?;
+
         if (id != null) {
           AppSnackBar.showSuccess(context, "Submit quiz successfully");
           return id;
         }
         return null;
       } else {
-        throw Exception("Submit failed: ${response?['message'] ?? 'Unknown'}");
+        throw Exception("Submit failed: ${response['message'] ?? 'Unknown'}");
       }
     }catch(e){
       debugPrint("Error at createQuizResult: $e");
@@ -113,7 +116,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   }
 
   Future<void> _finishQuiz(List<Question> questions) async {
-    final quizResultId;
+    String? quizResultId;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -121,8 +124,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
     );
     try {
       quizResultId = await createQuizResult();
+      if(!mounted) return;
     } catch (e) {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) context.pop();
       AppSnackBar.showError(context, "Submit quiz fail: $e");
       return;
     }
@@ -236,14 +240,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   }
 
   void _calculateResults(){
-    final question_tmp = _cachedQuestions;
+    final questionTemp = _cachedQuestions;
     final answers = userAnswers;
-    final len = min(answers.length, question_tmp.length);
+    final len = min(answers.length, questionTemp.length);
 
     totalQuestions = len;
     correctAnswers = 0;
     for (int i = 0; i < len; i++) {
-      if (answers[i] == question_tmp[i].correctAnswer) {
+      if (answers[i] == questionTemp[i].correctAnswer) {
         correctAnswers++;
       }
     }
@@ -251,14 +255,14 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   }
 
   void _generateQuestionQuizResult(){
-    questions_quiz_result.clear();
-    final question_tmp = _cachedQuestions;
+    questionsQuizResult.clear();
+    final questionTemp = _cachedQuestions;
     final answers = userAnswers;
 
-    final len = min(answers.length, question_tmp.length);
+    final len = min(answers.length, questionTemp.length);
     for(int i = 0; i < len; i++){
       final selected = answers[i].isEmpty ? 'No answer' : answers[i];
-      final q = question_tmp[i];
+      final q = questionTemp[i];
       final result = QuestionQuizResult(
         id: null,
         questionId: q.qsId,
@@ -267,7 +271,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
         correctAnswer: q.correctAnswer,
         isCorrect: q.correctAnswer == answers[i],
       );
-      questions_quiz_result.add(result);
+      questionsQuizResult.add(result);
     }
   }
 
@@ -290,7 +294,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   void _showSubmitQuiz(List<Question> questions) {
     showAppDialog(
       context,
-      icon: Icons.check,
+      icon: Icons.check_circle,
       title: "Confirm Submit",
       message: "Do you really want to Submit the Quiz?",
       okText: "Submit",
@@ -298,6 +302,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
       animType: AnimType.scale,
       align: TextAlign.center,
       primaryColor: Colors.green,
+      titleColor: Colors.green
     );
   }
 
@@ -310,6 +315,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
       okText: "Exit",
       onOk: (){context.pop();},
       animType: AnimType.scale,
+      primaryColor: Colors.redAccent,
+      titleColor: Colors.redAccent
     );
   }
 
@@ -480,7 +487,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, -5),
                         ),

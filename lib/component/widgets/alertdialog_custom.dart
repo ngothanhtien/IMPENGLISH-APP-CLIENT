@@ -1,6 +1,5 @@
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showAppDialog(BuildContext context, {
@@ -36,7 +35,7 @@ Future<void> showAppDialog(BuildContext context, {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.12),
+            color: primaryColor.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -92,6 +91,7 @@ Future<void> showAppDialog(BuildContext context, {
                   style: TextStyle(
                     color: Color(0xFFB6B6BC),
                     fontWeight: FontWeight.w500,
+                    fontSize: 13
                   ),
                 ),
               ),
@@ -119,6 +119,7 @@ Future<void> showAppDialog(BuildContext context, {
                   style: TextStyle(
                     color: okTextColor,
                     fontWeight: FontWeight.w700,
+                    fontSize: 14
                   ),
                 ),
               ),

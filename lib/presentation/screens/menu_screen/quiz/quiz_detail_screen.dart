@@ -1,11 +1,10 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/quiz_detail_card.dart';
 import 'package:learning_app_client/component/widgets/quiz_info_card.dart';
-import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_questions_screen.dart';
 
 class QuizDetailScreen extends StatefulWidget {
   final String level;
@@ -161,7 +160,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                             borderRadius: BorderRadius.circular(60),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF6366F1).withOpacity(0.3),
+                                color: const Color(0xFF6366F1).withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -284,7 +283,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, -5),
                         ),

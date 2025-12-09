@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/question_result_card.dart';
 import 'package:learning_app_client/component/widgets/result_summary_card.dart';
 import 'package:learning_app_client/component/widgets/stats_chart.dart';
-import 'package:learning_app_client/model/quiz.dart';
 import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
-import 'package:learning_app_client/service/quizResultService.dart';
+import 'package:learning_app_client/service/quiz_result_service.dart';
 
 class QuizResultsScreen extends StatefulWidget {
   final String quizResultId;
@@ -86,10 +85,10 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
 
   Future<QuizResult> fetchDetailResultById() async {
     try{
-      final response = await quizResultService().getDetailQuizResultById(
+      final response = await QuizResultService().getDetailQuizResultById(
           quizResultId: widget.quizResultId
       );
-      if(response != null){
+      if(response.id != null){
         return response;
       }else{
         throw Exception("Error at fetchDetailResultById!");
@@ -206,7 +205,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                                         : percentage >= 50
                                         ? const Color(0xFFF59E0B)
                                         : const Color(0xFFEF4444))
-                                        .withOpacity(0.3),
+                                        .withValues(alpha: 0.3),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -237,7 +236,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'You scored ${percentage}% in this quiz',
+                              'You scored $percentage% in this quiz',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -349,7 +348,7 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF4F46E5),
                                 side: const BorderSide(
-                                  color: const Color(0xFF4F46E5),
+                                  color: Color(0xFF4F46E5),
                                   width: 2,
                                 ),
                                 shape: RoundedRectangleBorder(

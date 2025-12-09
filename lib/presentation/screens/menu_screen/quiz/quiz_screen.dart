@@ -87,7 +87,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1).withOpacity(0.1),
+                              color: const Color(0xFF6366F1).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(60),
                             ),
                             child: const Icon(

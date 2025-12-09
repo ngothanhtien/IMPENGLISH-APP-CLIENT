@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/action_card.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
-import 'package:learning_app_client/service/authService.dart';
+import 'package:learning_app_client/service/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -45,43 +45,56 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
     _animationController.forward();
   }
-  Future<void> handlelogout() async {
-    final storage = const FlutterSecureStorage();
+  Future<void> handleLogout() async {
+    if (!mounted) return;
 
+    final storage = const FlutterSecureStorage();
     setState(() => _isLoggingOut = true);
 
-    try{
+    try {
       final refreshToken = await storage.read(key: 'refreshToken');
 
-      if(refreshToken == null || refreshToken.isEmpty){
-        await storage.delete(key: 'accessToken');
-        await storage.delete(key: 'refreshToken');
+      // 1. Nếu không có refreshToken → chỉ xoá token & điều hướng
+      if (refreshToken == null || refreshToken.isEmpty) {
+        await _clearTokens(storage);
+        if (!mounted) return;
         AppSnackBar.showSuccess(context, "Logged out");
-        if (mounted) context.go('/login');
+        context.go('/login');
         return;
       }
-      final response = await authService().logOut(refreshToken: refreshToken);
+
+      // 2. Gửi request logout tới backend
+      final response = await AuthService().logOut(refreshToken: refreshToken);
+
+      if (!mounted) return;
 
       final title = response['title'] ?? response['status'] ?? '';
       final message = response['message'] ?? 'Logged out successfully';
-      if(title == 'Success'){
-        Future.delayed(const Duration(seconds: 1), (){
-          if(mounted) context.go('/login');
-          AppSnackBar.showSuccess(context, message);
-        });
-      }else{
+
+      if (title == 'Success') {
+        AppSnackBar.showSuccess(context, message);
+      } else {
         AppSnackBar.showError(context, message);
       }
-    }catch (e) {
-      AppSnackBar.showError(context, "Đã xảy ra lỗi khi đăng xuất: $e");
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(context, "Có lỗi khi đăng xuất: $e");
+      }
     } finally {
-      await storage.delete(key: 'accessToken');
-      await storage.delete(key: 'refreshToken');
+      // 3. Dù có lỗi hay không → xoá token
+      await _clearTokens(storage);
 
-      setState(() => _isLoggingOut = false);
-
-      if (mounted) context.go('/login');
+      // 4. Chỉ navigate nếu widget còn mounted
+      if (mounted) {
+        setState(() => _isLoggingOut = false);
+        context.go('/login');
+      }
     }
+  }
+
+  Future<void> _clearTokens(FlutterSecureStorage storage) async {
+    await storage.delete(key: 'accessToken');
+    await storage.delete(key: 'refreshToken');
   }
 
   @override
@@ -124,119 +137,117 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   child: Column(
                     children: [
                       // Header Section
-                    Container(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 5),
-                          // Avatar
-                          _informationCard(),
-                          const SizedBox(height: 16),
+                    Column(
+                      children: [
+                        const SizedBox(height: 5),
+                        // Avatar
+                        _informationCard(),
+                        const SizedBox(height: 16),
 
-                          // Stats Cards
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ProfileCard(
-                                  title: 'Level',
-                                  value: 'Advanced',
-                                  icon: Icons.trending_up,
-                                  color: const Color(0xFF10B981),
-                                  titleSize: 14,
-                                  valueSize: 16,
-                                ),
+                        // Stats Cards
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ProfileCard(
+                                title: 'Level',
+                                value: 'Advanced',
+                                icon: Icons.trending_up,
+                                color: const Color(0xFF10B981),
+                                titleSize: 14,
+                                valueSize: 16,
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ProfileCard(
-                                  title: 'Day Streak',
-                                  value: '36',
-                                  icon: Icons.local_fire_department,
-                                  color: const Color(0xFFD7E37431),
-                                  titleSize: 14,
-                                  valueSize: 16,
-                                ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ProfileCard(
+                                title: 'Day Streak',
+                                value: '36',
+                                icon: Icons.local_fire_department,
+                                color: const Color(0xFFEA8E31),
+                                titleSize: 14,
+                                valueSize: 16,
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ProfileCard(
-                                  title: 'Quizzes',
-                                  value: '47',
-                                  icon: Icons.quiz,
-                                  color: const Color(0xFF6366F1),
-                                  titleSize: 14,
-                                  valueSize: 16,
-                                ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ProfileCard(
+                                title: 'Quizzes',
+                                value: '47',
+                                icon: Icons.quiz,
+                                color: const Color(0xFF6366F1),
+                                titleSize: 14,
+                                valueSize: 16,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: ProfileCard(
-                                  title: 'Average Score',
-                                  value: '85%',
-                                  icon: Icons.star,
-                                  color: const Color(0xFFF59E0B),
-                                  titleSize: 14,
-                                  valueSize: 16,
-                                ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ProfileCard(
+                                title: 'Average Score',
+                                value: '85%',
+                                icon: Icons.star,
+                                color: const Color(0xFFF59E0B),
+                                titleSize: 14,
+                                valueSize: 16,
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ProfileCard(
-                                  title: 'Vocabulary Learned',
-                                  value: '180',
-                                  icon: Icons.school_outlined,
-                                  color: const Color(0xFFF59E0B),
-                                  titleSize: 14,
-                                  valueSize: 16,
-                                ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ProfileCard(
+                                title: 'Vocabulary Learned',
+                                value: '180',
+                                icon: Icons.school_outlined,
+                                color: const Color(0xFFF59E0B),
+                                titleSize: 14,
+                                valueSize: 16,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
 
-                          const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                          // Action Cards
-                          ActionCard(
-                            title: 'Edit Profile',
-                            subtitle: 'Update your personal information',
-                            icon: Icons.edit,
-                            color: const Color(0xFF6366F1),
-                            onTap: () => context.push('/profile/edit-profile'),
-                          ),
-                          const SizedBox(height: 12),
-                          ActionCard(
-                            title: 'Achievements',
-                            subtitle: 'View your badges and rewards',
-                            icon: Icons.emoji_events,
-                            color: const Color(0xFFF59E0B),
-                            onTap: () => context.push("/profile/achievement"),
-                          ),
-                          const SizedBox(height: 12),
+                        // Action Cards
+                        ActionCard(
+                          title: 'Edit Profile',
+                          subtitle: 'Update your personal information',
+                          icon: Icons.edit,
+                          color: const Color(0xFF6366F1),
+                          onTap: () => context.push('/profile/edit-profile'),
+                        ),
+                        const SizedBox(height: 12),
+                        ActionCard(
+                          title: 'Achievements',
+                          subtitle: 'View your badges and rewards',
+                          icon: Icons.emoji_events,
+                          color: const Color(0xFFF59E0B),
+                          onTap: () => context.push("/profile/achievement"),
+                        ),
+                        const SizedBox(height: 12),
 
-                          ActionCard(
-                            title: 'Settings',
-                            subtitle: 'Manage app preferences',
-                            icon: Icons.settings,
-                            color: const Color(0xFF64748B),
-                            onTap: () => context.push('/profile/setting'),
-                          ),
-                          const SizedBox(height: 12),
+                        ActionCard(
+                          title: 'Settings',
+                          subtitle: 'Manage app preferences',
+                          icon: Icons.settings,
+                          color: const Color(0xFF64748B),
+                          onTap: () => context.push('/profile/setting'),
+                        ),
+                        const SizedBox(height: 12),
 
-                          ActionCard(
-                            title: 'Logout',
-                            subtitle: 'Sign out of your account',
-                            icon: Icons.logout,
-                            color: const Color(0xFFEF4444),
-                            onTap: () => _showLogoutDialog(),
-                          ),
+                        ActionCard(
+                          title: 'Logout',
+                          subtitle: 'Sign out of your account',
+                          icon: Icons.logout,
+                          color: const Color(0xFFEF4444),
+                          onTap: () => _showLogoutDialog(),
+                        ),
 
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ],
                 ),
@@ -260,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: const Offset(0, 6),
             blurRadius: 12,
           )
@@ -292,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF667EEA).withOpacity(0.3),
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   )
@@ -357,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         text,
@@ -398,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: handlelogout,
+              onPressed: handleLogout,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFEF4444),
                 foregroundColor: Colors.white,

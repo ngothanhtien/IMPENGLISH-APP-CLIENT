@@ -31,13 +31,13 @@ class _QuestionResultCardState extends State<QuestionResultCard> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: widget.isCorrect
-              ? const Color(0xFF10B981).withOpacity(0.5)
-              : const Color(0xFFDF1414).withOpacity(0.5),
+              ? const Color(0xFF10B981).withValues(alpha: 0.5)
+              : const Color(0xFFDF1414).withValues(alpha: 0.5),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

@@ -69,7 +69,7 @@ class ProfileCard extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Icon(icon, color: color, size: size * 0.7),
@@ -118,7 +118,7 @@ class ProfileCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
           blurRadius: 16,
           offset: const Offset(0, 4),
         ),

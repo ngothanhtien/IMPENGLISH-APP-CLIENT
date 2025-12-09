@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
-class quizResultService{
+class QuizResultService{
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
   final _storage = FlutterSecureStorage();
 
@@ -76,7 +76,7 @@ class quizResultService{
       );
       if(response.statusCode == 200){
         final data = json.decode(response.body);
-        final result = QuizResult.fromJson(data['data']);;
+        final result = QuizResult.fromJson(data['data']);
         return result;
       }else{
         throw("Error in function get quiz result by id at service: ${response.statusCode}");

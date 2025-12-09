@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/textfield/CustomTextField.dart';
+import 'package:learning_app_client/component/textfield/custom_textfield.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/category_list_card.dart';
 import 'package:learning_app_client/model/post/post.dart';
-import 'package:learning_app_client/service/postService.dart';
+import 'package:learning_app_client/service/post_service.dart';
 
-class Post_Screen extends StatefulWidget {
+class PostScreen extends StatefulWidget {
+  const PostScreen({super.key});
   @override
-  State<Post_Screen> createState() => _Post_Screen();
+  State<PostScreen> createState() => _PostScreen();
 }
 
-class _Post_Screen extends State<Post_Screen> {
+class _PostScreen extends State<PostScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final TextEditingController tagController = TextEditingController();
@@ -113,19 +114,24 @@ class _Post_Screen extends State<Post_Screen> {
       userId: UserPost(id: "68cd5981cf94a9641d3e9391"),
     );
     try{
-      final response = await postService().createPost(post: post).timeout(Duration(seconds: 5));
+      final response = await PostService().createPost(post: post).timeout(Duration(seconds: 5));
       await Future.delayed(const Duration(milliseconds: 1500));
-      if(response != null){
-        setState(() {
-          isLoading = false;
-          resetAll();
-        });
-        AppSnackBar.showSuccess(context, "Post created successfully!");
-      }
+
+      if(!mounted) return;
+
+      setState(() {
+        isLoading = false;
+        resetAll();
+      });
+
+      AppSnackBar.showSuccess(context, "Post created successfully!");
     }catch(e){
       await Future.delayed(const Duration(milliseconds: 1500));
+
+      if(!mounted) return;
       setState(() => isLoading = false);
-      print("Error at create post screen: $e");
+
+      debugPrint("Error at create post screen: $e");
       AppSnackBar.showError(context, "Failed to create post!");
     }
   }
@@ -227,7 +233,7 @@ class _Post_Screen extends State<Post_Screen> {
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           offset: Offset(0, 2),
                           blurRadius: 10,
                         )
@@ -353,7 +359,7 @@ class _Post_Screen extends State<Post_Screen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             offset: Offset(0, 4),
             blurRadius: 4,
           )

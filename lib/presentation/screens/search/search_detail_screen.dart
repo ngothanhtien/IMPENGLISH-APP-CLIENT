@@ -4,21 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
 import 'package:learning_app_client/model/vocabulary/flash_card.dart';
-import 'package:learning_app_client/service/vocabularyService.dart';
+import 'package:learning_app_client/service/vocabulary_service.dart';
 
-class SearchDetail_Screen extends StatefulWidget {
+class SearchDetailScreen extends StatefulWidget {
   final String topic;
 
-  const SearchDetail_Screen({
+  const SearchDetailScreen({
     super.key,
     required this.topic
   });
 
   @override
-  State<StatefulWidget> createState() => _SearchDetail_ScreenState();
+  State<StatefulWidget> createState() => _SearchDetailScreen();
 }
 
-class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
+class _SearchDetailScreen extends State<SearchDetailScreen> {
   List<IVocabBrief> vocabs = [];
   int currentPage = 1;
   int totalPages = 1;
@@ -34,20 +34,19 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
       isLoading = true;
     });
     try{
-      final response_data = await vocabService().fetchVocabBrief(
+      final responseData = await VocabService().fetchVocabBrief(
         topic: widget.topic.toString().toLowerCase(),
       );
       setState(() {
-        vocabs = response_data.data ?? [];
-        currentPage = response_data.pagination?.page ?? 0;
-        totalPages = response_data.pagination?.pages ?? 0;
+        vocabs = responseData.data ?? [];
+        currentPage = responseData.pagination?.page ?? 0;
+        totalPages = responseData.pagination?.pages ?? 0;
         isLoading = false;
       });
     }catch(e){
       setState(() {
         isLoading = false;
       });
-      print("Error at List Vocab by topic!: $e");
     }
   }
 
@@ -66,15 +65,15 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
     });
 
     try{
-      final response_data = await vocabService().fetchVocabBrief(
+      final responseData = await VocabService().fetchVocabBrief(
         topic: widget.topic.toString().toLowerCase(),
         page: newPage
       );
       await Future.delayed(Duration(milliseconds: 800));
       setState(() {
         currentPage = newPage;
-        vocabs = response_data.data ?? [];
-        totalPages = response_data.pagination?.pages ?? totalPages;
+        vocabs = responseData.data ?? [];
+        totalPages = responseData.pagination?.pages ?? totalPages;
         isLoadingChangePage =false;
       });
     }catch(e){
@@ -109,7 +108,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
         leading: IconButton(
           onPressed: () => context.pop(),
           style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.3),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -144,7 +143,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     offset: Offset(0, 4),
                     blurRadius: 10
                   )
@@ -172,7 +171,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           )
@@ -202,7 +201,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF4F46E5).withOpacity(0.3),
+                  color: Color(0xFF4F46E5).withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 )
@@ -253,7 +252,7 @@ class _SearchDetail_ScreenState extends State<SearchDetail_Screen> {
                 ? []
                 : [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )

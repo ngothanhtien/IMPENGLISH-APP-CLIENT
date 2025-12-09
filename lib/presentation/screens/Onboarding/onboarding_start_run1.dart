@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import '../../../core/prefs.dart';
-class Onboarding_Screen extends StatefulWidget{
+class OnboardingScreen extends StatefulWidget{
   static const String routeName = '/onboarding';
+  const OnboardingScreen({
+    super.key
+  });
   @override
-  State<Onboarding_Screen> createState() => _Onboarding_Screen();
+  State<OnboardingScreen> createState() => _OnboardingScreen();
 }
-class _Onboarding_Screen extends State<Onboarding_Screen>{
+class _OnboardingScreen extends State<OnboardingScreen>{
   final introKey = GlobalKey<IntroductionScreenState>();
 
   Future<void> _onIntroEnd(BuildContext context) async {
     await Prefs.setOnboardingDone();
-    if(!mounted) return;
+    if (!context.mounted) return;
     context.go('/');
   }
   Widget _buildIllustration(String logoPath,
@@ -118,17 +121,17 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                     height: 40,
                     width: 150 ,
                     child: ElevatedButton(
-                        onPressed: () => context.go('/register'),
-                        child: const Text("Sign up",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
+                      onPressed: () => context.go('/register'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF3D5CFF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16)
+                        ),
+                      ),
+                      child: const Text("Sign up",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -139,18 +142,18 @@ class _Onboarding_Screen extends State<Onboarding_Screen>{
                     width: 150 ,
                     child: ElevatedButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text("Log in",
-                        style: TextStyle(
-                          color: Color(0xFF3D5CFF),
-                          fontSize: 16,
-                        ),
-                      ),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                           ),
                         side: BorderSide(color: Color(0xFF3D5CFF),width: 1.5)
+                      ),
+                      child: const Text("Log in",
+                        style: TextStyle(
+                          color: Color(0xFF3D5CFF),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   )

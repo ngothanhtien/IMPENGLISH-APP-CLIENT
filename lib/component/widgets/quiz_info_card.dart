@@ -23,7 +23,7 @@ class QuizInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
+            color: const Color(0xFF6366F1).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -38,7 +38,7 @@ class QuizInfoCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -66,7 +66,7 @@ class QuizInfoCard extends StatelessWidget {
             _getQuizDescription(),
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w400,
               height: 1.5,
             ),
@@ -93,7 +93,7 @@ class QuizInfoCard extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           size: 20,
         ),
         const SizedBox(width: 6),
@@ -101,7 +101,7 @@ class QuizInfoCard extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontWeight: FontWeight.w500,
           ),
         ),

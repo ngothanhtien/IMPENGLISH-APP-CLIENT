@@ -46,6 +46,7 @@ _$UserPostImpl _$$UserPostImplFromJson(Map<String, dynamic> json) =>
       fullName: json['fullName'] as String?,
       streakDay: (json['streakDay'] as num?)?.toInt(),
       level: json['level'] as String?,
+      avatar: json['avatar'] as String?,
     );
 
 Map<String, dynamic> _$$UserPostImplToJson(_$UserPostImpl instance) =>
@@ -54,4 +55,5 @@ Map<String, dynamic> _$$UserPostImplToJson(_$UserPostImpl instance) =>
       'fullName': instance.fullName,
       'streakDay': instance.streakDay,
       'level': instance.level,
+      'avatar': instance.avatar,
     };

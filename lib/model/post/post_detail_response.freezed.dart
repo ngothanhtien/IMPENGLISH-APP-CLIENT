@@ -424,7 +424,7 @@ mixin _$Comment {
   @JsonKey(name: '_id')
   String? get id => throw _privateConstructorUsedError;
   String? get postId => throw _privateConstructorUsedError;
-  String? get userId => throw _privateConstructorUsedError;
+  UserPost? get userId => throw _privateConstructorUsedError;
   int? get countLike => throw _privateConstructorUsedError;
   String? get content => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -447,12 +447,14 @@ abstract class $CommentCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String? id,
     String? postId,
-    String? userId,
+    UserPost? userId,
     int? countLike,
     String? content,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
+
+  $UserPostCopyWith<$Res>? get userId;
 }
 
 /// @nodoc
@@ -494,7 +496,7 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
                 freezed == userId
                     ? _value.userId
                     : userId // ignore: cast_nullable_to_non_nullable
-                        as String?,
+                        as UserPost?,
             countLike:
                 freezed == countLike
                     ? _value.countLike
@@ -519,6 +521,20 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
           as $Val,
     );
   }
+
+  /// Create a copy of Comment
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserPostCopyWith<$Res>? get userId {
+    if (_value.userId == null) {
+      return null;
+    }
+
+    return $UserPostCopyWith<$Res>(_value.userId!, (value) {
+      return _then(_value.copyWith(userId: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -532,12 +548,15 @@ abstract class _$$CommentImplCopyWith<$Res> implements $CommentCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String? id,
     String? postId,
-    String? userId,
+    UserPost? userId,
     int? countLike,
     String? content,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
+
+  @override
+  $UserPostCopyWith<$Res>? get userId;
 }
 
 /// @nodoc
@@ -578,7 +597,7 @@ class __$$CommentImplCopyWithImpl<$Res>
             freezed == userId
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
-                    as String?,
+                    as UserPost?,
         countLike:
             freezed == countLike
                 ? _value.countLike
@@ -626,7 +645,7 @@ class _$CommentImpl implements _Comment {
   @override
   final String? postId;
   @override
-  final String? userId;
+  final UserPost? userId;
   @override
   final int? countLike;
   @override
@@ -689,7 +708,7 @@ abstract class _Comment implements Comment {
   const factory _Comment({
     @JsonKey(name: '_id') final String? id,
     final String? postId,
-    final String? userId,
+    final UserPost? userId,
     final int? countLike,
     final String? content,
     final DateTime? createdAt,
@@ -704,7 +723,7 @@ abstract class _Comment implements Comment {
   @override
   String? get postId;
   @override
-  String? get userId;
+  UserPost? get userId;
   @override
   int? get countLike;
   @override

@@ -10,7 +10,11 @@ class ForumPostCard extends StatelessWidget {
   final String content;
   final int likes;
   final String category;
+  final List<String> tags;
+  final int? countComments;
   final VoidCallback? onTap;
+  final VoidCallback? isCheckLike;
+  final bool isLiked;
 
   const ForumPostCard({
     super.key,
@@ -24,6 +28,10 @@ class ForumPostCard extends StatelessWidget {
     required this.content,
     required this.likes,
     required this.category,
+    required this.tags,
+    this.isCheckLike,
+    this.countComments,
+    this.isLiked = false
   });
 
   @override
@@ -115,12 +123,12 @@ class ForumPostCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         const Icon(Icons.timer_outlined,
-                            size: 18, color: Colors.blueGrey),
+                            size: 16, color: Colors.blueGrey),
                         const SizedBox(width: 4),
                         Text(
                           date.split(' ')[0] ?? '',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             color: Colors.grey.shade700,
                           ),
                         ),
@@ -131,7 +139,7 @@ class ForumPostCard extends StatelessWidget {
               ],
             ),
       
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
       
             // 📝 Title + Content
             Text(
@@ -143,19 +151,30 @@ class ForumPostCard extends StatelessWidget {
                 height: 1.3,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               content??'',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade800,
+                color: const Color(0xFF333943),
                 height: 1.5,
                 letterSpacing: 0.5,
               ),
             ),
       
-            const SizedBox(height: 20),
-      
+            const SizedBox(height: 12),
+            Row(
+              children: List.generate(tags.length, (index){
+                final tag = tags[index];
+                return Text("#${tag} ",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: const Color(0xFF525E71)
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 12),
             // 💬 Actions Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -163,8 +182,19 @@ class ForumPostCard extends StatelessWidget {
                 // ❤️ Like
                 Row(
                   children: [
-                    Icon(Icons.favorite_border,
-                        size: 22, color: Colors.grey.shade700),
+                    GestureDetector(
+                      onTap: isCheckLike,
+                      child: AnimatedScale(
+                        scale: isLiked ? 1.2 : 1.0,
+                        duration: Duration(milliseconds: 400),
+                        curve: Curves.fastOutSlowIn,
+                        child: Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          size: 20,
+                          color: isLiked ? Colors.red : Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 6),
                     Text("${likes}",
                         style: TextStyle(
@@ -178,7 +208,7 @@ class ForumPostCard extends StatelessWidget {
                     Icon(Icons.mode_comment_outlined,
                         size: 22, color: Colors.grey.shade700),
                     const SizedBox(width: 6),
-                    Text("6",
+                    Text("${countComments ?? ''}",
                         style: TextStyle(
                             fontSize: 16, color: Colors.grey.shade800)),
                   ],

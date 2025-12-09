@@ -40,18 +40,24 @@ class postService {
     }
   }
 
-  Future<Post> createPost() async {
+  Future<Post> createPost({required Post post}) async {
     try{
-      final response = await http.get(
-        Uri.parse('$baseUrl/posts/create/68cd5981cf94a9641d3e9391'),
-        headers: _defaultHeaders,
+      final response  = await http.post(
+          Uri.parse("$baseUrl/posts/create/${post.userId?.id}"),
+          headers: _defaultHeaders,
+          body: json.encode({
+            "title" : post.title ?? '',
+            "category": post.category ?? '',
+            "content": post.content ?? '',
+            "tags": post.tags ?? [],
+          })
       );
       if(response.statusCode == 200){
-        final Map<String,dynamic> dataJson = json.decode(response.body);
-        final post_create = Post.fromJson(dataJson);
-        return post_create;
-      }else {
-        throw Exception('Failed to create posts: ${response.statusCode}');
+        final data_response = json.decode(response.body);
+        final post_results = Post.fromJson(data_response);
+        return post_results;
+      }else{
+        throw Exception("Failed with status ${response.statusCode}");
       }
     }catch(e){
       throw Exception("Error at fetch post: $e");

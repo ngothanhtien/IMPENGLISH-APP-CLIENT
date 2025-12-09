@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learning_app_client/component/textfield/CustomTextField.dart';
+import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
 import 'package:learning_app_client/component/widgets/forum_postcard.dart';
+import 'package:learning_app_client/component/widgets/popupmenu_custom.dart';
 import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/model/post/post_detail_response.dart';
+import 'package:learning_app_client/service/postDetailSevirce.dart';
 import 'package:learning_app_client/service/postService.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -14,74 +20,142 @@ class PostDetailScreen extends StatefulWidget {
 }
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
-  final List<Map<String, dynamic>> _comments = [
-    {
-      "text": "This is really helpful, thanks!",
-      "author": "Sarah Johnson",
-      "time": "2 hours ago",
-      "likes": 12,
-      "isLiked": false,
-    },
-    {
-      "text": "I recommend using podcasts for listening practice.",
-      "author": "Mike Chen",
-      "time": "5 hours ago",
-      "likes": 8,
-      "isLiked": false,
-    },
-    {
-      "text": "Try reading business articles daily.",
-      "author": "Emma Wilson",
-      "time": "1 day ago",
-      "likes": 15,
-      "isLiked": false,
-    },
-  ];
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controllerContent = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  List<Comment>? comments;
+  List<CommentUI> commentUIList = [];
   Post? postCard;
+  bool isCheckliked = false;
+  bool isLiking = false;
 
-  void _addComment() {
-    final text = _controller.text.trim();
-    if (text.isNotEmpty) {
+  Timer? _debounceLike;
+  Timer? _debounceCheck;
+
+  Future<void> _addComment() async {
+    if(_controller.text.isEmpty){
+      AppSnackBar.showError(context, "Please fill content before comment!");
+      return;
+    }
+    try{
+      final response = await postDetailService().addComment(
+        userId: '6922c97f156b0b58fefdc55f',
+        content: _controller.text ?? '',
+        postId: widget.post_id ?? ''
+      ).timeout(Duration(seconds: 4));
       setState(() {
-        _comments.insert(0, {
-          "text": text,
-          "author": "You",
-          "time": "Just now",
-          "likes": 0,
-          "isLiked": false,
-        });
+        // comments?.add(response);
+        commentUIList.add(CommentUI(data: response));
         _controller.clear();
       });
-      _focusNode.unfocus();
+    }catch(e){
+      print("Error at add comment: $e");
     }
   }
 
-  void _toggleLike(int index) {
-    setState(() {
-      _comments[index]["isLiked"] = !_comments[index]["isLiked"];
-      _comments[index]["likes"] += _comments[index]["isLiked"] ? 1 : -1;
-    });
-  }
-
   Future<void> fetchDetailPost() async {
-    try{
-      final response = await postService().getPostDetail(postId: widget.post_id.toString());
-      if(response.status == "Success"){
+    try {
+      final response = await postService().getPostDetail(postId: widget.post_id);
+
+      if (response.status == "Success") {
         setState(() {
           postCard = response.data!.post;
-          comments = response.data!.comments;
+          // comments = List<Comment>.from(response.data!.comments as Iterable);
+          commentUIList = response.data!.comments!.map((cmt) => CommentUI(data: cmt)).toList();
         });
-      }else{
-        print("fetch detail post error!!");
       }
-      setState(() {
+    } catch (e) {
+      print("Error fetchDetailPost: $e");
+    }
+  }
 
+  Future<void> _toggle_like() async {
+    if (isLiking) return; // chặn spam click
+
+    isLiking = true;
+
+    // Debounce 300ms
+    _debounceLike?.cancel();
+    _debounceLike = Timer(const Duration(milliseconds: 300), () async {
+
+      try {
+        final res = await postDetailService().toggle_liked(
+          userId: '6922c97f156b0b58fefdc55f',
+          postId: widget.post_id,
+        );
+        final like = postCard?.countLike;
+        if (res != null) {
+          // Cập nhật UI tức thời – không cần fetch Detail
+          setState(() {
+            isCheckliked = !isCheckliked;
+            postCard = postCard?.copyWith(
+              countLike: (postCard?.countLike ?? 0) + (isCheckliked ? 1 : -1)
+            );
+          });
+
+          // Nếu muốn đồng bộ server → gọi checkLiked() (debounce)
+          checkLiked();
+        }
+      } catch (e) {
+        print("Error like: $e");
+      } finally {
+        isLiking = false;
+      }
+    });
+  }
+  Future<void> checkLiked() async {
+    _debounceCheck?.cancel();
+    _debounceCheck = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        final res = await postDetailService().check_liked(
+          userId: '6922c97f156b0b58fefdc55f',
+          postId: widget.post_id,
+        );
+
+        setState(() {
+          isCheckliked = res["liked"] == true;
+        });
+      } catch (e) {
+        print("Error checkLiked: $e");
+      }
+    });
+  }
+  Future<void> deleteComment(String commentId) async {
+    try{
+      final response = await postDetailService().deleteComment(
+          commentId: commentId,
+      );
+      if(response['status'] == 'Success'){
+        await Future.delayed(Duration(milliseconds: 800));
+        AppSnackBar.showSuccess(context, "Delete comment successfull");
+        fetchDetailPost();
+      }
+    }catch(e){
+      print("Error delete comment: $e");
+    }
+  }
+  void unlockComment(CommentUI cmt) {
+    setState(() {
+      cmt.isEditing = !cmt.isEditing;
+    });
+  }
+  Future<void> updateComment(CommentUI cmt) async{
+    final newContent = cmt.controller.text.trim();
+
+    if(newContent.isEmpty){
+      AppSnackBar.showError(context, "Please fill content before update!");
+      return;
+    }
+    try{
+      final response = await postDetailService().updateComment(
+          commentId: cmt.data.id!,
+          content: newContent
+      );
+      setState(() {
+        cmt.data = cmt.data.copyWith(content: newContent);
+        cmt.isEditing = false;
       });
     }catch(e){
-      print("Error at fetch detail post!: $e");
+      print("Error delete comment: $e");
     }
   }
   @override
@@ -89,11 +163,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     // TODO: implement initState
     super.initState();
     fetchDetailPost();
+    checkLiked();
   }
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _controllerContent.dispose();
     super.dispose();
   }
 
@@ -107,8 +183,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         title: const Text(
           "Discussion",
           style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
             letterSpacing: -0.3,
             color: Color(0xFF1F2937),
           ),
@@ -117,13 +193,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: const Color(0xFFE6E7EA),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.arrow_back_ios_new_rounded,
               color: Color(0xFF1F2937),
-              size: 22,
+              size: 18,
             ),
           ),
           onPressed: () => context.pop(),
@@ -147,6 +223,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               level: postCard?.userId?.level ?? '',
               title: postCard?.title ?? '',
               id: postCard?.id ?? '',
+              tags: postCard?.tags ?? [],
+              countComments: commentUIList.length ?? 0,
+              isCheckLike: _toggle_like,
+              isLiked: isCheckliked,
             ),
           ),
 
@@ -154,7 +234,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
           // Comments header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
@@ -164,11 +244,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             child: Row(
               children: [
                 Text(
-                  "${comments?.length ?? 0} Comments",
+                  "${commentUIList?.length ?? 0} Comments",
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1F2937),
+                    height: 1.5
                   ),
                 ),
                 const Spacer(),
@@ -176,42 +257,44 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               ],
             ),
           ),
-
+          const SizedBox(height: 8),
           // Comments list
           Expanded(
-            child: comments == null
+            child: commentUIList == null
                 ? const Center(child: CircularProgressIndicator())
-                : comments!.isEmpty
+                : commentUIList.isEmpty
                 ? const Center(
               child: Text(
                 "No comments yet.",
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: Colors.grey,fontSize: 14),
               ),
             )
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              itemCount: comments!.length,
+              padding: const EdgeInsets.all(8),
+              itemCount: commentUIList.length,
               itemBuilder: (context, index) {
-                final comment = comments![index];
+                final comment = commentUIList[index];
+                final item = commentUIList[index];
+                final comment2 = item.data;
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Avatar
                       CircleAvatar(
-                        radius: 22,
+                        radius: 20,
                         backgroundColor: const Color(0xFF4F46E5),
                         child: Text(
-                          comment.userId?[0].toUpperCase() ?? '?',
+                          comment2.userId?.fullName?[0].toUpperCase() ?? '?',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 15,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,27 +302,82 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             Row(
                               children: [
                                 Text(
-                                  comment.userId ?? "Anonymous",
+                                  comment2.userId?.fullName ?? "Anonymous",
                                   style: const TextStyle(
-                                    fontSize: 17,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  comment.createdAt?.toString().split(" ")[0] ?? '',
+                                  comment2.createdAt?.toString().split(" ")[0] ?? '',
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xFF9CA3AF),
+                                    fontSize: 12,
+                                    color: Color(0xFF8C929A),
                                   ),
                                 ),
+                                SizedBox(width: 12,),
+                                CustomPopupMenu(
+                                  isOwner: '6922c97f156b0b58fefdc55f' == comment2.userId?.id,
+                                  onEdit: () => unlockComment(item),
+                                  onDelete: () => deleteComment(comment2.id as String),
+                                  onReport: () => print("Report tapped")
+                                )
                               ],
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              comment.content ?? '',
-                              style: const TextStyle(fontSize: 16, height: 1.4),
+                            TextField(
+                              controller: item.controller,
+                              enabled: item.isEditing,
+                              maxLines: null,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                height: 1.4,
+                                color: Colors.black87
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                enabledBorder: item.isEditing ? OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(width: 0.8,color: Colors.black26)
+                                ): null,
+                                contentPadding:
+                                item.isEditing ? EdgeInsets.only(left: 5)
+                                    : EdgeInsets.zero,
+                              ),
                             ),
+                            if (item.isEditing)
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        item.controller.text = item.data.content ?? '';
+                                        item.isEditing = false;
+                                      });
+                                    },
+                                    child: const Text("Cancel",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black54
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  ElevatedButton(
+                                    onPressed: () => updateComment(item),
+                                    child: const Text("Save",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepOrange,
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -271,7 +409,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -282,36 +420,31 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   "Y",
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 4),
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    decoration: const InputDecoration(
-                      hintText: "Add a comment...",
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                    ),
-                  ),
+                child: CustomTextField(
+                  hintText: "Add a comment ...",
+                  controller: _controller,
+                  isPassword: false,
+                  showTitle: false,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 2),
               IconButton(
-                onPressed: _addComment,
+                onPressed: (){
+                  setState(() {
+                    _addComment();
+                  });
+                },
                 style: IconButton.styleFrom(
                   backgroundColor: const Color(0xFF4F46E5),
                 ),
-                icon: const Icon(Icons.send_rounded, color: Colors.white),
+                icon: const Icon(Icons.send_rounded, color: Colors.white,size: 20,),
               ),
             ],
           ),
@@ -319,4 +452,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
     );
   }
+}
+class CommentUI {
+  Comment data;
+  final TextEditingController controller;
+  bool isEditing = false;
+
+  CommentUI({required this.data})
+      : controller = TextEditingController(text: data.content);
 }

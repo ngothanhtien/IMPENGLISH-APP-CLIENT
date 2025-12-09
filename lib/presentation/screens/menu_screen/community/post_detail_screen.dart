@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/textfield/CustomTextField.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/textfield/custom_textfield.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/forum_postcard.dart';
 import 'package:learning_app_client/component/widgets/popupmenu_custom.dart';
 import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/model/post/post_detail_response.dart';
-import 'package:learning_app_client/service/postDetailSevirce.dart';
-import 'package:learning_app_client/service/postService.dart';
+import 'package:learning_app_client/service/post_detail_service.dart';
+import 'package:learning_app_client/service/post_service.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  final String post_id;
-  const PostDetailScreen({super.key,required this.post_id});
+  final String postId;
+  const PostDetailScreen({super.key,required this.postId});
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
@@ -37,10 +37,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       return;
     }
     try{
-      final response = await postDetailService().addComment(
+      final response = await PostDetailService().addComment(
         userId: '6922c97f156b0b58fefdc55f',
-        content: _controller.text ?? '',
-        postId: widget.post_id ?? ''
+        content: _controller.text,
+        postId: widget.postId
       ).timeout(Duration(seconds: 4));
       setState(() {
         // comments?.add(response);
@@ -48,13 +48,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         _controller.clear();
       });
     }catch(e){
-      print("Error at add comment: $e");
+      debugPrint("Error at add comment: $e");
     }
   }
 
   Future<void> fetchDetailPost() async {
     try {
-      final response = await postService().getPostDetail(postId: widget.post_id);
+      final response = await PostService().getPostDetail(postId: widget.postId);
 
       if (response.status == "Success") {
         setState(() {
@@ -64,11 +64,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         });
       }
     } catch (e) {
-      print("Error fetchDetailPost: $e");
+      debugPrint("Error fetchDetailPost: $e");
     }
   }
 
-  Future<void> _toggle_like() async {
+  Future<void> toggleLike() async {
     if (isLiking) return; // chặn spam click
 
     isLiking = true;
@@ -78,12 +78,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     _debounceLike = Timer(const Duration(milliseconds: 300), () async {
 
       try {
-        final res = await postDetailService().toggle_liked(
+        final res = await PostDetailService().toggleLiked(
           userId: '6922c97f156b0b58fefdc55f',
-          postId: widget.post_id,
+          postId: widget.postId,
         );
-        final like = postCard?.countLike;
-        if (res != null) {
+
+        if (res['status'] == 'Success') {
           // Cập nhật UI tức thời – không cần fetch Detail
           setState(() {
             isCheckliked = !isCheckliked;
@@ -96,7 +96,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           checkLiked();
         }
       } catch (e) {
-        print("Error like: $e");
+        debugPrint("Error like: $e");
       } finally {
         isLiking = false;
       }
@@ -106,31 +106,37 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     _debounceCheck?.cancel();
     _debounceCheck = Timer(const Duration(milliseconds: 400), () async {
       try {
-        final res = await postDetailService().check_liked(
+        final res = await PostDetailService().checkLiked(
           userId: '6922c97f156b0b58fefdc55f',
-          postId: widget.post_id,
+          postId: widget.postId,
         );
 
         setState(() {
           isCheckliked = res["liked"] == true;
         });
       } catch (e) {
-        print("Error checkLiked: $e");
+        debugPrint("Error checkLiked: $e");
       }
     });
   }
   Future<void> deleteComment(String commentId) async {
     try{
-      final response = await postDetailService().deleteComment(
+      final response = await PostDetailService().deleteComment(
           commentId: commentId,
       );
+
+      if(!mounted) return;
+
       if(response['status'] == 'Success'){
         await Future.delayed(Duration(milliseconds: 800));
+
+        if(!mounted) return;
+
         AppSnackBar.showSuccess(context, "Delete comment successfull");
         fetchDetailPost();
       }
     }catch(e){
-      print("Error delete comment: $e");
+      debugPrint("Error delete comment: $e");
     }
   }
   void unlockComment(CommentUI cmt) {
@@ -146,16 +152,18 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       return;
     }
     try{
-      final response = await postDetailService().updateComment(
+      final response = await PostDetailService().updateComment(
           commentId: cmt.data.id!,
           content: newContent
       );
-      setState(() {
-        cmt.data = cmt.data.copyWith(content: newContent);
-        cmt.isEditing = false;
-      });
+      if(response['status'] == 'Success'){
+        setState(() {
+          cmt.data = cmt.data.copyWith(content: newContent);
+          cmt.isEditing = false;
+        });
+      }
     }catch(e){
-      print("Error delete comment: $e");
+      debugPrint("Error delete comment: $e");
     }
   }
   @override
@@ -224,8 +232,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               title: postCard?.title ?? '',
               id: postCard?.id ?? '',
               tags: postCard?.tags ?? [],
-              countComments: commentUIList.length ?? 0,
-              isCheckLike: _toggle_like,
+              countComments: commentUIList.length,
+              isCheckLike: toggleLike,
               isLiked: isCheckliked,
             ),
           ),
@@ -244,7 +252,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             child: Row(
               children: [
                 Text(
-                  "${commentUIList?.length ?? 0} Comments",
+                  "${commentUIList.length} Comments",
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -260,9 +268,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           const SizedBox(height: 8),
           // Comments list
           Expanded(
-            child: commentUIList == null
-                ? const Center(child: CircularProgressIndicator())
-                : commentUIList.isEmpty
+            child: commentUIList.isEmpty
                 ? const Center(
               child: Text(
                 "No comments yet.",
@@ -273,9 +279,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               padding: const EdgeInsets.all(8),
               itemCount: commentUIList.length,
               itemBuilder: (context, index) {
-                final comment = commentUIList[index];
                 final item = commentUIList[index];
-                final comment2 = item.data;
+                final comment = item.data;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(
@@ -286,7 +291,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         radius: 20,
                         backgroundColor: const Color(0xFF4F46E5),
                         child: Text(
-                          comment2.userId?.fullName?[0].toUpperCase() ?? '?',
+                          comment.userId?.fullName?[0].toUpperCase() ?? '?',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -302,7 +307,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             Row(
                               children: [
                                 Text(
-                                  comment2.userId?.fullName ?? "Anonymous",
+                                  comment.userId?.fullName ?? "Anonymous",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -310,7 +315,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  comment2.createdAt?.toString().split(" ")[0] ?? '',
+                                  comment.createdAt?.toString().split(" ")[0] ?? '',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Color(0xFF8C929A),
@@ -318,10 +323,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 ),
                                 SizedBox(width: 12,),
                                 CustomPopupMenu(
-                                  isOwner: '6922c97f156b0b58fefdc55f' == comment2.userId?.id,
+                                  isOwner: '6922c97f156b0b58fefdc55f' == comment.userId?.id,
                                   onEdit: () => unlockComment(item),
-                                  onDelete: () => deleteComment(comment2.id as String),
-                                  onReport: () => print("Report tapped")
+                                  onDelete: () => deleteComment(comment.id as String),
+                                  onReport: () => debugPrint("Report tapped")
                                 )
                               ],
                             ),
@@ -365,15 +370,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   const SizedBox(width: 4),
                                   ElevatedButton(
                                     onPressed: () => updateComment(item),
-                                    child: const Text("Save",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700
-                                      ),
-                                    ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.deepOrange,
+                                    ),
+                                    child: const Text("Save",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -401,7 +406,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

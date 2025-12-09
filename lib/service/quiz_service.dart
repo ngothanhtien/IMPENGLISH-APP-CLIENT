@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:learning_app_client/model/quiz.dart';
 import 'package:http/http.dart' as http;
-class quizService {
+class QuizService {
   static String? baseUrl = dotenv.env['BASE_URL_SML_3'];
 
   final storage = FlutterSecureStorage();
@@ -20,13 +20,12 @@ class quizService {
   }) async {
     try{
       final response = await http.get(
-        Uri.parse('${baseUrl}/quiz?level=$level&topic=$topic'),
+        Uri.parse('$baseUrl/quiz?level=$level&topic=$topic'),
         headers: headers,
       );
-      print("$response");
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        return Quiz.fromJson(data_response);
+        final dataResponse = json.decode(response.body);
+        return Quiz.fromJson(dataResponse);
       }else {
         throw Exception('Failed to load quiz. StatusCode: ${response.statusCode}');
       }

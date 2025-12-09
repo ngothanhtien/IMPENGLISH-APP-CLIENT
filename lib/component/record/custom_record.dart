@@ -163,6 +163,7 @@ class _RecorderCustom extends State<RecorderCustom>
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.white,
       child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -401,7 +402,7 @@ class _RecorderCustom extends State<RecorderCustom>
               ),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: const Color(0xFF10B981).withOpacity(0.2),
+                color: const Color(0xFF10B981).withValues(alpha: 0.4),
                 width: 1.5,
               ),
             ),
@@ -449,7 +450,7 @@ class _RecorderCustom extends State<RecorderCustom>
                               text: 'Practice the sound by opening your mouth wider. Try saying '
                             ),
                             TextSpan(
-                              text: "'${word}'",
+                              text: word,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15
@@ -589,7 +590,7 @@ class _RecorderCustom extends State<RecorderCustom>
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isError ? const Color(0xFFFECACA)
-          :const Color(0xFF10B981).withOpacity(0.2),
+          :const Color(0xFF10B981).withValues(alpha: 0.2),
           width: isError ? 1.5 : 1,
         ),
       ),

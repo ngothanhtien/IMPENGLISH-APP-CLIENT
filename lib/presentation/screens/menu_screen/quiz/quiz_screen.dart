@@ -18,7 +18,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
 
   String selectedLevel = 'Easy';
   String selectedCategory = 'Technology';
-  String selectedQuestions = '5';
+  String selectedTotalQuestions = '5';
   String selectedTime = '1 min';
 
   @override
@@ -62,14 +62,11 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
         backgroundColor: const Color(0xFF4F46E5),
         title: const Text('Create Quiz',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Colors.white
+            color: Colors.white,
+            letterSpacing: -0.5
           ),
-        ),
-        leading: IconButton(
-            onPressed: () => context.go("/home"),
-            icon: Icon(Icons.arrow_back,size: 22,color: Colors.white,)
         ),
       ),
       body: FadeTransition(
@@ -90,7 +87,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1).withOpacity(0.1),
+                              color: const Color(0xFF6366F1).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(60),
                             ),
                             child: const Icon(
@@ -155,8 +152,8 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                           'Number of Questions',
                           FilterChipWidget(
                             options: const ['5', '10', '20'],
-                            selectedOption: selectedQuestions,
-                            onSelected: (value) => setState(() => selectedQuestions = value),
+                            selectedOption: selectedTotalQuestions,
+                            onSelected: (value) => setState(() => selectedTotalQuestions = value),
                           ),
                         ),
 
@@ -175,14 +172,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                             width: double.infinity,
                             height: 45,
                             child: ElevatedButton.icon(
-                              onPressed:()=> context.push("/quiz/detail",
-                                extra: {
-                                  "level": selectedLevel,
-                                  "category": selectedCategory,
-                                  "questions": selectedQuestions,
-                                  "timeLimit": selectedTime
-                                }
-                              ),
+                              onPressed: _showQuizCreatedDialog,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF4F46E5),
                                 foregroundColor: Colors.white,
@@ -236,16 +226,13 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   }
 
   void _showQuizCreatedDialog() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuizDetailScreen(
-          level: selectedLevel,
-          category: selectedCategory,
-          questions: selectedQuestions,
-          timeLimit: selectedTime,
-        ),
-      ),
+    context.push("/quiz/detail",
+      extra: {
+        "level": selectedLevel,
+        "category": selectedCategory,
+        "totalQuestions": int.parse(selectedTotalQuestions),
+        "timeLimit": selectedTime
+      }
     );
   }
 }

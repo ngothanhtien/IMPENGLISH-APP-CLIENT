@@ -28,7 +28,7 @@ class HighlightCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: gradient[1].withOpacity(0.4),
+            color: gradient[1].withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -65,7 +65,7 @@ class HighlightCard extends StatelessWidget {
                 width: 45,
                 height: 45,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -104,7 +104,7 @@ class HighlightCard extends StatelessWidget {
               const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: progress,
-                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundColor: Colors.white.withValues(alpha: 0.3),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 borderRadius: BorderRadius.circular(4),
                 minHeight: 6,

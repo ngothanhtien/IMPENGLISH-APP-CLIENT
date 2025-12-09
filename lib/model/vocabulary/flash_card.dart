@@ -1,32 +1,32 @@
 import 'package:learning_app_client/model/pagination.dart';
 
-class Card_Vocabulary {
+class CardVocabulary {
   bool? success;
   String? message;
   List<IVocabBrief>? data;
   Pagination? pagination;
-  Card_Vocabulary({this.success, this.message, this.data,this.pagination});
+  CardVocabulary({this.success, this.message, this.data,this.pagination});
 
-  Card_Vocabulary.fromJson(Map<String,dynamic> json){
+  CardVocabulary.fromJson(Map<String,dynamic> json){
     success = json['success'];
     message = json['message'];
     if(json['data'] != null){
       data = <IVocabBrief>[];
       json['data'].forEach((vocab) => {
-        data!.add(new IVocabBrief.fromJson(vocab))
+        data!.add(IVocabBrief.fromJson(vocab))
       });
     }
-    pagination = json['pagination'] !=null ? new Pagination.fromJson(json['pagination']) : null;
+    pagination = json['pagination'] !=null ? Pagination.fromJson(json['pagination']) : null;
   }
   Map<String,dynamic> toJson(){
-    final Map<String,dynamic> data = new Map<String,dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String,dynamic> data = {};
+    data['success'] = success;
+    data['message'] = message;
     if(this.data != null){
       data['data'] = this.data!.map((vocab) => vocab.toJson()).toList();
     }
-    if(this.pagination != null){
-      data['pagination'] = this.pagination!.toJson();
+    if(pagination != null){
+      data['pagination'] = pagination!.toJson();
     }
     return data;
   }
@@ -70,7 +70,7 @@ class IVocabBrief {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = {};
     data['id'] = id;
     data['word'] = word;
     data['meaningVN'] = meaningVN;

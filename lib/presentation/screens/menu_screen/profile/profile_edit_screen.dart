@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
   @override
   State<StatefulWidget> createState() => _EditProfileScreen();
 }
@@ -105,7 +105,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         onPressed: () => context.pop(),
         style: IconButton.styleFrom(
             padding: const EdgeInsets.all(8),
-            backgroundColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.3),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
           ),
         ),
@@ -192,7 +192,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                   border: Border.all(color: Colors.white, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -217,7 +217,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF667EEA).withOpacity(0.3),
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -267,7 +267,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -321,7 +321,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -397,7 +397,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -477,7 +477,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -488,7 +488,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.1),
+                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -564,7 +564,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
 
   Widget _buildLoadingOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       child: const Center(
         child: Card(
           color: Colors.white,
@@ -578,7 +578,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
                 ),
                 SizedBox(height: 16),
-                const Text(
+                Text(
                   'Saving your profile...',
                   style: TextStyle(
                     fontSize: 16,
@@ -609,7 +609,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.label,
     required this.icon,
@@ -620,7 +620,7 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.keyboardType,
     this.maxLines = 1,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -633,7 +633,7 @@ class CustomTextField extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: enabled
-                  ? const Color(0xFF667EEA).withOpacity(0.1)
+                  ? const Color(0xFF667EEA).withValues(alpha: 0.1)
                   : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -701,7 +701,7 @@ class CustomTextField extends StatelessWidget {
 
 // Reusable Divider Widget
 class CustomDivider extends StatelessWidget {
-  const CustomDivider({Key? key}) : super(key: key);
+  const CustomDivider({super.key});
 
   @override
   Widget build(BuildContext context) {

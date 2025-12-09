@@ -49,7 +49,7 @@ class ForumPostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -77,7 +77,7 @@ class ForumPostCard extends StatelessWidget {
                     Row(
                       children: [
                          Text(
-                          fullName ?? '',
+                          fullName,
                           style: TextStyle(
                             color: Colors.black87,
                             fontSize: 16,
@@ -98,7 +98,7 @@ class ForumPostCard extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            level ?? '',
+                            level,
                             style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFF22C55E),
@@ -115,7 +115,7 @@ class ForumPostCard extends StatelessWidget {
                             size: 18, color: Colors.orange),
                         const SizedBox(width: 4),
                         Text(
-                          "${streakDay}-day streak",
+                          "$streakDay-day streak",
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade700,
@@ -126,7 +126,7 @@ class ForumPostCard extends StatelessWidget {
                             size: 16, color: Colors.blueGrey),
                         const SizedBox(width: 4),
                         Text(
-                          date.split(' ')[0] ?? '',
+                          date.split(' ')[0],
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey.shade700,
@@ -143,7 +143,7 @@ class ForumPostCard extends StatelessWidget {
       
             // 📝 Title + Content
             Text(
-              title ?? '',
+              title,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -153,7 +153,7 @@ class ForumPostCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              content??'',
+              content,
               style: TextStyle(
                 fontSize: 14,
                 color: const Color(0xFF333943),
@@ -166,7 +166,7 @@ class ForumPostCard extends StatelessWidget {
             Row(
               children: List.generate(tags.length, (index){
                 final tag = tags[index];
-                return Text("#${tag} ",
+                return Text("#$tag",
                   style: TextStyle(
                     fontSize: 13,
                     color: const Color(0xFF525E71)
@@ -196,7 +196,7 @@ class ForumPostCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text("${likes}",
+                    Text("$likes",
                         style: TextStyle(
                             fontSize: 16, color: Colors.grey.shade800)),
                   ],
@@ -227,7 +227,7 @@ class ForumPostCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    category ?? '',
+                    category,
                     style: TextStyle(
                       fontSize: 14,
                       color: Color(0xFF565563),

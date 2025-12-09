@@ -1,10 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/countdown_timer/countdown_timer.dart';
 import 'package:learning_app_client/component/otp-verify/custom_otp_field.dart';
-import 'package:learning_app_client/service/userService.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
-import 'package:learning_app_client/component/dialog_done_verify/dialogDone.dart';
+import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
+import 'package:learning_app_client/service/user_service.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 class VerifyOtpScreen extends StatefulWidget {
   final String email;
   const VerifyOtpScreen({super.key,required this.email});
@@ -26,10 +27,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await userService().veryfyOtp(
+      final response = await UserService().veryfyOtp(
         email: widget.email.toString().trim(),
         otp: int.parse(otpCode),
       );
+
+      if(!mounted) return;
 
       final result = response["title"] ?? '';
       final message = response['message'] ?? '';
@@ -39,7 +42,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         return;
       } else {
         Future.delayed(const Duration(milliseconds: 3000), () {
-          if (mounted) showDialogDone(context);
+          if (mounted) _showDialogDone();
         });
       }
     } catch (e) {
@@ -50,12 +53,30 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       }
     }
   }
+  void _showDialogDone(){
+    showAppDialog(
+      context,
+      icon: Icons.check_circle,
+      title: "Verify Successfully",
+      message: 'Congratulations, you have completed your registration!',
+      onOk: (){context.go('/login');},
+      align: TextAlign.center,
+      animType: AnimType.scale,
+      dismissOntouchOnside: false,
+      okText: 'Done',
+      hideBtnCancel: true
+    );
+  }
 
   Future<void> _resendOTP() async {
     try{
-      final response = await userService().resendOtp(email: widget.email.toString().trim());
+      final response = await UserService().resendOtp(email: widget.email.toString().trim());
+
+      if(!mounted) return;
+
       final title = response['title'];
       final message = response['message'] ?? '';
+
       if(title == 'BAD REQUEST' || title == 'FAILED'){
         AppSnackBar.showError(context,message);
       }else{
@@ -167,11 +188,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     "Resend Code",
                     style: TextStyle(
                       fontSize: 16,
-                      color: const Color(0xFF4F46E5),
+                      color: Color(0xFF4F46E5),
                       decoration: TextDecoration.underline,
                       decorationStyle: TextDecorationStyle.solid,
                       decorationThickness: 2,
-                      decorationColor: const Color(0xFF4F46E5),
+                      decorationColor: Color(0xFF4F46E5),
                     ),
                   ),
                 )

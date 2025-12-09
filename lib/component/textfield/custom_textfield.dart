@@ -11,8 +11,9 @@ class CustomTextField extends StatefulWidget {
   final Color titleColor;
   final bool showTitle;
   final Function(String)? onchanged;
+
   const CustomTextField({
-    Key? key,
+    super.key,
     this.nameTextField,
     required this.hintText,
     required this.controller,
@@ -23,7 +24,7 @@ class CustomTextField extends StatefulWidget {
     this.errorText,
     this.onchanged,
     this.showTitle = true
-  }) : super(key: key);
+  });
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -83,7 +84,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: Colors.grey.withOpacity(0.5), width: 1.2),
+              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.5),
+              width: 1.2),
             ),
             hintStyle: const TextStyle(
               color: Color(0xFF858597),

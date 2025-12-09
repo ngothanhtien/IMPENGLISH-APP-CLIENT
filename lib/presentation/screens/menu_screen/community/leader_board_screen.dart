@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
 
 class LeaderBoardScreen extends StatefulWidget {
+  const LeaderBoardScreen({
+    super.key
+  });
   @override
   State<StatefulWidget> createState() => _LeaderBoardScreen();
 }
 
 class _LeaderBoardScreen extends State<LeaderBoardScreen> {
-  final List<Map<String, dynamic>> top_learnings = [
+  final List<Map<String, dynamic>> topLearnings = [
     {
       "id": 1,
       "fullname": "David Ngo",
@@ -102,7 +105,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -131,9 +134,9 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                   ListView.builder(
                     shrinkWrap: true, // ✅ cho phép ListView trong Column
                     physics: const NeverScrollableScrollPhysics(), // ✅ tránh lỗi cuộn lồng nhau
-                    itemCount: top_learnings.length,
+                    itemCount: topLearnings.length,
                     itemBuilder: (context, index) {
-                      final item = top_learnings[index];
+                      final item = topLearnings[index];
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         padding: const EdgeInsets.all(8),
@@ -144,7 +147,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                             BoxShadow(
                               offset: const Offset(0, 2),
                               blurRadius: 6,
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                             )
                           ],
                         ),
@@ -193,7 +196,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                   Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.08),
+                                      color: Colors.black.withValues(alpha: 0.08),
                                       borderRadius: BorderRadius.circular(20)
                                     ),
                                     child: Text(
@@ -221,7 +224,7 @@ class _LeaderBoardScreen extends State<LeaderBoardScreen> {
                                     Text("${item['streak']} day streak",
                                       style: const TextStyle(
                                         fontSize: 13,
-                                        color: const Color(0xFF525E71),
+                                        color: Color(0xFF525E71),
                                         fontWeight: FontWeight.w600,
                                         height: 1.5
                                       )

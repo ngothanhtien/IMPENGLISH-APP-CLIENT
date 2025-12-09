@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final String url;
@@ -12,12 +12,12 @@ class AudioPlayerWidget extends StatefulWidget {
   final VoidCallback? onPlay;
 
   const AudioPlayerWidget({
-    Key? key,
+    super.key,
     required this.url,
     this.activeColor = const Color(0xFFEF4444),
     this.inactiveColor = const Color(0xFF4F46E5),
     this.onPlay
-  }) : super(key: key);
+  });
 
   @override
   State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
@@ -67,8 +67,8 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         _isPlaying = !_isPlaying;
       });
     } catch (e) {
+      if(!mounted) return;
       AppSnackBar.showError(context, "Audio failed: $e");
-      print("AUDIO ERROR ===> $e");
     }
   }
 

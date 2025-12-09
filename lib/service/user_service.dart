@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_app_client/model/user.dart';
 
-class userService {
+class UserService {
   static String? baseUrl = dotenv.env['BASE_URL_SML_3'];
 
   final storage = FlutterSecureStorage();
@@ -28,7 +28,7 @@ class userService {
       });
 
       final response = await http.post(
-        Uri.parse('${baseUrl}/users/register'),
+        Uri.parse('$baseUrl/users/register'),
         headers: headers,
         body: body,
       ).timeout(const Duration(seconds: 10)); // Tăng timeout
@@ -78,7 +78,7 @@ class userService {
   }) async {
     try{
       final response = await http.post(
-          Uri.parse('${baseUrl}/users/verify-otp'),
+          Uri.parse('$baseUrl/users/verify-otp'),
           headers: headers,
           body: json.encode({
             'email': email,
@@ -100,7 +100,7 @@ class userService {
   }) async {
     try{
       final response = await http.put(
-        Uri.parse("${baseUrl}/users/resend-otp"),
+        Uri.parse("$baseUrl/users/resend-otp"),
         headers: headers,
         body: json.encode({'email': email})
       );
@@ -122,7 +122,7 @@ class userService {
         throw Exception("Access token not found");
       }
       final response = await http.get(
-        Uri.parse("${baseUrl}/users/profile"),
+        Uri.parse("$baseUrl/users/profile"),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

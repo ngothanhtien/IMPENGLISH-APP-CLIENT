@@ -1,18 +1,19 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/forum_postcard.dart';
 import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/presentation/screens/menu_screen/community/leader_board_screen.dart';
-import 'package:learning_app_client/presentation/screens/menu_screen/community/post_detail_screen.dart';
-import 'package:learning_app_client/service/postService.dart';
+import 'package:learning_app_client/service/post_service.dart';
 
-class Community_Screen extends StatefulWidget {
+class CommunityScreen extends StatefulWidget {
+  const CommunityScreen({
+    super.key
+  });
   @override
-  State<StatefulWidget> createState() => _Community_Screen();
+  State<StatefulWidget> createState() => _CommunityScreen();
 }
-class _Community_Screen extends State<Community_Screen>
+class _CommunityScreen extends State<CommunityScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
@@ -24,7 +25,7 @@ class _Community_Screen extends State<Community_Screen>
       isLoadingPost = true;
     });
     try{
-      final response = await postService().fetchPosts();
+      final response = await PostService().fetchPosts();
       setState(() {
         posts = response;
         isLoadingPost = false;
@@ -191,7 +192,7 @@ class _Community_Screen extends State<Community_Screen>
                                     level: post.userId?.level ?? '',
                                     content: post.content ?? '',
                                     category: post.category ?? '',
-                                    date: post.createdAt.toString() ?? '',
+                                    date: post.createdAt.toString(),
                                     likes: post.countLike ?? 0,
                                     streakDay: post.userId?.streakDay ?? 0,
                                     tags: post.tags ?? [],

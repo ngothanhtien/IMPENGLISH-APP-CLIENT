@@ -4,22 +4,22 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_app_client/model/vocabulary/flash_card.dart';
 import 'package:learning_app_client/model/vocabulary/vocab_detail.dart';
-class vocabService {
-  final String? base_url = dotenv.env["BASE_URL_SML_3"];
+class VocabService {
+  final String? baseUrl = dotenv.env["BASE_URL_SML_3"];
   static Map<String,String> headers = {
     'Content-type': "application/json",
     'Accept': 'application/json'
   };
 
-  Future<Card_Vocabulary> fetchVocabBrief({int page = 1, int limit = 10,String? topic}) async {
+  Future<CardVocabulary> fetchVocabBrief({int page = 1, int limit = 10,String? topic}) async {
     try{
       final response = await http.get(
-        Uri.parse("${base_url}/vocabulary/flashCard?page=$page&topic=$topic"),
+        Uri.parse("$baseUrl/vocabulary/flashCard?page=$page&topic=$topic"),
         headers: headers,
       );
       if(response.statusCode == 200){
         final jsondata = json.decode(response.body);
-        return Card_Vocabulary.fromJson(jsondata);
+        return CardVocabulary.fromJson(jsondata);
       }else {
         throw Exception('Failed to load vocab. StatusCode: ${response.statusCode}');
       }
@@ -31,7 +31,7 @@ class vocabService {
   Future<VocabDetailResponse> fetchVocabDetail({required String id}) async {
     try{
       final response = await http.get(
-        Uri.parse("$base_url/vocabulary/detail/$id"),
+        Uri.parse("$baseUrl/vocabulary/detail/$id"),
         headers: headers
       );
       if(response.statusCode == 200){
@@ -45,17 +45,17 @@ class vocabService {
       throw Exception("Error at get Vocabulary brief: $e");
     }
   }
-  Map<String,Card_Vocabulary> cache = {};
-  Future<Card_Vocabulary> searchVocab({required String keyword,String? topic, String? level}) async {
+  Map<String,CardVocabulary> cache = {};
+  Future<CardVocabulary> searchVocab({required String keyword,String? topic, String? level}) async {
     try{
       if(cache.containsKey(keyword)) return cache[keyword]!;
       final response = await http.get(
-        Uri.parse("${base_url}/vocabulary/search?keyword=$keyword&topic=$topic&level=$level"),
+        Uri.parse("$baseUrl/vocabulary/search?keyword=$keyword&topic=$topic&level=$level"),
         headers: headers,
       );
       if(response.statusCode == 200){
         final jsondata = json.decode(response.body);
-        final result = Card_Vocabulary.fromJson(jsondata);
+        final result = CardVocabulary.fromJson(jsondata);
         cache[keyword] = result;
         return result;
       }else {
@@ -68,7 +68,7 @@ class vocabService {
   Future<VocabDetailResponse> getRandomVocab({required String topic,required String word}) async {
     try{
       final response = await http.get(
-        Uri.parse("${base_url}/vocabulary/randomword?topic=$topic&word=$word"),
+        Uri.parse("$baseUrl/vocabulary/randomword?topic=$topic&word=$word"),
         headers: headers
       );
       if(response.statusCode ==200){

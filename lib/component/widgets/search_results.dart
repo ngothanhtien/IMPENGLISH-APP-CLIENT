@@ -1,16 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/widgets/filter_dropdown.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
 import 'package:learning_app_client/model/vocabulary/flash_card.dart';
-import 'package:learning_app_client/presentation/screens/search/search_detail_screen.dart';
-import 'package:learning_app_client/service/vocabularyService.dart';
+import 'package:learning_app_client/service/vocabulary_service.dart';
 
 class SearchResults extends StatefulWidget {
   final String query;
-  SearchResults({
+
+  const SearchResults({
     super.key,
     required this.query
   });
@@ -19,11 +18,11 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResults extends State<SearchResults>{
-  Card_Vocabulary? card_vocabulary;
+  CardVocabulary? cardVocabulary;
   List<IVocabBrief>? results;
   bool isLoading = false;
   String? error;
-  int? total_vocab_find;
+  int? totalVocabFind;
   Timer? _debounce;
 
   String selectedTopic = '';
@@ -54,15 +53,15 @@ class _SearchResults extends State<SearchResults>{
     });
     
     try{
-      final data_response = await vocabService().searchVocab(
+      final dataResponse = await VocabService().searchVocab(
         keyword: widget.query.toString(),
         topic: selectedTopic.toLowerCase().toString(),
         level: selectedLevel.toString()
       );
       setState(() {
-        results = data_response.data;
-        card_vocabulary = data_response;
-        total_vocab_find = data_response.pagination?.total;
+        results = dataResponse.data;
+        cardVocabulary = dataResponse;
+        totalVocabFind = dataResponse.pagination?.total;
         isLoading = false;
         error = null;
       });
@@ -89,108 +88,106 @@ class _SearchResults extends State<SearchResults>{
     if(isLoading){
       return const Center(child: CircularProgressIndicator(),);
     }
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Results for "${widget.query}"',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1E293B),
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Results for "${widget.query}"',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1E293B),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: Offset(0, 4)
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: Offset(0, 4)
+                )
+              ]
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Topic",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87
+                        ),
+                      ),
+                      SizedBox(height: 8,),
+                      FilterDropdown(
+                        value: selectedTopic,
+                        options: const [
+                          '', 'Technology', 'Business', 'Education', 'Sports',
+                          'Entertainment', 'Science', 'History',"General",
+                        ],
+                        onChanged: (value){
+                          setState(() {
+                            selectedTopic = value!;
+                            _runDebounce();
+                          });
+                        },
+                      ),
+                    ],
                   )
-                ]
-              ),
-              child: Row(
-                children: [
-                  Expanded(
+                ),
+                SizedBox(width: 10,),
+                Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Topic",
+                        const Text("Level",
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87
                           ),
                         ),
                         SizedBox(height: 8,),
                         FilterDropdown(
-                          value: selectedTopic,
+                          value: selectedLevel,
                           options: const [
-                            '', 'Technology', 'Business', 'Education', 'Sports',
-                            'Entertainment', 'Science', 'History',"General",
+                            '', "A1", "A2", "B1", "B2", "C1", "C2"
                           ],
                           onChanged: (value){
                             setState(() {
-                              selectedTopic = value!;
+                              selectedLevel = value!;
                               _runDebounce();
                             });
                           },
                         ),
                       ],
                     )
-                  ),
-                  SizedBox(width: 10,),
-                  Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Level",
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87
-                            ),
-                          ),
-                          SizedBox(height: 8,),
-                          FilterDropdown(
-                            value: selectedLevel,
-                            options: const [
-                              '', "A1", "A2", "B1", "B2", "C1", "C2"
-                            ],
-                            onChanged: (value){
-                              setState(() {
-                                selectedLevel = value!;
-                                _runDebounce();
-                              });
-                            },
-                          ),
-                        ],
-                      )
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: SearchResultList(
-                isLoading: isLoading,
-                error: error,
-                results: results,
-                total: total_vocab_find,
-              ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: SearchResultList(
+              isLoading: isLoading,
+              error: error,
+              results: results,
+              total: totalVocabFind,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

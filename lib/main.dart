@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/fadetransition/CustomFadeTransition.dart';
+import 'package:learning_app_client/component/fadetransition/custom_fade_transition.dart';
 import 'package:learning_app_client/component/navigation/bottom_nav_scaffold.dart';
 import 'package:learning_app_client/core/prefs.dart';
 import 'package:learning_app_client/presentation/screens/Onboarding/onboarding_start_run1.dart';
@@ -67,7 +67,7 @@ final GoRouter _router = GoRouter(
               routes: [
                 GoRoute(
                     path: '/community',
-                    builder: (context,state) =>  Community_Screen()
+                    builder: (context,state) =>  CommunityScreen()
                 )
               ]
           ),
@@ -84,8 +84,8 @@ final GoRouter _router = GoRouter(
       GoRoute(
           path: '/posts/detail/:id',
           builder: (context,state){
-            final post_id = state.pathParameters['id'];
-            return PostDetailScreen(post_id: post_id.toString());
+            final postId = state.pathParameters['id'];
+            return PostDetailScreen(postId: postId.toString());
           }
       ),
       GoRoute(
@@ -94,12 +94,12 @@ final GoRouter _router = GoRouter(
             final data = state.extra as Map<String,dynamic>;
             final level = data['level'];
             final category = data['category'];
-            final questions = data['questions'];
+            final totalQuestions = data['totalQuestions'];
             final timeLimit = data['timeLimit'];
             return QuizDetailScreen(
                 level: level,
                 category: category,
-                questions: questions,
+                totalQuestions: totalQuestions,
                 timeLimit: timeLimit
             );
           }
@@ -110,12 +110,12 @@ final GoRouter _router = GoRouter(
             final data = state.extra as Map<String,dynamic>;
             final level = data['level'];
             final category = data['category'];
-            final questions = data['questions'];
+            final totalQuestions = data['totalQuestions'];
             final timeLimit = data['timeLimit'];
             return QuizQuestionsScreen(
                 level: level,
                 category: category,
-                questions: questions,
+                totalQuestions: totalQuestions,
                 timeLimit: timeLimit
             );
           }
@@ -124,25 +124,17 @@ final GoRouter _router = GoRouter(
           path: '/quiz/detail/practice/result',
           builder: (context,state)  {
             final data = state.extra as Map<String,dynamic>;
-            final level = data['level'];
-            final category = data['category'];
-            final questions = data['questions'];
+            final quizResultId = data['quizResultId'];
             final timeLimit = data['timeLimit'];
-            final userAnswers = data['userAnswers'];
-            final quizQuestions = data['quizQuestions'];
             return QuizResultsScreen(
-                level: level,
-                category: category,
-                questions: questions,
-                timeLimit: timeLimit,
-                userAnswers: userAnswers,
-                quizQuestions: quizQuestions
+              quizResultId: quizResultId,
+              timeLimit: timeLimit,
             );
           }
       ),
       GoRoute(
           path: '/community/post',
-          builder: (context,state) =>  Post_Screen()
+          builder: (context,state) =>  PostScreen()
       ),
       GoRoute(
           path: '/profile/edit-profile',
@@ -164,19 +156,19 @@ final GoRouter _router = GoRouter(
           path: '/home/vocabulary-topic/:topic',
           builder: (context,state){
             final topic = state.pathParameters['topic'];
-            return SearchDetail_Screen(topic: topic.toString() ?? '');
+            return SearchDetailScreen(topic: topic.toString());
           }
       ),
       GoRoute(
           path: '/learning/practice/:id',
           builder: (context,state) {
-            final vocab_id = state.pathParameters["id"];
-            return DetailPracticeScreen(vocab_id: vocab_id.toString(),);
+            final vocabId = state.pathParameters["id"];
+            return DetailPracticeScreen(vocabId: vocabId.toString(),);
           }
       ),
       GoRoute(
           path: '/onboarding',
-          pageBuilder: (context,state) => buildFadeTransitionPage(Onboarding_Screen())
+          pageBuilder: (context,state) => buildFadeTransitionPage(OnboardingScreen())
       ),
       GoRoute(
           path: '/login',

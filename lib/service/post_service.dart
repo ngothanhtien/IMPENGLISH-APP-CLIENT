@@ -6,7 +6,7 @@ import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/model/post/post_detail_response.dart';
 import 'package:learning_app_client/model/post/post_response.dart';
 
-class postService {
+class PostService {
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
   final _storage = FlutterSecureStorage();
 
@@ -53,9 +53,9 @@ class postService {
           })
       );
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        final post_results = Post.fromJson(data_response);
-        return post_results;
+        final dataResponse = json.decode(response.body);
+        final postResults = Post.fromJson(dataResponse);
+        return postResults;
       }else{
         throw Exception("Failed with status ${response.statusCode}");
       }

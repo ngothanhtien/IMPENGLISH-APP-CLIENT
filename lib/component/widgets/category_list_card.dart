@@ -5,10 +5,10 @@ class CategorySelector extends StatefulWidget {
   final ValueChanged<String> onSelected; // callback gửi giá trị được chọn
 
   const CategorySelector({
-    Key? key,
+    super.key,
     required this.categories,
     required this.onSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
@@ -56,12 +56,12 @@ class _CategorySelectorState extends State<CategorySelector>
               boxShadow: [
                 if (isSelected)
                   BoxShadow(
-                    color: const Color(0xFF4F46E5).withOpacity(0.3),
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

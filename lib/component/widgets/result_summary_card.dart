@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ResultSummaryCard extends StatelessWidget {
   final String level;
   final String category;
-  final String questions;
+  final int totalQuestions;
   final String timeLimit;
   final String score;
   final String percentage;
@@ -13,7 +13,7 @@ class ResultSummaryCard extends StatelessWidget {
     super.key,
     required this.level,
     required this.category,
-    required this.questions,
+    required this.totalQuestions,
     required this.timeLimit,
     required this.score,
     required this.percentage,
@@ -33,7 +33,7 @@ class ResultSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
+            color: const Color(0xFF6366F1).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -68,7 +68,7 @@ class ResultSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildDetailItem('Questions', questions, Icons.quiz),
+                child: _buildDetailItem('Questions', totalQuestions.toString(), Icons.quiz),
               ),
               Expanded(
                 child: _buildDetailItem('Time Limit', timeLimit, Icons.timer),
@@ -81,7 +81,7 @@ class ResultSummaryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -103,7 +103,7 @@ class ResultSummaryCard extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           size: 20,
         ),
         const SizedBox(width: 8),
@@ -114,7 +114,7 @@ class ResultSummaryCard extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -147,7 +147,7 @@ class ResultSummaryCard extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontWeight: FontWeight.w500,
           ),
         ),

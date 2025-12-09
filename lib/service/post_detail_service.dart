@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:learning_app_client/model/post/post_detail_response.dart';
 import 'package:http/http.dart' as http;
 
-class postDetailService {
+class PostDetailService {
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
   final _storage = FlutterSecureStorage();
 
@@ -24,8 +24,8 @@ class postDetailService {
         Uri.parse("$baseUrl/comments/create/$userId"),
         headers: _defaultHeaders,
         body: json.encode({
-          "postId":  postId ?? '',
-          "content": content ?? '',
+          "postId":  postId,
+          "content": content,
         })
       );
       if(response.statusCode == 200){
@@ -40,7 +40,7 @@ class postDetailService {
     }
   }
 
-  Future<Map<String,dynamic>> toggle_liked({
+  Future<Map<String,dynamic>> toggleLiked({
     required String userId,
     required String postId
   }) async {
@@ -49,13 +49,13 @@ class postDetailService {
         Uri.parse("$baseUrl/likes/toggle-like"),
         headers: _defaultHeaders,
         body: json.encode({
-          "userId": userId ?? '',
-          "postId": postId ?? ''
+          "userId": userId,
+          "postId": postId
         })
       );
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        Map<String,dynamic> result = data_response;
+        final dataResponse = json.decode(response.body);
+        Map<String,dynamic> result = dataResponse;
         return result;
       }else{
         throw Exception("Error at toggle like: ${response.statusCode}");
@@ -65,7 +65,7 @@ class postDetailService {
     }
   }
 
-  Future<Map<String,dynamic>> check_liked({
+  Future<Map<String,dynamic>> checkLiked({
     required String userId,
     required String postId
   }) async {
@@ -75,8 +75,8 @@ class postDetailService {
         headers: _defaultHeaders,
       );
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        final Map<String,dynamic> checkLiked = data_response;
+        final dataResponse = json.decode(response.body);
+        final Map<String,dynamic> checkLiked = dataResponse;
         return checkLiked;
       }else{
         throw Exception("Error at toggle like at postServiceDetail: ${response.statusCode}");
@@ -95,8 +95,8 @@ class postDetailService {
         headers: _defaultHeaders,
       );
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        final Map<String,dynamic> result = data_response;
+        final dataResponse = json.decode(response.body);
+        final Map<String,dynamic> result = dataResponse;
         return result;
       }else{
         throw Exception("Error at delete commemt at postServiceDetail: ${response.statusCode}");
@@ -119,8 +119,8 @@ class postDetailService {
         })
       );
       if(response.statusCode == 200){
-        final data_response = json.decode(response.body);
-        final Map<String,dynamic> result = data_response['data'];
+        final dataResponse = json.decode(response.body);
+        final Map<String,dynamic> result = dataResponse;
         return result;
       }else{
         throw Exception("Error at update commemt at postServiceDetail: ${response.statusCode}");

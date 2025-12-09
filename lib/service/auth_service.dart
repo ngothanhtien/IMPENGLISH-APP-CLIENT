@@ -1,11 +1,12 @@
 
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class authService {
+class AuthService {
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
   
   final storage = FlutterSecureStorage();
@@ -24,7 +25,7 @@ class authService {
       });
 
       final response = await http.post(
-        Uri.parse('${baseUrl}/auth/login'),
+        Uri.parse('$baseUrl/auth/login'),
         headers: headers,
         body: body,
       ).timeout(const Duration(seconds: 10));
@@ -39,8 +40,8 @@ class authService {
         final accesstokenRead = await storage.read(key: 'accessToken');
         final refreshtokenRead = await storage.read(key: 'refreshToken');
 
-        print("accesstoken: ${accesstokenRead}");
-        print("refreshtoken: ${refreshtokenRead}");
+        debugPrint("accesstoken: $accesstokenRead");
+        debugPrint("refreshtoken: $refreshtokenRead");
 
         return json.decode(response.body);
       }else{
@@ -56,7 +57,7 @@ class authService {
     try {
       final response = await http
           .post(
-        Uri.parse("${baseUrl}/auth/logout"),
+        Uri.parse("$baseUrl/auth/logout"),
         headers: headers,
         body: json.encode({'refreshToken': refreshToken}),
       ).timeout(const Duration(seconds: 8));

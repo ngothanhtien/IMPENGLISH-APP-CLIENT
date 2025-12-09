@@ -41,7 +41,7 @@ class _PracticeExerciseState extends State<PracticeExercise> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -69,7 +69,7 @@ class _PracticeExerciseState extends State<PracticeExercise> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: selectedOption == index
-                        ? const Color(0xFF4F46E5).withOpacity(0.1)
+                        ? const Color(0xFF4F46E5).withValues(alpha: 0.1)
                         : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
@@ -161,7 +161,7 @@ class _PracticeExerciseState extends State<PracticeExercise> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -243,7 +243,7 @@ class _PracticeExerciseState extends State<PracticeExercise> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -281,7 +281,7 @@ class _PracticeExerciseState extends State<PracticeExercise> {
                   borderRadius: BorderRadius.circular(40),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF4F46E5).withOpacity(0.3),
+                      color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),

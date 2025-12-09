@@ -1,10 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/textfield/CustomTextField.dart';
-import 'package:learning_app_client/component/topsnackbar/showTopSnackBar.dart';
-import 'package:learning_app_client/service/authService.dart';
+import 'package:learning_app_client/component/textfield/custom_textfield.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
+import 'package:learning_app_client/service/auth_service.dart';
 class LoginScreen extends StatefulWidget{
+  const LoginScreen({
+    super.key
+  });
   @override
   State<StatefulWidget> createState() => _LoginScreen();
 }
@@ -25,18 +28,24 @@ class _LoginScreen extends State<LoginScreen> {
       _isLoading = true;
     });
     try{
-      final response = await authService().login(
+
+      final response = await AuthService().login(
         email: email,
         password: password
       );
+
+      if(!mounted) return;
+
       final title = response['title'] ?? '';
       final message = response['message'] ?? '';
+
       if(title.toString() == 'Success'){
         AppSnackBar.showSuccess(context, message);
+
         Future.delayed(const Duration(milliseconds: 3000),() => {
-          if(mounted) context.go('/home'),
-          AppSnackBar.showSuccess(context, message)
+          if(mounted) context.go('/home')
         });
+
       }else{
         AppSnackBar.showError(context, message);
       }

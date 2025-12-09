@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:learning_app_client/model/quiz.dart';
-import 'package:learning_app_client/model/quiz_question.dart';
 
 class QuestionCard extends StatelessWidget {
   final Question question;
@@ -18,19 +17,20 @@ class QuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Question Text
@@ -43,7 +43,7 @@ class QuestionCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
 
           // Answer Options
           ...question.options!.asMap().entries.map((entry) {
@@ -59,7 +59,7 @@ class QuestionCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF6366F1).withOpacity(0.1)
+                        ? const Color(0xFF6366F1).withValues(alpha: 0.1)
                         : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
@@ -113,7 +113,7 @@ class QuestionCard extends StatelessWidget {
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

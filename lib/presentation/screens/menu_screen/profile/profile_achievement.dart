@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AchievementScreen extends StatelessWidget {
+  AchievementScreen({super.key});
   final List<Map<String, dynamic>> achievements = [
     {
       "title": "Grammar Master",
@@ -53,7 +54,7 @@ class AchievementScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
           style: IconButton.styleFrom(
             padding: const EdgeInsets.all(8),
-            backgroundColor: Colors.white.withOpacity(0.3),
+            backgroundColor: Colors.white.withValues(alpha: 0.3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             )
@@ -83,7 +84,7 @@ class AchievementScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -148,7 +149,7 @@ class AchievementScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

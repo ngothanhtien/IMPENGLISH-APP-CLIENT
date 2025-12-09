@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
 import 'package:learning_app_client/component/widgets/question_result_card.dart';
 import 'package:learning_app_client/component/widgets/result_summary_card.dart';
 import 'package:learning_app_client/component/widgets/stats_chart.dart';
-import 'package:learning_app_client/model/quiz.dart';
-import 'package:learning_app_client/model/quiz_question.dart';
-import 'package:learning_app_client/presentation/screens/menu_screen/quiz/quiz_questions_screen.dart';
-import 'quiz_screen.dart';
+import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
+import 'package:learning_app_client/service/quiz_result_service.dart';
 
 class QuizResultsScreen extends StatefulWidget {
-  final String level;
-  final String category;
-  final String questions;
+  final String quizResultId;
   final String timeLimit;
-  final List<String> userAnswers;
-  final List<Question> quizQuestions;
 
   const QuizResultsScreen({
     super.key,
-    required this.level,
-    required this.category,
-    required this.questions,
+    required this.quizResultId,
     required this.timeLimit,
-    required this.userAnswers,
-    required this.quizQuestions,
   });
 
   @override
@@ -38,16 +29,15 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
   late Animation<double> _slideAnimation;
   late Animation<double> _statsAnimation;
   bool isExpandedResult = false;
+  late Future<QuizResult> futureQuizResult;
 
-  int correctAnswers = 0;
-  int incorrectAnswers = 0;
   double percentage = 0.0;
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
-    _calculateResults();
+    futureQuizResult = fetchDetailResultById();
   }
 
   void _initializeAnimations() {
@@ -93,15 +83,20 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
     });
   }
 
-  void _calculateResults() {
-    correctAnswers = 0;
-    for (int i = 0; i < widget.userAnswers.length; i++) {
-      if (widget.userAnswers[i] == widget.quizQuestions[i].correctAnswer) {
-        correctAnswers++;
+  Future<QuizResult> fetchDetailResultById() async {
+    try{
+      final response = await QuizResultService().getDetailQuizResultById(
+          quizResultId: widget.quizResultId
+      );
+      if(response.id != null){
+        return response;
+      }else{
+        throw Exception("Error at fetchDetailResultById!");
       }
+    }catch(e){
+      debugPrint("Error at fetchDetailResultById at screen_result: $e");
+      rethrow;
     }
-    incorrectAnswers = widget.userAnswers.length - correctAnswers;
-    percentage = (correctAnswers / widget.userAnswers.length) * 100;
   }
 
   @override
@@ -113,320 +108,309 @@ class _QuizResultsScreenState extends State<QuizResultsScreen>
 
   @override
   Widget build(BuildContext context) {
-    int allQuestion = widget.quizQuestions.length;
-    int haftQuestion = allQuestion~/2;
-    int questionBreakDownLenght = isExpandedResult ? allQuestion : haftQuestion;
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4F46E5),
-        title: const Text('Quiz Results',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-            letterSpacing: -0.5
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.close,size: 22,color: Colors.white,),
-          onPressed: () => context.go('/quiz'),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: const Color(0xFFE2E8F0),
-          ),
-        ),
-      ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Transform.translate(
-          offset: Offset(0, _slideAnimation.value * 50),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 10,),
-                // Celebration Header
-                Center(
+    return FutureBuilder<QuizResult>(
+      future: futureQuizResult,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red, fontSize: 18),
+              ),
+            ),
+          );
+        }
+
+        if(snapshot.hasData && snapshot.data != null){
+          final quizResult = snapshot.data;
+
+          final correct = quizResult?.correctAnswers ?? 0;
+          final total = quizResult?.totalQuestions ?? 0;
+
+          int allQuestion = total;
+          int haftQuestion = allQuestion~/2;
+          int questionBreakDownLenght = isExpandedResult ? allQuestion : haftQuestion;
+
+
+          if (total > 0) {
+            percentage = (correct / total) * 100;
+          } else {
+            percentage = 0; // hoặc null → tùy UI bạn muốn
+          }
+
+          return Scaffold(
+            backgroundColor: const Color(0xFFF8FAFC),
+            appBar: AppBar(
+              backgroundColor: const Color(0xFF4F46E5),
+              title: const Text('Quiz Results',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: -0.5
+                ),
+              ),
+              centerTitle: true,
+              leading: IconButton(
+                icon: const Icon(Icons.close,size: 22,color: Colors.white,),
+                onPressed: () => context.go('/quiz'),
+              ),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1),
+                child: Container(
+                  height: 1,
+                  color: const Color(0xFFE2E8F0),
+                ),
+              ),
+            ),
+            body: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Transform.translate(
+                offset: Offset(0, _slideAnimation.value * 50),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(8),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: percentage >= 70
-                                ? [const Color(0xFF10B981), const Color(0xFF059669)]
-                                : percentage >= 50
-                                ? [const Color(0xFFF59E0B), const Color(0xFFD97706)]
-                                : [const Color(0xFFEF4444), const Color(0xFFDC2626)],
-                          ),
-                          borderRadius: BorderRadius.circular(50),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (percentage >= 70
-                                  ? const Color(0xFF10B981)
+                      SizedBox(height: 10,),
+                      // Celebration Header
+                      Center(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: percentage >= 70
+                                      ? [const Color(0xFF10B981), const Color(0xFF059669)]
+                                      : percentage >= 50
+                                      ? [const Color(0xFFF59E0B), const Color(0xFFD97706)]
+                                      : [const Color(0xFFEF4444), const Color(0xFFDC2626)],
+                                ),
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (percentage >= 70
+                                        ? const Color(0xFF10B981)
+                                        : percentage >= 50
+                                        ? const Color(0xFFF59E0B)
+                                        : const Color(0xFFEF4444))
+                                        .withValues(alpha: 0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                percentage >= 70
+                                    ? Icons.emoji_events
+                                    : percentage >= 50
+                                    ? Icons.thumb_up
+                                    : Icons.refresh,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              percentage >= 70
+                                  ? 'Excellent!'
                                   : percentage >= 50
-                                  ? const Color(0xFFF59E0B)
-                                  : const Color(0xFFEF4444))
-                                  .withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                                  ? 'Good Job!'
+                                  : 'Keep Trying!',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'You scored $percentage% in this quiz',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ],
                         ),
-                        child: Icon(
-                          percentage >= 70
-                              ? Icons.emoji_events
-                              : percentage >= 50
-                              ? Icons.thumb_up
-                              : Icons.refresh,
-                          size: 40,
-                          color: Colors.white,
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Results Summary
+                      ResultSummaryCard(
+                        level: quizResult?.level ?? '',
+                        category: quizResult?.category ?? '',
+                        totalQuestions: quizResult?.totalQuestions ?? 0,
+                        timeLimit: widget.timeLimit,
+                        score: '${quizResult?.correctAnswers}/${quizResult?.totalQuestions}',
+                        percentage: '${percentage.toInt()}%',
+                        timeTaken: '5 min', // Mock data
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Statistics Chart
+                      AnimatedBuilder(
+                        animation: _statsAnimation,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: _statsAnimation.value,
+                            child: Transform.translate(
+                              offset: Offset(0, (1 - _statsAnimation.value) * 30),
+                              child: StatsChart(
+                                correct: quizResult?.correctAnswers ?? 0,
+                                incorrect: quizResult?.incorrectAnswers ?? 0,
+                                animation: _statsAnimation,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Question Breakdown
+                      const Text(
+                        'Question Breakdown',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF374151),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        percentage >= 70
-                            ? 'Excellent!'
-                            : percentage >= 50
-                            ? 'Good Job!'
-                            : 'Keep Trying!',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1E293B),
+
+                      ...List.generate(
+                        questionBreakDownLenght,
+                            (index) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: AnimatedBuilder(
+                            animation: _statsAnimation,
+                            builder: (context, child) {
+                              return Opacity(
+                                opacity: _statsAnimation.value,
+                                child: Transform.translate(
+                                  offset: Offset(0, (1 - _statsAnimation.value) * 20),
+                                  child: QuestionResultCard(
+                                    questionNumber: index + 1,
+                                    question: quizResult?.questions?[index].questionText ?? '',
+                                    userAnswer: quizResult?.questions?[index].selectedAnswer ?? '',
+                                    correctAnswer: quizResult?.questions?[index].correctAnswer ?? '',
+                                    isCorrect: quizResult?.questions?[index].isCorrect ?? false,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'You scored ${percentage.toInt()}% in this quiz',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
+                      TextButton(
+                          onPressed: (){
+                            setState(() {
+                              isExpandedResult = !isExpandedResult;
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(isExpandedResult ? "Show less": "Show More",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xFF4F46E5)
+                                ),
+                              ),
+                              Icon(isExpandedResult ? Icons.expand_less : Icons.expand_more,
+                                size: 18,
+                                color: const Color(0xFF4F46E5),
+                              )
+                            ],
+                          )
                       ),
+                      const SizedBox(height: 6),
+                      // Action Buttons
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: () => context.go('/quiz'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF4F46E5),
+                                side: const BorderSide(
+                                  color: Color(0xFF4F46E5),
+                                  width: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.home, size: 22),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Back to Quiz Screen',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: -0.2
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: TextButton(
+                              onPressed: () => {
+                                AppSnackBar.showInfo(context, 'Share functionality coming soon!')
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.share, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Share Results',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: -0.2
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
-
-                // Results Summary
-                ResultSummaryCard(
-                  level: widget.level,
-                  category: widget.category,
-                  questions: widget.questions,
-                  timeLimit: widget.timeLimit,
-                  score: '$correctAnswers/${widget.userAnswers.length}',
-                  percentage: '${percentage.toInt()}%',
-                  timeTaken: '8 min', // Mock data
-                ),
-                const SizedBox(height: 24),
-
-                // Statistics Chart
-                AnimatedBuilder(
-                  animation: _statsAnimation,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _statsAnimation.value,
-                      child: Transform.translate(
-                        offset: Offset(0, (1 - _statsAnimation.value) * 30),
-                        child: StatsChart(
-                          correct: correctAnswers,
-                          incorrect: incorrectAnswers,
-                          animation: _statsAnimation,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // Question Breakdown
-                const Text(
-                  'Question Breakdown',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF374151),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                ...List.generate(
-                  questionBreakDownLenght,
-                      (index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: AnimatedBuilder(
-                      animation: _statsAnimation,
-                      builder: (context, child) {
-                        return Opacity(
-                          opacity: _statsAnimation.value,
-                          child: Transform.translate(
-                            offset: Offset(0, (1 - _statsAnimation.value) * 20),
-                            child: QuestionResultCard(
-                              questionNumber: index + 1,
-                              question: widget.quizQuestions[index].questionText.toString(),
-                              userAnswer: widget.userAnswers[index],
-                              correctAnswer: widget.quizQuestions[index].correctAnswer.toString(),
-                              isCorrect: widget.userAnswers[index] ==
-                                  widget.quizQuestions[index].correctAnswer,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                TextButton(
-                    onPressed: (){
-                      setState(() {
-                        isExpandedResult = !isExpandedResult;
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(isExpandedResult ? "Show less": "Show More",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: const Color(0xFF4F46E5)
-                          ),
-                        ),
-                        Icon(isExpandedResult ? Icons.expand_less : Icons.expand_more,
-                          size: 18,
-                          color: const Color(0xFF4F46E5),
-                        )
-                      ],
-                    )
-                ),
-                const SizedBox(height: 20),
-                // Action Buttons
-                Column(
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () => _retryQuiz(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4F46E5),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.refresh, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Retry Quiz',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: () => context.go('/quiz'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF4F46E5),
-                          side: const BorderSide(
-                            color: const Color(0xFF4F46E5),
-                            width: 2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.home, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Back to Quiz Screen',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.2
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: TextButton(
-                        onPressed: () => _shareResults(),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.share, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Share Results',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.2
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _retryQuiz() {
-    context.go('/quiz/detail/practice',
-        extra: {
-          "level": widget.level,
-          "category": widget.category,
-          "questions": widget.questions,
-          "timeLimit": widget.timeLimit
+          );
         }
-    );
-  }
-
-  void _shareResults() {
-    // Mock share functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Share functionality coming soon!'),
-        backgroundColor: Color(0xFF6366F1),
-        behavior: SnackBarBehavior.floating,
-      ),
+        return const Scaffold(
+          body: Center(child: Text('No Quiz Result found')),
+        );
+      }
     );
   }
 }

@@ -28,7 +28,7 @@ class _SettingScreenState extends State<SettingScreen> {
             onPressed: ()=> context.pop(),
             style: IconButton.styleFrom(
                 padding: const EdgeInsets.all(8),
-                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundColor: Colors.white.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 )
@@ -139,7 +139,7 @@ class _SettingScreenState extends State<SettingScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 8,
             spreadRadius: 2,
           )

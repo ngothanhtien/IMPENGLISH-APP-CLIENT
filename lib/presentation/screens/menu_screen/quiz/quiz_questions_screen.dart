@@ -1,23 +1,28 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/countdown_timer/countdown_timer.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
+import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/progress_indicator_widget.dart';
 import 'package:learning_app_client/component/widgets/question_card.dart';
 import 'package:learning_app_client/model/quiz.dart';
-import 'package:learning_app_client/service/quizService.dart';
+import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
+import 'package:learning_app_client/service/quiz_result_service.dart';
+import 'package:learning_app_client/service/quiz_service.dart';
 import 'dart:math';
 
 class QuizQuestionsScreen extends StatefulWidget {
   final String level;
   final String category;
-  final String questions;
+  final int totalQuestions;
   final String timeLimit;
 
   const QuizQuestionsScreen({
     super.key,
     required this.level,
     required this.category,
-    required this.questions,
+    required this.totalQuestions,
     required this.timeLimit,
   });
 
@@ -42,33 +47,102 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
   bool isAnswerSelected = false;
   List<Question> _cachedQuestions = [];
 
-  late Future<List<Question>> futureQuestions;
+  //operator for create result
+  int totalQuestions = 0;
+  int correctAnswers = 0;
+  int incorrectAnswers = 0;
+  List<QuestionQuizResult> questionsQuizResult = [];
+  DateTime completeAt = DateTime.now();
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeAnimations();
-    futureQuestions = _generateQuestions();
-  }
+  late Future<List<Question>> futureQuestions;
 
   Future<List<Question>> _generateQuestions() async {
     try {
-      final quiz = await quizService().fetchQuiz(
+      final quiz = await QuizService().fetchQuiz(
         level: widget.level,
         topic: widget.category,
-        numberQuestions: int.parse(widget.questions),
+        numberQuestions: widget.totalQuestions,
       );
 
       if (quiz.data != null && quiz.data!.isNotEmpty) {
         final questions = quiz.data!.first.question;
         userAnswers = List.filled(questions!.length, '');
-        return questions!;
+        return questions;
       } else {
         throw Exception("Error: Can't fetch data quiz!");
       }
     } catch (e) {
       debugPrint("Error at _generateQuestions: $e");
       rethrow;
+    }
+  }
+  Future<String?> createQuizResult() async {
+    _calculateResults();
+    _generateQuestionQuizResult();
+    try{
+      final quizResult = QuizResult(
+        level: widget.level,
+        category: widget.category,
+        correctAnswers: correctAnswers,
+        totalQuestions: totalQuestions,
+        incorrectAnswers: incorrectAnswers,
+        statusFinish: true,
+        questions: questionsQuizResult,
+      );
+
+      final response = await QuizResultService().createQuizResult(
+        quiz: quizResult,
+        userId: '68cd5981cf94a9641d3e9391',
+      );
+
+      if (!mounted) return null;
+
+      if (response['status'] == 'Success') {
+        final data = response['data'];
+        final id = data?['_id'] as String?;
+
+        if (id != null) {
+          AppSnackBar.showSuccess(context, "Submit quiz successfully");
+          return id;
+        }
+        return null;
+      } else {
+        throw Exception("Submit failed: ${response['message'] ?? 'Unknown'}");
+      }
+    }catch(e){
+      debugPrint("Error at createQuizResult: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> _finishQuiz(List<Question> questions) async {
+    String? quizResultId;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Center(child: CircularProgressIndicator()),
+    );
+    try {
+      quizResultId = await createQuizResult();
+      if(!mounted) return;
+    } catch (e) {
+      if (mounted) context.pop();
+      AppSnackBar.showError(context, "Submit quiz fail: $e");
+      return;
+    }
+
+    if (mounted) Navigator.of(context).pop();
+
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    if (mounted) {
+      context.push(
+        '/quiz/detail/practice/result',
+        extra: {
+          "quizResultId": quizResultId,
+          "timeLimit": widget.timeLimit,
+        },
+      );
     }
   }
 
@@ -120,7 +194,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
         if (_shouldFinishAfterAnimation) {
           // gọi finish sau frame để tránh gọi khi đang trong quá trình render
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _finishQuiz(_cachedQuestions);
+            _showSubmitQuiz(_cachedQuestions);
           });
         }
         // reset flags
@@ -131,13 +205,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
     });
 
     _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _cardAnimationController.dispose();
-    super.dispose();
   }
 
   void _selectAnswer(String answer) {
@@ -166,125 +233,107 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
       // nếu là câu cuối, hoàn thành quiz
       if (_shouldFinishAfterAnimation) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _finishQuiz(_cachedQuestions);
+            _showSubmitQuiz(_cachedQuestions);
         });
       }
     });
   }
 
-  void _finishQuiz(List<Question> questions) {
-    context.push(
-      '/quiz/detail/practice/result',
-      extra: {
-        "level": widget.level,
-        "category": widget.category,
-        "questions": widget.questions,
-        "timeLimit": widget.timeLimit,
-        "userAnswers": userAnswers,
-        "quizQuestions": questions,
-      },
-    );
+  void _calculateResults(){
+    final questionTemp = _cachedQuestions;
+    final answers = userAnswers;
+    final len = min(answers.length, questionTemp.length);
+
+    totalQuestions = len;
+    correctAnswers = 0;
+    for (int i = 0; i < len; i++) {
+      if (answers[i] == questionTemp[i].correctAnswer) {
+        correctAnswers++;
+      }
+    }
+    incorrectAnswers = len - correctAnswers;
+  }
+
+  void _generateQuestionQuizResult(){
+    questionsQuizResult.clear();
+    final questionTemp = _cachedQuestions;
+    final answers = userAnswers;
+
+    final len = min(answers.length, questionTemp.length);
+    for(int i = 0; i < len; i++){
+      final selected = answers[i].isEmpty ? 'No answer' : answers[i];
+      final q = questionTemp[i];
+      final result = QuestionQuizResult(
+        id: null,
+        questionId: q.qsId,
+        questionText: q.questionText,
+        selectedAnswer: selected,
+        correctAnswer: q.correctAnswer,
+        isCorrect: q.correctAnswer == answers[i],
+      );
+      questionsQuizResult.add(result);
+    }
   }
 
   void _showDialogTimeOut(List<Question> questions) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, size: 32, color: Color(0xFF4F46E5)),
-              SizedBox(width: 12),
-              Text(
-                "Time is up",
-                style: TextStyle(
-                  color: Color(0xFF4F46E5),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 24,
-                ),
-              ),
-            ],
-          ),
-          content: const Text(
-            "Time is up. Please press 'Finish' to see results",
-            style: TextStyle(fontSize: 16, height: 1.5),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                context.pop();
-                _finishQuiz(questions);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Finish', style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        );
-      },
+    showAppDialog(
+      context,
+      icon: Icons.timer_outlined,
+      title: "Time is up",
+      message: "Time is up. Please press (Finish) to end the quiz.",
+      okText: "Finish",
+      onOk: (){_finishQuiz(questions);},
+      animType: AnimType.scale,
+      primaryColor: Colors.deepOrange,
+      dismissOntouchOnside: false,
+      align: TextAlign.center,
+      hideBtnCancel: true
     );
   }
+
+  void _showSubmitQuiz(List<Question> questions) {
+    showAppDialog(
+      context,
+      icon: Icons.check_circle,
+      title: "Confirm Submit",
+      message: "Do you really want to Submit the Quiz?",
+      okText: "Submit",
+      onOk: (){_finishQuiz(questions);},
+      animType: AnimType.scale,
+      align: TextAlign.center,
+      primaryColor: Colors.green,
+      titleColor: Colors.green
+    );
+  }
+
   void _showDialogCancel() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.close, color: Color(0xFF4F46E5), size: 24),
-              SizedBox(width: 12),
-              Text('Exit Quiz?',style: TextStyle(fontWeight: FontWeight.w700,
-              color: Color(0xFF4F46E5),fontSize: 18
-              ),),
-            ],
-          ),
-          content: Text(
-            'Do you really want to get out of the Quiz?',
-            style: TextStyle(
-                letterSpacing: -0.2,
-                fontSize: 15,
-                height: 1.5
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(),
-              child: const Text('Cancel',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.pop();
-                context.pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Confirm',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    showAppDialog(
+      context,
+      icon: Icons.logout_rounded,
+      title: "Exit Quiz?",
+      message: "Do you really want to exit the quiz?",
+      okText: "Exit",
+      onOk: (){context.pop();},
+      animType: AnimType.scale,
+      primaryColor: Colors.redAccent,
+      titleColor: Colors.redAccent
     );
   }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _cardAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimations();
+    futureQuestions = _generateQuestions();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Question>>(
@@ -318,6 +367,8 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
           int timePractice = widget.timeLimit != 'None'
               ? int.parse(timesplit[0])
               : 0;
+          _cachedQuestions = questions;
+          _currentQuestionsLength ??= questions.length;
 
           return Scaffold(
             backgroundColor: const Color(0xFFF8FAFC),
@@ -326,10 +377,10 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
               title: Text(
                 'Quiz in ${widget.category} - Level: ${widget.level}',
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
-                  letterSpacing: -0.5
+                  letterSpacing: -1
                 ),
               ),
               centerTitle: true,
@@ -430,60 +481,109 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
 
                   // 👉 Next Button Section
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(8),
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, -5),
                         ),
                       ],
                     ),
                     child: SafeArea(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: (isAnswerSelected && !_isAnimating)
-                              ? () => _nextQuestion(questions)
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isAnswerSelected
-                                ? const Color(0xFF4F46E5)
-                                : Colors.grey[300],
-                            foregroundColor: isAnswerSelected
-                                ? Colors.white
-                                : Colors.grey[500],
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                currentQuestionIndex == questions.length - 1
-                                    ? 'Finish Quiz'
-                                    : 'Next Question',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: (currentQuestionIndex > 0) ? (){
+                                  setState(() {
+                                    currentQuestionIndex--;
+                                    selectedAnswer = userAnswers[currentQuestionIndex].isEmpty ? null : userAnswers[currentQuestionIndex];
+                                    isAnswerSelected = userAnswers[currentQuestionIndex].isNotEmpty;
+                                  });
+                                } : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: currentQuestionIndex > 0
+                                      ? const Color(0xFF4F46E5)
+                                      : Colors.grey[300],
+                                  foregroundColor: currentQuestionIndex > 0
+                                      ? Colors.white
+                                      : Colors.grey[500],
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.arrow_back,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Previous',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                currentQuestionIndex == questions.length - 1
-                                    ? Icons.check_circle
-                                    : Icons.arrow_forward,
-                                size: 20,
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                          SizedBox(width: 12,),
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: (isAnswerSelected && !_isAnimating)
+                                    ? () => _nextQuestion(questions)
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isAnswerSelected
+                                      ? const Color(0xFF4F46E5)
+                                      : Colors.grey[300],
+                                  foregroundColor: isAnswerSelected
+                                      ? Colors.white
+                                      : Colors.grey[500],
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      currentQuestionIndex == questions.length - 1
+                                          ? 'Finish Quiz'
+                                          : 'Next Question',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      currentQuestionIndex == questions.length - 1
+                                          ? Icons.check_circle
+                                          : Icons.arrow_forward,
+                                      size: 20,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

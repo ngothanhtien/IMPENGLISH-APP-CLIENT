@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/audio/custom_audio_widget.dart';
-import 'package:learning_app_client/component/record/CustomRecord.dart';
-import 'package:learning_app_client/model/vocabulary/flash_card.dart';
+import 'package:learning_app_client/component/record/custom_record.dart';
 import 'package:learning_app_client/model/vocabulary/vocab_detail.dart';
-import 'package:learning_app_client/service/vocabularyService.dart';
+import 'package:learning_app_client/service/vocabulary_service.dart';
 
 class DetailPracticeScreen extends StatefulWidget {
-  final String vocab_id;
+  final String vocabId;
 
-  const DetailPracticeScreen({super.key, required this.vocab_id});
+  const DetailPracticeScreen({super.key, required this.vocabId});
 
   @override
   State<StatefulWidget> createState() => _DetailPracticeScreen();
@@ -47,7 +45,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
 
   Future<IVocabDetail> _fetchDetailVocab() async {
     try {
-      final vocabDetail = await vocabService().fetchVocabDetail(id: widget.vocab_id);
+      final vocabDetail = await VocabService().fetchVocabDetail(id: widget.vocabId);
       return vocabDetail.detail!;
     } catch (e) {
       throw Exception("Failed fetch detail vocab: $e");
@@ -59,7 +57,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
       _isContinueWord = true;
     });
     try {
-      final vocabDetail = await vocabService().getRandomVocab(
+      final vocabDetail = await VocabService().getRandomVocab(
         topic: topic,
         word: word
       );
@@ -115,7 +113,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -132,7 +130,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -163,7 +161,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: Colors.red.withOpacity(0.5),
+                    color: Colors.red.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -251,7 +249,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -262,7 +260,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF667EEA).withOpacity(0.1),
+              color: const Color(0xFF667EEA).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -322,7 +320,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF764BA2).withOpacity(0.3),
+            color: const Color(0xFF764BA2).withValues(alpha: 0.3),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -336,7 +334,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -351,7 +349,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -380,7 +378,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 : '',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w500,
               fontStyle: FontStyle.italic,
             ),
@@ -390,12 +388,12 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             padding: const EdgeInsets.all(16),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: AudioPlayerWidget(
                 url: _getAudioUrl(vocab),
-                inactiveColor: Colors.white.withOpacity(0.3),
+                inactiveColor: Colors.white.withValues(alpha: 0.3),
                 onPlay: (){
                   setState(() {
                     _isListen = true;
@@ -417,7 +415,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -431,7 +429,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -580,7 +578,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
             decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black.withOpacity(0.2), width: 1.2)
+                border: Border.all(color: Colors.black.withValues(alpha: 0.2), width: 1.2)
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -629,7 +627,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -650,7 +648,6 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: steps.map((step) {
-              final index = steps.indexOf(step);
               final isCompleted = step['completed'] as bool;
 
               return Expanded(
@@ -660,7 +657,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                       label: Icon(
                         Icons.check_circle,
                         size: 24,
-                        color: isCompleted ? const Color(0xFF10B981) : Colors.black.withOpacity(0.1),
+                        color: isCompleted ? const Color(0xFF10B981) : Colors.black.withValues(alpha: 0.1),
                       ),
                       alignment: const Alignment(0.5, -0.9),
                       backgroundColor: Colors.transparent,
@@ -684,7 +681,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                             BoxShadow(
                               color: (isCompleted
                                   ? const Color(0xFF10B981)
-                                  : const Color(0xFF6366F1)).withOpacity(0.2),
+                                  : const Color(0xFF6366F1)).withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -731,7 +728,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -745,7 +742,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withOpacity(0.1),
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -781,7 +778,6 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               setState(() {
                 _isPractice = true;
                 countSteps += 1;
-                print("count: $countSteps");
               });
             },
           ),

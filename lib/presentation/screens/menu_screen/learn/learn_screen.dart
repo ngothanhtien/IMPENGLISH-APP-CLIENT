@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:learning_app_client/component/widgets/filter_chip_widget.dart';
 import 'package:learning_app_client/component/widgets/learning_progress_chart.dart';
-import 'package:learning_app_client/component/widgets/search_input_field.dart';
 import 'package:learning_app_client/component/widgets/vocabulary_card.dart';
 import 'package:learning_app_client/model/vocabulary/flash_card.dart';
 import 'package:learning_app_client/service/vocabularyService.dart';
@@ -16,13 +14,16 @@ class _LearnScreen extends State<LearnScreen>{
   List<IVocabBrief> get_vocabCards = [];
   List<IVocabBrief> filter_vocabCards = [];
   bool isLoading = true;
-  String filterSelected = "All";
 
   late TextEditingController _searchController;
 
   Future<void> loadVocabCard () async {
     try{
-      final result = await vocabService().fetchVocabBrief(limit: 50);
+      final result = await vocabService().fetchVocabBrief(
+        limit: 10,
+        topic: '',
+        page: 1
+      );
       setState(() {
         get_vocabCards = result.data ?? [];
         filter_vocabCards = get_vocabCards.where((v) => v.audio != null&& v.audio!.isNotEmpty).toList();
@@ -57,7 +58,7 @@ class _LearnScreen extends State<LearnScreen>{
         backgroundColor: const Color(0xFF4F46E5),
         title: Text("Vocabulary & Progress",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5

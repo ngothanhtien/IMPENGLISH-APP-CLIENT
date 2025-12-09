@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:learning_app_client/component/audio/custom_audio_widget.dart';
 import 'package:learning_app_client/component/record/CustomRecord.dart';
@@ -19,36 +20,75 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  int _currentStep = 0;
-  bool _isloading = true;
-  bool _isRecorded = false;
-  IVocabDetail? vocab;
 
-  Future<IVocabDetail> fetchDetailVocab() async {
-    try {
-      final vocabDetail =
-      await vocabService().fetchVocabDetail(id: widget.vocab_id);
+  int countSteps = 1;
+  bool _isListen = false;
+  bool _isPractice = false;
+  bool _seeMeaningMore = false;
+  bool _isContinueWord = false;
 
-      return vocabDetail.detail!;
-    } catch (e) {
-      throw Exception("Failed fetch detail vocab: $e");
-    }
-  }
+  // ✅ FIX: Lưu Future để tránh gọi lại
+  late Future<IVocabDetail> _vocabFuture;
 
   @override
   void initState() {
     super.initState();
+    _vocabFuture = _fetchDetailVocab();
+
     _animationController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
-    fetchDetailVocab();
   }
 
+  Future<IVocabDetail> _fetchDetailVocab() async {
+    try {
+      final vocabDetail = await vocabService().fetchVocabDetail(id: widget.vocab_id);
+      return vocabDetail.detail!;
+    } catch (e) {
+      throw Exception("Failed fetch detail vocab: $e");
+    }
+  }
+
+  Future<IVocabDetail> _getContinueWord(String topic,String word) async {
+    setState(() {
+      _isContinueWord = true;
+    });
+    try {
+      final vocabDetail = await vocabService().getRandomVocab(
+        topic: topic,
+        word: word
+      );
+      await Future.delayed(Duration(milliseconds: 400));
+      setState(() {
+        _isContinueWord = false;
+      });
+      return vocabDetail.detail!;
+    } catch (e) {
+      setState(() {
+        _isContinueWord = false;
+      });
+      throw Exception("Failed fetch detail vocab: $e");
+    }
+  }
+  String _getAudioUrl(IVocabDetail vocab) {
+    if (vocab.phonetics == null || vocab.phonetics!.isEmpty) {
+      return '';
+    }
+
+    // Tìm phonetic có audio
+    for (var phonetic in vocab.phonetics!) {
+      if (phonetic.audio != null && phonetic.audio!.isNotEmpty) {
+        return phonetic.audio!;
+      }
+    }
+
+    return ''; // Không tìm thấy audio
+  }
   @override
   void dispose() {
     _animationController.dispose();
@@ -64,7 +104,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         title: const Text(
           'Vocabulary Practice',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: Colors.white,
             letterSpacing: -0.5,
@@ -105,25 +145,68 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
         ],
       ),
       body: FutureBuilder<IVocabDetail>(
-        future: fetchDetailVocab(),
+        future: _vocabFuture,
         builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return const Center(child: CircularProgressIndicator(),);
-          }
-          if(snapshot.hasError){
-            return Center(
-              child: Text(
-                "Error: ${snapshot.error}",
-                style: TextStyle(color: Colors.red),
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF4F46E5),
               ),
             );
           }
-          if(!snapshot.hasData) {
-            return const Center(child: Text("No data"),);
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Error: ${snapshot.error}",
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _vocabFuture = _fetchDetailVocab();
+                      });
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4F46E5),
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
+
+          if (!snapshot.hasData) {
+            return const Center(
+              child: Text(
+                "No data available",
+                style: TextStyle(fontSize: 14),
+              ),
+            );
+          }
+
           final vocab = snapshot.data!;
+
           return SafeArea(
-            child: FadeTransition(
+            child: _isContinueWord ? Center(child: CircularProgressIndicator())
+              : FadeTransition(
               opacity: _fadeAnimation,
               child: SingleChildScrollView(
                 child: Padding(
@@ -142,11 +225,11 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                         const SizedBox(height: 24),
                         _buildWordDetails(vocab),
                         const SizedBox(height: 24),
-                        _buildPracticeSteps(),
+                        _buildPracticeSteps(_isListen,_isPractice),
                         const SizedBox(height: 24),
-                        _buildRecordSection(),
+                        _buildRecordSection(vocab),
                         const SizedBox(height: 24),
-                        _buildActionButtons(),
+                        _buildActionButtons(vocab),
                       ],
                     ),
                   ),
@@ -154,12 +237,13 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               ),
             ),
           );
-        }
-      )
+        },
+      ),
     );
   }
 
   Widget _buildProgressIndicator() {
+    double value = (countSteps*33.33)/100;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -202,15 +286,15 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 ),
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
-                  value: 0.7,
+                  value: countSteps == 0 ? 0: value,
                   backgroundColor: const Color(0xFFDEE6ED),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
                   borderRadius: BorderRadius.circular(8),
                   minHeight: 5,
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '3 of 5 steps completed',
+                Text(
+                  '$countSteps of 3 steps completed',
                   style: TextStyle(
                     fontSize: 12,
                     color: Color(0xFF64748B),
@@ -256,8 +340,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  vocab?.level ?? '',
-                  style: TextStyle(
+                  vocab.level ?? '',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -280,8 +364,8 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
           const SizedBox(height: 20),
           Text(
-            vocab?.word ?? '',
-            style: TextStyle(
+            vocab.word ?? '',
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -290,7 +374,10 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
           const SizedBox(height: 12),
           Text(
-            vocab?.phonetics?[0].text ?? '',
+              vocab.phonetics != null && vocab.phonetics!.isNotEmpty
+                ? (vocab.phonetics![0].text ??
+                  vocab.phonetics![1].text ?? '')
+                : '',
             style: TextStyle(
               fontSize: 16,
               color: Colors.white.withOpacity(0.9),
@@ -307,9 +394,15 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               borderRadius: BorderRadius.circular(16),
             ),
             child: AudioPlayerWidget(
-              url: vocab?.phonetics?[0].audio ?? '',
-              inactiveColor: Colors.white.withOpacity(0.3),
-            ),
+                url: _getAudioUrl(vocab),
+                inactiveColor: Colors.white.withOpacity(0.3),
+                onPlay: (){
+                  setState(() {
+                    _isListen = true;
+                    countSteps += 1;
+                  })
+                ;},
+              ),
           ),
         ],
       ),
@@ -362,79 +455,132 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           RichText(
             text: TextSpan(
               children: [
-                TextSpan(text: "Meaning: ",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: const Color(0xFF475569),
-                    fontWeight: FontWeight.w600
-                  )
+                const TextSpan(
+                    text: "Topic: ",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF475569),
+                        fontWeight: FontWeight.w600
+                    )
                 ),
-                TextSpan(text: '"${vocab?.meanings?[0].definitions?[0].definition ?? ''}"',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: const Color(0xFF525E71),
-                    fontStyle: FontStyle.italic,
-                    height: 1.5,
-                    letterSpacing: -0.2,
-                  )
-                ),
-              ]
-            )
-          ),
-          const SizedBox(height: 12),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: "MeaningVN: ",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: const Color(0xFF475569),
-                    fontWeight: FontWeight.w600
-                  )
-                ),
-                TextSpan(text: '"${vocab?.meaningVN ?? ''}"',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: const Color(0xFF525E71),
-                    fontStyle: FontStyle.italic,
-                    height: 1.5,
-                    letterSpacing: -0.2,
-                  )
-                ),
-              ]
-            )
-          ),
-          const SizedBox(height: 12),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: "Part Of Speech: ",
-                  style: TextStyle(
+                TextSpan(
+                    text: vocab.topic ?? '',
+                    style: const TextStyle(
                       fontSize: 15,
-                      color: const Color(0xFF475569),
-                      fontWeight: FontWeight.w600
-                  )
-                ),
-                TextSpan(text: '${vocab?.meanings?[0].partOfSpeech?? ''}',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: const Color(0xFF525E71),
-                    fontStyle: FontStyle.italic,
-                    height: 1.5,
-                    letterSpacing: -0.2,
-                  )
+                      color: Color(0xFF525E71),
+                      fontStyle: FontStyle.italic,
+                      height: 1.5,
+                      letterSpacing: -0.2,
+                    )
                 ),
               ]
             )
+          ),
+          const SizedBox(height: 12),
+          RichText(
+            text: TextSpan(
+              children: [
+                const TextSpan(
+                    text: "Meaning: ",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF475569),
+                        fontWeight: FontWeight.w600
+                    )
+                ),
+                TextSpan(
+                    text: '"${vocab.meanings?[0].definitions?[0].definition ?? ''}"',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color(0xFF525E71),
+                      fontStyle: FontStyle.italic,
+                      height: 1.5,
+                      letterSpacing: -0.2,
+                    )
+                ),
+              ]
+            )
+          ),
+          const SizedBox(height: 12),
+          RichText(
+              textAlign: TextAlign.justify,
+              overflow: _seeMeaningMore ? TextOverflow.clip : TextOverflow.ellipsis,
+              maxLines: _seeMeaningMore ? null : 2,
+              text: TextSpan(
+                  children: [
+                    const TextSpan(
+                        text: "MeaningVN: ",
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFF475569),
+                            fontWeight: FontWeight.w600
+                        )
+                    ),
+                    TextSpan(
+                        text: '"${vocab.meaningVN ?? ''}"',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF525E71),
+                          fontStyle: FontStyle.italic,
+                          height: 1.5,
+                          letterSpacing: -0.2,
+                        )
+                    ),
+                  ]
+              )
+          ),
+          if ((vocab.meaningVN?.length ?? 0) > 100)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _seeMeaningMore = !_seeMeaningMore;
+                });
+              },
+              child: Text(
+                _seeMeaningMore ? 'Show less' : 'Show more',
+                style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF938F8F),
+                    height: 1.5,
+                    letterSpacing: -0.2,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline
+                ),
+              ),
+            ),
+          const SizedBox(height: 12),
+          RichText(
+              text: TextSpan(
+                  children: [
+                    const TextSpan(
+                        text: "Part Of Speech: ",
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFF475569),
+                            fontWeight: FontWeight.w600
+                        )
+                    ),
+                    TextSpan(
+                        text: vocab.meanings?[0].partOfSpeech ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF525E71),
+                          fontStyle: FontStyle.italic,
+                          height: 1.5,
+                          letterSpacing: -0.2,
+                        )
+                    ),
+                  ]
+              )
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black.withOpacity(0.2),width: 1.2)
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.black.withOpacity(0.2), width: 1.2)
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,17 +590,17 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF475569),
+                    color: Color(0xFF475569),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '"${vocab?.meanings?[0].definitions?[0].example ?? ''}"',
+                  '"${vocab.meanings?[0].definitions?[0].example ?? ''}"',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
-                    color: const Color(0xFF525E71),
+                    color: Color(0xFF525E71),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -466,12 +612,14 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     );
   }
 
-  Widget _buildPracticeSteps() {
+  Widget _buildPracticeSteps(
+      bool listen,
+      bool practice,
+    ) {
     final steps = [
-      {'title': 'Listen', 'icon': Icons.headphones, 'completed': true},
       {'title': 'Read', 'icon': Icons.visibility, 'completed': true},
-      {'title': 'Practice', 'icon': Icons.mic, 'completed': false},
-      {'title': 'Review', 'icon': Icons.check_circle_outline, 'completed': false},
+      {'title': 'Listen', 'icon': Icons.headphones, 'completed': listen},
+      {'title': 'Practice', 'icon': Icons.mic, 'completed': practice},
     ];
 
     return Container(
@@ -498,13 +646,12 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               color: Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: steps.map((step) {
               final index = steps.indexOf(step);
               final isCompleted = step['completed'] as bool;
-              final isActive = index == 2; // Current step
 
               return Expanded(
                 child: Column(
@@ -513,33 +660,42 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                       label: Icon(
                         Icons.check_circle,
                         size: 24,
-                        color: isCompleted ? Colors.green:
-                        Colors.black.withOpacity(0.15),
+                        color: isCompleted ? const Color(0xFF10B981) : Colors.black.withOpacity(0.1),
                       ),
-                      alignment: Alignment(0.5,-0.9),
+                      alignment: const Alignment(0.5, -0.9),
                       backgroundColor: Colors.transparent,
                       child: Container(
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
                           color: isCompleted
-                              ? const Color(0xFF10B981)
-                              : isActive
-                              ? const Color(0xFF667EEA)
-                              : const Color(0xFFF1F5F9),
+                              ? const Color(0xFF10B981)  // Green-500 - xanh lá tươi sáng
+                              : const Color(0xFFF8FAFC),  // Slate-50 - xám nhạt tinh tế
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: isCompleted || isActive
+                            color: isCompleted
                                 ? Colors.transparent
-                                : const Color(0xFFE2E8F0),
+                                : const Color(0xFFE2E8F0),  // Slate-200 - viền xám nhẹ
                             width: 2,
                           ),
+                          // Thêm shadow để tạo chiều sâu
+                          boxShadow: isCompleted
+                              ? [
+                            BoxShadow(
+                              color: (isCompleted
+                                  ? const Color(0xFF10B981)
+                                  : const Color(0xFF6366F1)).withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                              : null,
                         ),
                         child: Icon(
                           step['icon'] as IconData,
-                          color: isCompleted || isActive
+                          color: isCompleted
                               ? Colors.white
-                              : const Color(0xFF94A3B8),
+                              : const Color(0xFF94A3B8),  // Slate-400 - xám trung tính
                           size: 24,
                         ),
                       ),
@@ -548,13 +704,13 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                     Text(
                       step['title'] as String,
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.2,
-                        color: isCompleted || isActive
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFF94A3B8),
-                        height: 1.1
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.2,
+                          color: isCompleted
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFF94A3B8),
+                          height: 1.1
                       ),
                     ),
                   ],
@@ -567,7 +723,7 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
     );
   }
 
-  Widget _buildRecordSection() {
+  Widget _buildRecordSection(IVocabDetail vocab) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -609,62 +765,45 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 12),
+          const Text(
             'Tap and hold the microphone to record your pronunciation. We\'ll help you improve!',
             style: TextStyle(
-              fontSize: 14,
-              color: const Color(0xFF64748B),
-              height: 1.4,
-              fontStyle: FontStyle.italic
+                fontSize: 14,
+                color: Color(0xFF64748B),
+                height: 1.4,
+                fontStyle: FontStyle.italic
             ),
           ),
-          const SizedBox(height: 20),
-          RecorderScreen(),
-          if (_isRecorded) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF10B981).withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.check_circle,
-                    color: Color(0xFF10B981),
-                    size: 22,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Great job! Your pronunciation sounds good.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF10B981),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          const SizedBox(height: 12),
+          RecorderCustom(word: vocab.word ?? '',pronouciation: vocab.phonetics?[0].text ?? '',
+            onRecordingComplete: () { // ✅ Callback
+              setState(() {
+                _isPractice = true;
+                countSteps += 1;
+                print("count: $countSteps");
+              });
+            },
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(IVocabDetail vocab) {
     return Column(
       children: [
         SizedBox(
           width: double.infinity,
           height: 50,
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: ()  {
               setState(() {
-                _isRecorded = true;
+                _vocabFuture = _getContinueWord(vocab.topic!, vocab.word!);
+                _isPractice = false;
+                _isListen = false;
+                countSteps = 1;
               });
             },
             style: ElevatedButton.styleFrom(
@@ -675,12 +814,12 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.arrow_forward, size: 20),
-                const SizedBox(width: 8),
-                const Text(
+                Icon(Icons.arrow_forward, size: 20),
+                SizedBox(width: 8),
+                Text(
                   'Continue to Next Word',
                   style: TextStyle(
                     fontSize: 14,
@@ -692,26 +831,6 @@ class _DetailPracticeScreen extends State<DetailPracticeScreen>
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF64748B),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Skip this word',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }

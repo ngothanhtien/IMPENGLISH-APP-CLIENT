@@ -65,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 12,),
                   // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Good morning! 👋',
+                                'Welcome Back 👋',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF64748B),
@@ -104,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ],
                       ),
                       Container(
-                        width: 45,
-                        height: 45,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         child: const Icon(
                           Icons.notifications_outlined,
                           color: Colors.white,
-                          size: 24,
+                          size: 20,
                         ),
                       ),
                     ],
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     icon: Icons.play_circle_outline,
                     gradient: [Color(0xFF5356F1), Color(0xFF4649E6)],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 22),
 
                   // Daily Goal Card
                   const DailyGoalCard(),

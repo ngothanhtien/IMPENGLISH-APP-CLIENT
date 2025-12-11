@@ -10,10 +10,12 @@ class AuthService {
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
   
   final storage = FlutterSecureStorage();
+
   static const Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json'
   };
+
   Future<Map<String,dynamic>> login({
     required String email,
     required String password
@@ -34,14 +36,11 @@ class AuthService {
 
         final accessToken = data['accessToken'];
         final refreshToken = data['refreshToken'];
+        final user = data['user'];
+
         await storage.write(key: 'accessToken', value: accessToken);
         await storage.write(key: 'refreshToken', value: refreshToken);
-
-        final accesstokenRead = await storage.read(key: 'accessToken');
-        final refreshtokenRead = await storage.read(key: 'refreshToken');
-
-        debugPrint("accesstoken: $accesstokenRead");
-        debugPrint("refreshtoken: $refreshtokenRead");
+        await storage.write(key: 'user', value: json.encode(user));
 
         return json.decode(response.body);
       }else{
@@ -51,20 +50,27 @@ class AuthService {
       throw Exception("Error in processing login: $e");
     }
   }
-  Future<Map<String, dynamic>> logOut({
-    required String refreshToken,
-  }) async {
+
+  Future<Map<String, dynamic>?> logOut() async {
     try {
-      final response = await http
-          .post(
+      final refreshToken = await storage.read(key: "refreshToken");
+
+      if (refreshToken == null) return null;
+
+      final response = await http.post(
         Uri.parse("$baseUrl/auth/logout"),
-        headers: headers,
-        body: json.encode({'refreshToken': refreshToken}),
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: json.encode({ 'refreshToken': refreshToken }),
       ).timeout(const Duration(seconds: 8));
 
       final data = response.body.isNotEmpty ? json.decode(response.body) : {};
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Xóa token local
+        await storage.delete(key: 'accessToken');
+        await storage.delete(key: 'refreshToken');
         return data;
       } else {
         final msg = data['message'] ?? 'Logout failed with status ${response.statusCode}';
@@ -72,6 +78,31 @@ class AuthService {
       }
     } catch (e) {
       throw Exception("Error in logOut: $e");
+    }
+  }
+
+  Future<String?> refreshToken() async {
+    try{
+      final refreshToken = await storage.read(key: "refreshToken");
+
+      if (refreshToken == null) return null;
+
+      final response = await http.post(
+        Uri.parse("$baseUrl/auth/refresh-token"),
+        headers: headers,
+        body: json.encode({ "refreshToken": refreshToken }),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        await storage.write(key: 'accessToken', value: data['accessToken']);
+        await storage.write(key: 'refreshToken', value: data['refreshToken']);
+
+        return data['accessToken'];
+      }
+
+      return null;
+    }catch(e){
+      throw Exception("Error at refreshToken: $e");
     }
   }
 }

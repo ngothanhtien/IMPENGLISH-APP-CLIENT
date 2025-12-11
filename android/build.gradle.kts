@@ -22,3 +22,11 @@ tasks.register<Delete>("clean") {
 tasks.withType<Test>().configureEach {
     enabled = false
 }
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.activity:activity:1.9.0")
+            force("androidx.activity:activity-ktx:1.9.0")
+        }
+    }
+}

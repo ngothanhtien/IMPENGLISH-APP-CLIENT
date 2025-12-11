@@ -1,19 +1,27 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:learning_app_client/component/textfield/custom_textfield_editprofile.dart';
+import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dart';
+import 'package:learning_app_client/model/user/user.dart';
+import 'package:learning_app_client/service/user_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
+
   @override
   State<StatefulWidget> createState() => _EditProfileScreen();
 }
 
 class _EditProfileScreen extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _passwordFormKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -23,77 +31,257 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   bool _isConfirmPasswordVisible = false;
   bool _isChangePassword = false;
   bool _isLoading = false;
+  bool isLoadingProfile = false;
+  bool _isSavePassword = false;
+  String? avatarUrl;
+  bool isLoading = false;
+
+  final picker = ImagePicker();
+
+  late Future<User?> currentUser;
+  User? _userData;
+
+  Future<void> pickImage() async {
+    // 👉 FIX 1: Kiểm tra mounted trước khi bắt đầu
+    if (!mounted) return;
+
+    try {
+      final XFile? pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80, // Giảm chất lượng để file nhỏ hơn
+        // 👉 FIX 2: Thêm maxWidth/maxHeight để giảm kích thước
+        maxWidth: 1024,
+        maxHeight: 1024,
+      );
+
+      //  User cancel chọn ảnh
+      if (pickedFile == null) return;
+
+      // Kiểm tra kích thước file trước khi upload
+      final file = File(pickedFile.path);
+      final fileSize = await file.length();
+      final fileSizeInMB = fileSize / (1024 * 1024);
+
+      debugPrint("📦 File size: ${fileSizeInMB.toStringAsFixed(2)} MB");
+
+      if (fileSizeInMB > 1.0) {
+        if (!mounted) return;
+        AppSnackBar.showError(context, "File size must be less than 1MB");
+        return;
+      }
+
+      setState(() => isLoading = true);
+
+      final newAvatar = await UserService().changeAvatar(file);
+
+      // Log kết quả
+      debugPrint("📸 New avatar URL: $newAvatar");
+
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+        if (newAvatar != null) {
+          avatarUrl = newAvatar;
+          if (_userData != null) {
+            _userData = _userData?.copyWith(
+              avatar: newAvatar
+            );
+          }
+        }
+      });
+
+      if (!mounted) return;
+
+      if (newAvatar != null) {
+        AppSnackBar.showSuccess(context, "Avatar updated successfully");
+      } else {
+        AppSnackBar.showError(context, "Failed to update avatar. Please try again.");
+      }
+
+    } catch (e) {
+
+      debugPrint("❌ Error picking/uploading image: $e");
+
+      if (!mounted) return;
+
+      setState(() => isLoading = false);
+
+      AppSnackBar.showError(
+          context,
+          "An error occurred while updating avatar"
+      );
+    }
+  }
+
+  Future<User?> getProfile() async {
+    try {
+      final response = await UserService().getProfile();
+      if (response.fullName != null) {
+        return response;
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Error at _getProfile: $e");
+      return null;
+    }
+  }
+
+  Future<void> changePassword() async {
+    if (!_passwordFormKey.currentState!.validate()) {
+      return;
+    }
+    setState(() {
+      _isSavePassword = true;
+    });
+    try {
+      final response = await UserService().changePassword(
+        oldPassword: _currentPasswordController.text,
+        newPassword: _newPasswordController.text
+      );
+      if(!mounted) return;
+      if(response.statusCode == 200){
+        await Future.delayed(Duration(milliseconds: 800));
+        if(!mounted) return;
+        AppSnackBar.showSuccess(context, "Change password successfully");
+        setState(() {
+          _currentPasswordController.text = '';
+          _newPasswordController.text = '';
+          _confirmPasswordController.text = '';
+          _isSavePassword = false;
+          _isChangePassword = false;
+          _isPasswordVisible = false;
+          _isConfirmPasswordVisible = false;
+          _isNewPasswordVisible = false;
+        });
+      }else{
+        await Future.delayed(Duration(milliseconds: 800));
+        final data = jsonDecode(response.body);
+        String mes = data['message'] ?? "Unknown Error";
+        if(!mounted) return;
+        AppSnackBar.showError(context, mes);
+        setState(() {
+          _isSavePassword = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isSavePassword = false;
+      });
+      debugPrint("Error at _getProfile: $e");
+    }
+  }
+
+  Future<void> updateUserProfile() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await UserService().updateProfile({
+        "fullName": _fullNameController.text.trim().isNotEmpty
+            ? _fullNameController.text
+            : '',
+        'phone': _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text
+            : '',
+      });
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        await Future.delayed(const Duration(milliseconds: 800));
+        if(!mounted) return;
+        AppSnackBar.showSuccess(context, "Update profile Successfully");
+        // Update local user data
+        setState(() {
+          _userData = User.fromJson(body['user']);
+          _isLoading = false;
+        });
+      } else {
+        final body = json.decode(response.body);
+        final msg = body['message'] ?? "Unknown Error";
+        await Future.delayed(const Duration(milliseconds: 800));
+        if(!mounted) return;
+        AppSnackBar.showError(context, msg);
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("Error at updateUserProfile: $e");
+      if (mounted) {
+        setState(() => _isLoading = false);
+        AppSnackBar.showError(context, "An error occurred");
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    // Load existing user data
-    _loadUserData();
+    currentUser = getProfile();
   }
 
-  void _loadUserData() {
-    // Simulate loading user data
-    _fullNameController.text = "John Doe";
-    _usernameController.text = "johndoe";
-    _emailController.text = "john.doe@example.com";
-    _phoneController.text = "+84 123 456 789";
-    _addressController.text = "123 Main Street, Da Nang, Vietnam";
+  void _loadUserData(User user) {
+    _fullNameController.text = user.fullName ?? '';
+    _emailController.text = user.email ?? '';
+    _phoneController.text = user.phone ?? '';
   }
 
   @override
   void dispose() {
     _fullNameController.dispose();
-    _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _saveProfile() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-
-      setState(() => _isLoading = false);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Text('Profile updated successfully!'),
-              ],
-            ),
-            backgroundColor: const Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: _buildAppBar(),
-      body: Stack(
-        children: [
-          _buildBody(),
-          if (_isLoading) _buildLoadingOverlay(),
-        ],
-      ),
+    return FutureBuilder<User?>(
+      future: currentUser,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red, fontSize: 18),
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasData && snapshot.data != null) {
+          // Load user data only once
+          if (_userData == null) {
+            _userData = snapshot.data;
+            _loadUserData(_userData!);
+          }
+
+          return Scaffold(
+            appBar: _buildAppBar(),
+            body: _buildBody(),
+          );
+        }
+
+        return const Scaffold(
+          body: Center(child: Text('No User Data found')),
+        );
+      },
     );
   }
 
@@ -104,20 +292,21 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       leading: IconButton(
         onPressed: () => context.pop(),
         style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(8),
-            backgroundColor: Colors.white.withValues(alpha: 0.3),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+          padding: const EdgeInsets.all(8),
+          backgroundColor: Colors.white.withValues(alpha: 0.3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        icon: const Icon(Icons.arrow_back, size: 22, color: Colors.white,),
+        icon: const Icon(Icons.arrow_back, size: 22, color: Colors.white),
       ),
       title: const Text(
         'Edit Profile',
         style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-          letterSpacing: -0.2
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: -0.2
         ),
       ),
       bottom: PreferredSize(
@@ -143,7 +332,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   _buildSectionTitle('Personal Information'),
                   const SizedBox(height: 12),
                   _buildPersonalInfoSection(),
@@ -166,6 +355,13 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
+    // 👉 FIX 1: Ưu tiên avatarUrl mới, fallback về _userData
+    final displayAvatarUrl = avatarUrl ?? _userData?.avatar;
+
+    // 👉 FIX 2: Default avatar nếu không có gì
+    const defaultAvatar = "https://img.freepik.com/free-vector/smiling-young-"
+        "man-illustration_1308-174669.jpg?semt=ais_hybrid&w=740&q=80";
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),
@@ -177,71 +373,82 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       ),
       child: Column(
         children: [
-          Badge(
-            backgroundColor: Colors.transparent,
-            alignment: Alignment(0.3, 0.6),
-            label: GestureDetector(
-              onTap: () {
-                // Handle image upload
-              },
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF667EEA),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+          // 👉 FIX 3: Tách logic loading ra khỏi Badge
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Avatar chính
+              Badge(
+                backgroundColor: Colors.transparent,
+                alignment: const Alignment(0.35, 1.0),
+                label: GestureDetector(
+                  onTap: isLoading ? null : pickImage,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667EEA),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
-            ),
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  'JD',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    // 👉 FIX 4: Disable camera icon khi đang loading
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: isLoading ? Colors.grey : Colors.white,
+                      size: 16,
+                    ),
                   ),
                 ),
+
+                // 👉 FIX 5: Avatar luôn hiển thị, không bị thay bằng loading
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[200],
+                  // 👉 FIX 6: Xử lý image provider đúng cách
+                  backgroundImage: (displayAvatarUrl != null && displayAvatarUrl.isNotEmpty)
+                      ? NetworkImage(displayAvatarUrl)
+                      : NetworkImage(defaultAvatar),
+                  // 👉 FIX 7: Thêm error widget nếu load ảnh fail
+                  onBackgroundImageError: (exception, stackTrace) {
+                    debugPrint("❌ Error loading avatar image: $exception");
+                  },
+                ),
               ),
-            ),
+
+              // 👉 FIX 8: Overlay loading indicator lên trên avatar
+              if (isLoading)
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      strokeWidth: 3,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Change Profile Picture',
+
+          const SizedBox(height: 22),
+
+          // 👉 FIX 9: Text thay đổi theo trạng thái
+          Text(
+            isLoading ? 'Uploading...' : 'Change Profile Picture',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF667EEA),
+              color: isLoading ? Colors.grey : const Color(0xFF667EEA),
             ),
           ),
         ],
@@ -275,7 +482,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       ),
       child: Column(
         children: [
-          CustomTextField(
+          CustomTextFieldEditProfile(
             controller: _fullNameController,
             label: 'Full Name',
             icon: Icons.person_outline,
@@ -287,22 +494,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             },
           ),
           const CustomDivider(),
-          CustomTextField(
-            controller: _usernameController,
-            label: 'Username',
-            icon: Icons.alternate_email,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your username';
-              }
-              if (value.length < 3) {
-                return 'Username must be at least 3 characters';
-              }
-              return null;
-            },
-          ),
-          const CustomDivider(),
-          CustomTextField(
+          CustomTextFieldEditProfile(
             controller: _emailController,
             label: 'Email',
             icon: Icons.email_outlined,
@@ -329,7 +521,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       ),
       child: Column(
         children: [
-          CustomTextField(
+          CustomTextFieldEditProfile(
             controller: _phoneController,
             label: 'Phone Number',
             icon: Icons.phone_outlined,
@@ -337,19 +529,6 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your phone number';
-              }
-              return null;
-            },
-          ),
-          const CustomDivider(),
-          CustomTextField(
-            controller: _addressController,
-            label: 'Address',
-            icon: Icons.location_on_outlined,
-            maxLines: 2,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your address';
               }
               return null;
             },
@@ -392,6 +571,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           curve: Curves.easeInOut,
           child: _isChangePassword
               ? Container(
+            margin: const EdgeInsets.only(top: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -403,74 +583,162 @@ class _EditProfileScreen extends State<EditProfileScreen> {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                CustomTextField(
-                  controller: _currentPasswordController,
-                  label: 'Current Password',
-                  icon: Icons.lock_outline,
-                  obscureText: !_isPasswordVisible,
-                  suffixIcon: _isPasswordVisible
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  onSuffixIconTap: () {
-                    setState(() => _isPasswordVisible = !_isPasswordVisible);
-                  },
-                  validator: (value) {
-                    if (_isChangePassword && (value == null || value.isEmpty)) {
-                      return 'Please enter your current password';
-                    }
-                    return null;
-                  },
-                ),
-                const CustomDivider(),
-                CustomTextField(
-                  controller: _newPasswordController,
-                  label: 'New Password',
-                  icon: Icons.lock_outline,
-                  obscureText: !_isNewPasswordVisible,
-                  suffixIcon: _isNewPasswordVisible
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  onSuffixIconTap: () {
-                    setState(() => _isNewPasswordVisible = !_isNewPasswordVisible);
-                  },
-                  validator: (value) {
-                    if (_isChangePassword && (value == null || value.isEmpty)) {
-                      return 'Please enter a new password';
-                    }
-                    if (_isChangePassword && value!.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const CustomDivider(),
-                CustomTextField(
-                  controller: _confirmPasswordController,
-                  label: 'Confirm New Password',
-                  icon: Icons.lock_outline,
-                  obscureText: !_isConfirmPasswordVisible,
-                  suffixIcon: _isConfirmPasswordVisible
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  onSuffixIconTap: () {
-                    setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible);
-                  },
-                  validator: (value) {
-                    if (_isChangePassword && (value == null || value.isEmpty)) {
-                      return 'Please confirm your new password';
-                    }
-                    if (_isChangePassword && value != _newPasswordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+            child: Form(
+              key: _passwordFormKey,
+              child: Column(
+                children: [
+                  CustomTextFieldEditProfile(
+                    controller: _currentPasswordController,
+                    label: 'Current Password',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isPasswordVisible,
+                    suffixIcon: _isPasswordVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    onSuffixIconTap: () {
+                      setState(() => _isPasswordVisible = !_isPasswordVisible);
+                    },
+                    validator: (value) {
+                      if (_isChangePassword && (value == null || value.isEmpty)) {
+                        return 'Please enter your current password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const CustomDivider(),
+                  CustomTextFieldEditProfile(
+                    controller: _newPasswordController,
+                    label: 'New Password',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isNewPasswordVisible,
+                    suffixIcon: _isNewPasswordVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    onSuffixIconTap: () {
+                      setState(() => _isNewPasswordVisible = !_isNewPasswordVisible);
+                    },
+                    validator: (value) {
+                      if (_isChangePassword && (value == null || value.isEmpty)) {
+                        return 'Please enter a new password';
+                      }
+                      if (_isChangePassword && value!.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("The new password must be at least 6 characters long: ",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54
+                        ),
+                      ),
+                      Text("including both uppercase, lowercase, and numbers.",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12,),
+                  const CustomDivider(),
+                  CustomTextFieldEditProfile(
+                    controller: _confirmPasswordController,
+                    label: 'Confirm New Password',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isConfirmPasswordVisible,
+                    suffixIcon: _isConfirmPasswordVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    onSuffixIconTap: () {
+                      setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible);
+                    },
+                    validator: (value) {
+                      if (_isChangePassword && (value == null || value.isEmpty)) {
+                        return 'Please confirm your new password';
+                      }
+                      if (_isChangePassword && value != _newPasswordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isSavePassword ? null : changePassword,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          disabledBackgroundColor: const Color(0xFF6EE7B7),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isSavePassword
+                            ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              "Saving...",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        )
+                            : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(
+                              Icons.lock_open_rounded,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              "Save Password",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12,)
+                ],
+              ),
             ),
           )
               : Container(
+            margin: const EdgeInsets.only(top: 12),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -534,7 +802,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveProfile,
+        onPressed: _isLoading ? null : updateUserProfile,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4F46E5),
           foregroundColor: Colors.white,
@@ -544,7 +812,26 @@ class _EditProfileScreen extends State<EditProfileScreen> {
           ),
           disabledBackgroundColor: const Color(0xFF94A3B8),
         ),
-        child: const Row(
+        child: _isLoading
+            ? const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.white60,
+                  strokeWidth: 3,
+                ),
+                SizedBox(width: 8,),
+                Text(
+                  '...Updating',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white60
+                  ),
+                ),
+              ],
+            )
+          : const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.save_outlined, size: 22),
@@ -558,142 +845,6 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingOverlay() {
-    return Container(
-      color: Colors.black.withValues(alpha: 0.2),
-      child: const Center(
-        child: Card(
-          color: Colors.white,
-          margin: EdgeInsets.all(40),
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Saving your profile...',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Reusable Custom TextField Widget
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final bool enabled;
-  final bool obscureText;
-  final IconData? suffixIcon;
-  final VoidCallback? onSuffixIconTap;
-  final String? Function(String?)? validator;
-  final TextInputType? keyboardType;
-  final int? maxLines;
-
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    required this.label,
-    required this.icon,
-    this.enabled = true,
-    this.obscureText = false,
-    this.suffixIcon,
-    this.onSuffixIconTap,
-    this.validator,
-    this.keyboardType,
-    this.maxLines = 1,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: enabled
-                  ? const Color(0xFF667EEA).withValues(alpha: 0.1)
-                  : const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: enabled ? const Color(0xFF667EEA) : const Color(0xFF94A3B8),
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: enabled ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    letterSpacing: 0.5
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: controller,
-                  enabled: enabled,
-                  obscureText: obscureText,
-                  validator: validator,
-                  keyboardType: keyboardType,
-                  maxLines: maxLines,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: enabled ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
-                  ),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    hintText: 'Enter $label',
-                    hintStyle: const TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFFB7BFC8),
-                    ),
-                    suffixIcon: suffixIcon != null
-                        ? IconButton(
-                      icon: Icon(
-                        suffixIcon,
-                        color: const Color(0xFF94A3B8),
-                        size: 20,
-                      ),
-                      onPressed: enabled ? onSuffixIconTap : null,
-                    ) : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

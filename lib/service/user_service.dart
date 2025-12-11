@@ -1,9 +1,12 @@
 
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_app_client/model/user/user.dart';
+import 'package:learning_app_client/service/request_auth.dart';
 
 class UserService {
   static String? baseUrl = dotenv.env['BASE_URL_SML_3'];
@@ -131,7 +134,7 @@ class UserService {
           'Authorization': 'Bearer $accessToken',
         },
       );
-      print(jsonDecode(response.body));
+
       if (response.statusCode == 200) {
         final Map<String,dynamic> data = json.decode(response.body);
         return User.fromJson(data['user']);
@@ -144,6 +147,76 @@ class UserService {
       throw Exception("Error: ${response.statusCode}");
     }catch(e){
       throw Exception("Error in get profile: $e");
+    }
+  }
+
+  Future<http.Response> updateProfile(Map<String,dynamic> data) async {
+    return await requestWithAuth((token){
+      return http.put(
+        Uri.parse("$baseUrl/users/profile"),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+        body: json.encode(data)
+      );
+    });
+  }
+
+  Future<http.Response> changePassword({
+    String? oldPassword,
+    String? newPassword
+  }) async {
+    return await requestWithAuth((token){
+      return http.put(
+          Uri.parse("$baseUrl/users/change-password"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          },
+          body: json.encode({
+            "oldPassword": oldPassword,
+            "newPassword": newPassword
+          })
+      );
+    });
+  }
+
+  Future<String?> changeAvatar(File file) async {
+    try {
+
+      final response = await requestWithAuth((token) async {
+        final url = Uri.parse("$baseUrl/upload/change-avatar");
+
+        final request = http.MultipartRequest("PUT", url)
+          ..headers["Authorization"] = "Bearer $token"
+          ..headers["Content-Type"] = "multipart/form-data"
+          ..files.add(await http.MultipartFile.fromPath(
+            "file",
+            file.path,
+            filename: file.path.split('/').last,
+          ));
+
+        final res = await request.send();
+        return await http.Response.fromStream(res);
+      });
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+
+        debugPrint("✅ Avatar uploaded successfully: ${body['avatar']}");
+
+        return body["avatar"]; // URL avatar từ backend
+      } else {
+
+        debugPrint("❌ Upload failed: ${response.statusCode}");
+        debugPrint("Response body: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      // 👉 FIX 8: Bắt và log lỗi
+      debugPrint("❌ Error in changeAvatar: $e");
+      return null;
     }
   }
 }

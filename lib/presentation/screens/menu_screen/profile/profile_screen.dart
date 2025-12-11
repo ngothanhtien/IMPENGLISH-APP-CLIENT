@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,9 +8,7 @@ import 'package:learning_app_client/component/topsnackbar/show_top_snack_bar.dar
 import 'package:learning_app_client/component/widgets/action_card.dart';
 import 'package:learning_app_client/component/widgets/alertdialog_custom.dart';
 import 'package:learning_app_client/component/widgets/profile_card.dart';
-import 'package:learning_app_client/model/user/user.dart';
 import 'package:learning_app_client/service/auth_service.dart';
-import 'package:learning_app_client/service/user_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,29 +22,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _isLoggingOut = false;
-  User? user;
-  bool isLoadingProfile = false;
-
-  Future<void> _getProfile() async {
-    setState(() {
-      isLoadingProfile = true;
-    });
-    try{
-      final response = await UserService().getProfile();
-      if(!mounted) return;
-
-      await Future.delayed(Duration(milliseconds: 400));
-      setState(() {
-        user = response;
-        isLoadingProfile = false;
-      });
-    }catch(e){
-      setState(() {
-        isLoadingProfile = false;
-      });
-      debugPrint("Error at _getProfile: $e");
-    }
-  }
+  final storage = FlutterSecureStorage();
+  bool _isloadingUser = false;
+  Map<String,dynamic>? user;
   @override
   void initState() {
     super.initState();
@@ -70,60 +50,74 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     ));
 
     _animationController.forward();
-    _getProfile();
+    loadDataUser();
   }
 
   Future<void> handleLogout() async {
     if (!mounted) return;
 
-    final storage = const FlutterSecureStorage();
     setState(() => _isLoggingOut = true);
 
     try {
-      final refreshToken = await storage.read(key: 'refreshToken');
-
-      // 1. Nếu không có refreshToken → chỉ xoá token & điều hướng
-      if (refreshToken == null || refreshToken.isEmpty) {
-        await _clearTokens(storage);
-        if (!mounted) return;
-        context.go('/login');
-        return;
-      }
-
-      // 2. Gửi request logout tới backend
-      final response = await AuthService().logOut(refreshToken: refreshToken);
+      final response = await AuthService().logOut();
 
       if (!mounted) return;
 
-      final title = response['title'] ?? response['status'] ?? '';
-      final message = response['message'] ?? 'Logged out successfully';
-
-      if (title == 'Success') {
-        AppSnackBar.showSuccess(context, message);
+      // Nếu response null → có nghĩa refreshToken không tồn tại → đăng xuất luôn
+      if (response == null) {
+        AppSnackBar.showSuccess(context, "Logged out successfully");
       } else {
-        AppSnackBar.showError(context, message);
+        final title = response['title'] ?? response['status'] ?? '';
+        final message = response['message'] ?? 'Logged out successfully';
+
+        if (title == 'Success') {
+          AppSnackBar.showSuccess(context, message);
+        } else {
+          AppSnackBar.showError(context, message);
+        }
       }
     } catch (e) {
       if (mounted) {
         AppSnackBar.showError(context, "Có lỗi khi đăng xuất: $e");
       }
     } finally {
-      // 3. Dù có lỗi hay không → xoá token
-      await _clearTokens(storage);
-
-      // 4. Chỉ navigate nếu widget còn mounted
       if (mounted) {
         setState(() => _isLoggingOut = false);
-        context.go('/login');
+        context.go('/login');  // Điều hướng cuối cùng
       }
     }
   }
 
-  Future<void> _clearTokens(FlutterSecureStorage storage) async {
-    await storage.delete(key: 'accessToken');
-    await storage.delete(key: 'refreshToken');
-  }
+  Future<void> loadDataUser() async{
+    setState(() {
+      _isloadingUser = true;
+    });
 
+    try{
+      String? jsonString = await storage.read(key: 'user');
+
+      if(jsonString !=null){
+
+        Map<String,dynamic> data = jsonDecode(jsonString);
+        setState(() {
+          user = data;
+          _isloadingUser = false;
+
+        });
+
+      }else{
+        debugPrint("No user data in storage");
+        setState(() {
+          _isloadingUser = false;
+        });
+      }
+    }catch(e){
+      debugPrint("Error loading user data: $e");
+      setState(() {
+        _isloadingUser = false;
+      });
+    }
+  }
   @override
   void dispose() {
     _animationController.dispose();
@@ -145,9 +139,41 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
           ),
         ),
       ),
-      body: isLoadingProfile || user == null ?
-      Center(child: CircularProgressIndicator(),):
-      FadeTransition(
+      body: _isloadingUser
+          ? const Center(
+        child: CircularProgressIndicator(),
+      )
+          : user == null
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.person_off_outlined,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No user data available',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: loadDataUser,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4F46E5),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ): FadeTransition(
         opacity: _fadeAnimation,
         child: SlideTransition(
           position: _slideAnimation,
@@ -162,118 +188,144 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   child: Column(
                     children: [
                       // Header Section
-                    Column(
-                      children: [
-                        const SizedBox(height: 5),
-                        // Avatar
-                        _informationCard(user!),
-                        const SizedBox(height: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 12),
 
-                        // Stats Cards
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ProfileCard(
-                                title: 'Level',
-                                value: user?.level ?? 'Anonymous',
-                                icon: Icons.trending_up,
-                                color: const Color(0xFF10B981),
-                                titleSize: 14,
-                                valueSize: 16,
-                              ),
+                          // ===== LEARNING STATISTICS SECTION =====
+                          _buildSectionHeader(
+                            title: 'Learning Statistics',
+                            icon: Icons.analytics_outlined,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF0D9488), Color(0xFF14B8A6)],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ProfileCard(
-                                title: 'Day Streak',
-                                value: user?.streakDay.toString() ?? 'N/A',
-                                icon: Icons.local_fire_department,
-                                color: const Color(0xFFEA8E31),
-                                titleSize: 14,
-                                valueSize: 16,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Stats Cards Row 1
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ProfileCard(
+                                  title: 'Level',
+                                  value: user?['level']?.toString() ?? '0',
+                                  icon: Icons.trending_up,
+                                  color: const Color(0xFF10B981),
+                                  titleSize: 14,
+                                  valueSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ProfileCard(
-                                title: 'Quizzes',
-                                value: '7',
-                                icon: Icons.quiz,
-                                color: const Color(0xFF6366F1),
-                                titleSize: 14,
-                                valueSize: 16,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ProfileCard(
+                                  title: 'Day Streak',
+                                  value: user?['streakDay']?.toString() ?? '0',
+                                  icon: Icons.local_fire_department,
+                                  color: const Color(0xFFEA8E31),
+                                  titleSize: 14,
+                                  valueSize: 16,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: ProfileCard(
-                                title: 'Average Score',
-                                value: '85%',
-                                icon: Icons.star,
-                                color: const Color(0xFFF59E0B),
-                                titleSize: 14,
-                                valueSize: 16,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ProfileCard(
+                                  title: 'Quizzes',
+                                  value: '7',
+                                  icon: Icons.quiz,
+                                  color: const Color(0xFF6366F1),
+                                  titleSize: 14,
+                                  valueSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ProfileCard(
-                                title: 'Vocabulary Learned',
-                                value: '180',
-                                icon: Icons.school_outlined,
-                                color: const Color(0xFFF59E0B),
-                                titleSize: 14,
-                                valueSize: 16,
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Stats Cards Row 2
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: ProfileCard(
+                                  title: 'Average Score',
+                                  value: '85%',
+                                  icon: Icons.star,
+                                  color: const Color(0xFFF59E0B),
+                                  titleSize: 14,
+                                  valueSize: 16,
+                                ),
                               ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ProfileCard(
+                                  title: 'Vocabulary',
+                                  value: '180',
+                                  icon: Icons.school_outlined,
+                                  color: const Color(0xFF8B5CF6),
+                                  titleSize: 14,
+                                  valueSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // ===== ACCOUNT MANAGEMENT SECTION =====
+                          _buildSectionHeader(
+                            title: 'Account Management',
+                            icon: Icons.manage_accounts_outlined,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 12),
 
-                        const SizedBox(height: 12),
+                          // Action Cards
+                          ActionCard(
+                            title: 'Edit Profile',
+                            subtitle: 'Update your personal information',
+                            icon: Icons.edit_outlined,
+                            color: const Color(0xFF6366F1),
+                            onTap: () => context.push(
+                                '/profile/edit-profile',
+                                extra: user
+                            ),
+                          ),
+                          const SizedBox(height: 12),
 
-                        // Action Cards
-                        ActionCard(
-                          title: 'Edit Profile',
-                          subtitle: 'Update your personal information',
-                          icon: Icons.edit,
-                          color: const Color(0xFF6366F1),
-                          onTap: () => context.push('/profile/edit-profile'),
-                        ),
-                        const SizedBox(height: 12),
-                        ActionCard(
-                          title: 'Achievements',
-                          subtitle: 'View your badges and rewards',
-                          icon: Icons.emoji_events,
-                          color: const Color(0xFFF59E0B),
-                          onTap: () => context.push("/profile/achievement"),
-                        ),
-                        const SizedBox(height: 12),
+                          ActionCard(
+                            title: 'Achievements',
+                            subtitle: 'View your badges and rewards',
+                            icon: Icons.emoji_events_outlined,
+                            color: const Color(0xFFF59E0B),
+                            onTap: () => context.push("/profile/achievement"),
+                          ),
+                          const SizedBox(height: 12),
 
-                        ActionCard(
-                          title: 'Settings',
-                          subtitle: 'Manage app preferences',
-                          icon: Icons.settings,
-                          color: const Color(0xFF64748B),
-                          onTap: () => context.push('/profile/setting'),
-                        ),
-                        const SizedBox(height: 12),
+                          ActionCard(
+                            title: 'Settings',
+                            subtitle: 'Manage app preferences',
+                            icon: Icons.settings_outlined,
+                            color: const Color(0xFF64748B),
+                            onTap: () => context.push('/profile/setting'),
+                          ),
+                          const SizedBox(height: 12),
 
-                        ActionCard(
-                          title: 'Logout',
-                          subtitle: 'Sign out of your account',
-                          icon: Icons.logout,
-                          color: const Color(0xFFEF4444),
-                          onTap: () => _showLogoutDialog(),
-                        ),
+                          ActionCard(
+                            title: 'Logout',
+                            subtitle: 'Sign out of your account',
+                            icon: Icons.logout_outlined,
+                            color: const Color(0xFFEF4444),
+                            onTap: () => _showLogoutDialog(),
+                          ),
 
-                        const SizedBox(height: 24),
-                      ],
-                    ),
+                          const SizedBox(height: 24),
+                        ],
+                      )
                   ],
                 ),
               ),
@@ -283,125 +335,49 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       ),
     );
   }
-
-  Widget _informationCard(User user) {
+  Widget _buildSectionHeader({
+    required String title,
+    required IconData icon,
+    required Gradient gradient,
+  }) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4239DA), Color(0xFF4F46E1)], // nền nhạt
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            offset: const Offset(0, 6),
-            blurRadius: 12,
-          )
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
-        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar
           Container(
-            width: 60,
-            height: 60,
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6366F1), Color(0xFF3B82F6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child:  Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  )
-                ],
-                borderRadius: BorderRadius.circular(50)
-              ),
-              child: Text(
-                user.fullName?.split("")[0] ?? 'A',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 20,
             ),
           ),
           const SizedBox(width: 12),
-
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.fullName ?? '',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  user.email ?? '',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: -0.5
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Badges
-                Row(
-                  children: [
-                    _buildChip(user.level ?? '', Colors.green, Colors.green.shade50),
-                    const SizedBox(width: 8),
-                    _buildChip(user.createdAt.toString().split(' ')[0], Colors.indigo, Colors.indigo.shade50),
-                  ],
-                )
-              ],
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
             ),
-          )
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildChip(String text, Color color, Color bgColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-        ),
       ),
     );
   }

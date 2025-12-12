@@ -117,8 +117,10 @@ class _EditProfileScreen extends State<EditProfileScreen> {
   Future<User?> getProfile() async {
     try {
       final response = await UserService().getProfile();
-      if (response.fullName != null) {
-        return response;
+      if(!mounted) return null;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return User.fromJson(data['user']);
       }
       return null;
     } catch (e) {
@@ -309,6 +311,7 @@ class _EditProfileScreen extends State<EditProfileScreen> {
             letterSpacing: -0.2
         ),
       ),
+      centerTitle: true,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(

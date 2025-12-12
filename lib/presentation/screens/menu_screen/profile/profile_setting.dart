@@ -19,7 +19,7 @@ class _SettingScreenState extends State<SettingScreen> {
         title: const Text("Settings",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 20,
             letterSpacing: -0.2,
             fontWeight: FontWeight.w700
           ),
@@ -27,13 +27,13 @@ class _SettingScreenState extends State<SettingScreen> {
         leading: IconButton(
             onPressed: ()=> context.pop(),
             style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(4),
                 backgroundColor: Colors.white.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 )
             ),
-            icon: Icon(Icons.arrow_back,size: 24,color: Colors.white,)
+            icon: Icon(Icons.arrow_back,size: 20,color: Colors.white,)
         ),
       ),
       body: CustomScrollView(
@@ -41,14 +41,14 @@ class _SettingScreenState extends State<SettingScreen> {
           // ⚙️ Danh sách tùy chọn
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     "Account",
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
@@ -62,7 +62,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       onTap: () {},
                     ),
                   ]),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 24),
 
                   const Text(
                     "App Settings",
@@ -93,10 +93,10 @@ class _SettingScreenState extends State<SettingScreen> {
                       icon: LucideIcons.globe,
                       title: "Language",
                       subtitle: "English (US)",
-                      onTap: () {},
+                      onTap: (){},
                     ),
                   ]),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 24),
 
                   const Text(
                     "Support",
@@ -109,7 +109,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   const SizedBox(height: 12),
                   _buildSettingCard([
                     _buildSettingItem(
-                      icon: LucideIcons.handHelping100,
+                      icon: LucideIcons.handHelping300,
                       title: "Help Center",
                       subtitle: "FAQs & Support",
                       onTap: () {},
@@ -168,11 +168,11 @@ class _SettingScreenState extends State<SettingScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: const Color(0xFFDAE5EF),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.all(10),
-              child: Icon(icon, color: const Color(0xFF6366F1)),
+              child: Icon(icon, color: const Color(0xFF6366F5)),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -181,7 +181,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 children: [
                   Text(title,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       )),
@@ -189,7 +189,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       color: Colors.black54,
                     ),
                   ),

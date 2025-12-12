@@ -118,36 +118,16 @@ class UserService {
     }
   }
 
-  Future<User> getProfile() async {
-    try{
-      final accessToken = await storage.read(key: "accessToken");
-
-      if (accessToken == null) {
-        throw Exception("Access token not found");
-      }
-
-      final response = await http.get(
-        Uri.parse("$baseUrl/users/profile"),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
+  Future<http.Response> getProfile() async {
+    return await requestWithAuth((token){
+      return http.get(
+          Uri.parse("$baseUrl/users/profile"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          },
       );
-
-      if (response.statusCode == 200) {
-        final Map<String,dynamic> data = json.decode(response.body);
-        return User.fromJson(data['user']);
-      }
-
-      if (response.statusCode == 401) {
-        throw Exception("Unauthorized");
-      }
-
-      throw Exception("Error: ${response.statusCode}");
-    }catch(e){
-      throw Exception("Error in get profile: $e");
-    }
+    });
   }
 
   Future<http.Response> updateProfile(Map<String,dynamic> data) async {

@@ -103,7 +103,7 @@ class _LoginScreen extends State<LoginScreen> with SingleTickerProviderStateMixi
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -126,7 +126,7 @@ class _LoginScreen extends State<LoginScreen> with SingleTickerProviderStateMixi
                         Text(
                           "Sign in to continue learning",
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
                             height: 1.5
@@ -199,9 +199,9 @@ class _LoginScreen extends State<LoginScreen> with SingleTickerProviderStateMixi
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF3D5CFF),
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: const Color(0xFF3D5CFF).withOpacity(0.6),
+                            disabledBackgroundColor: const Color(0xFF3D5CFF).withValues(alpha: 0.6),
                             elevation: 0,
-                            shadowColor: const Color(0xFF3D5CFF).withOpacity(0.3),
+                            shadowColor: const Color(0xFF3D5CFF).withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),

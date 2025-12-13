@@ -111,7 +111,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
             boxShadow: _isFocused
                 ? [
               BoxShadow(
-                color: const Color(0xFF3D5CFF).withOpacity(0.15),
+                color: const Color(0xFF3D5CFF).withValues(alpha: 0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

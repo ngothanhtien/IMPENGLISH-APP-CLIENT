@@ -5,12 +5,14 @@ class CustomOtpField extends StatelessWidget {
   final int length;
   final void Function(String)? onCompleted;
   final void Function(String)? onChanged;
+  final bool enable;
 
   const CustomOtpField({
     super.key,
     this.length = 6,
     this.onCompleted,
     this.onChanged,
+    this.enable = true
   });
 
   @override
@@ -20,6 +22,7 @@ class CustomOtpField extends StatelessWidget {
       length: length,
       obscureText: false,
       keyboardType: TextInputType.number,
+      enabled: enable,
       textStyle: TextStyle(
         fontSize: 16,
         color: const Color(0xFF4F46E5)

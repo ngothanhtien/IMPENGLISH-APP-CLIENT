@@ -17,12 +17,10 @@ class VerifyOtpScreen extends StatefulWidget {
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String otpCode = "";
   bool _isLoading = false;
+  int timeUp = 2;
+  bool enableFillCode = true;
 
   Future<void> _verifyOtp() async {
-    if (otpCode.length != 6) {
-      AppSnackBar.showError(context,"Vui lòng nhập mã OTP phải đủ 6 số!");
-      return;
-    }
 
     setState(() => _isLoading = true);
 
@@ -38,34 +36,27 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       final message = response['message'] ?? '';
 
       if (result == 'NOT FOUND') {
+        await Future.delayed(Duration(milliseconds: 1200));
+        setState(() {
+          _isLoading = false;
+        });
+        if(!mounted) return;
         AppSnackBar.showError(context,message);
         return;
       } else {
-        Future.delayed(const Duration(milliseconds: 3000), () {
+        Future.delayed(const Duration(milliseconds: 1200), () {
+          setState(() {
+            _isLoading = false;
+          });
           if (mounted) _showDialogDone();
         });
       }
     } catch (e) {
-      AppSnackBar.showError(context,"Có lỗi xảy ra khi xác thực OTP");
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() {
+        _isLoading = false;
+      });
+      AppSnackBar.showError(context,"An error occurred during the OTP verification process!");
     }
-  }
-  void _showDialogDone(){
-    showAppDialog(
-      context,
-      icon: Icons.check_circle,
-      title: "Verify Successfully",
-      message: 'Congratulations, you have completed your registration!',
-      onOk: (){context.go('/login');},
-      align: TextAlign.center,
-      animType: AnimType.scale,
-      dismissOntouchOnside: false,
-      okText: 'Done',
-      hideBtnCancel: true
-    );
   }
 
   Future<void> _resendOTP() async {
@@ -81,11 +72,72 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         AppSnackBar.showError(context,message);
       }else{
         AppSnackBar.showSuccess(context, message);
+        setState(() {
+          timeUp = 2;
+          enableFillCode = true;
+        });
       }
     }catch(e){
-      AppSnackBar.showError(context,"Có lỗi xảy ra khi yêu cầu gửi lại mã OTP");
+      AppSnackBar.showError(context,"An error occurred during the resend otp process.");
     }
   }
+
+  void _showDialogDone(){
+    setState(() {
+      timeUp = 0;
+    });
+    showAppDialog(
+      context,
+      icon: Icons.check_circle,
+      title: "Verify Successfully",
+      message: 'Congratulations, you have completed your registration!',
+      onOk: (){context.go('/login');},
+      align: TextAlign.center,
+      animType: AnimType.scale,
+      dismissOntouchOnside: false,
+      okText: 'Finish',
+      hideBtnCancel: true,
+      primaryColor: Colors.green,
+      titleColor: Colors.green
+    );
+  }
+
+  void _showDialogCancelVerify(){
+    showAppDialog(
+      context,
+      icon: Icons.cancel,
+      title: "Cancel",
+      message: 'Do you really want to cancel verify otp for your account?',
+      onOk: (){context.pop();},
+      align: TextAlign.center,
+      animType: AnimType.scale,
+      okText: 'Confirm',
+      primaryColor: Colors.deepOrangeAccent,
+      titleColor: Colors.deepOrangeAccent
+    );
+  }
+
+  void _showDialogTimeOut() {
+    showAppDialog(
+        context,
+        icon: Icons.timer_outlined,
+        title: "Time is up",
+        message: "The verification period has expired.",
+        okText: "Close",
+        onOk: (){
+          setState(() {
+            enableFillCode = false;
+          });
+        },
+        animType: AnimType.scale,
+        primaryColor: Colors.redAccent,
+        dismissOntouchOnside: false,
+        align: TextAlign.center,
+        hideBtnCancel: true,
+        titleColor: Colors.redAccent
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,13 +147,13 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
-            fontSize: 18
+            fontSize: 20
         ),
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFF4F46E5),
         leading: GestureDetector(
-          onTap: () => context.pop(),
+          onTap: _showDialogCancelVerify,
           child: Icon(Icons.cancel,size: 24,color: Colors.white,),
         ),
       ),
@@ -113,8 +165,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               children: [
                 SizedBox(height: 12,),
                 CountdownTimerWidget(
-                  minutes: 1,
-                  onComplete: () => AppSnackBar.showError(context,"Time is up"),
+                  minutes: timeUp,
+                  onComplete: _showDialogTimeOut,
                   size: 60,
                 ),
                 const SizedBox(height: 24),
@@ -141,6 +193,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       otpCode = val;
                     });
                   },
+                  enable: enableFillCode,
                 ),
                 const SizedBox(height: 24),
                 /// Verify Button
@@ -148,32 +201,31 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _verifyOtp,
+                    onPressed: otpCode.length != 6 ? null : _verifyOtp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4F46E5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child:_isLoading ?
-                    SizedBox(
-                      height: 24,
+                    child:_isLoading
+                        ? const SizedBox(
                       width: 24,
+                      height: 24,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.transparent,
+                        strokeWidth: 2.5,
                         color: Colors.white,
-                        strokeWidth: 2,
                       ),
                     )
                     :
-                    const Text(
-                      "Verify and Create Account",
+                    Text(
+                      otpCode.length != 6 ? "Please Fill Code" : "Verify Code",
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text("Code will expire in 1 minute",
+                const Text("Code will expire in 2 minute",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       fontSize: 14,
@@ -187,7 +239,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   child: const Text(
                     "Resend Code",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Color(0xFF4F46E5),
                       decoration: TextDecoration.underline,
                       decorationStyle: TextDecorationStyle.solid,

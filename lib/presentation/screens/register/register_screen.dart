@@ -14,7 +14,7 @@ class RegisterScreen extends StatefulWidget{
   State<StatefulWidget> createState() => _RegisterScreen();
 }
 class _RegisterScreen extends State<RegisterScreen> {
-  final fullnameController = TextEditingController();
+  final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -22,13 +22,16 @@ class _RegisterScreen extends State<RegisterScreen> {
   bool _isLoading = false;
 
   Future<void> _handlerRegister() async {
-    if(!isChecked){
-      AppSnackBar.showError(context, "Bạn phải đồng ý điều khoản & điều kiện.");
+
+    if (fullNameController.text.isEmpty || emailController.text.isEmpty ||
+        passwordController.text.isEmpty || confirmPasswordController.text.isEmpty
+    ){
+      AppSnackBar.showError(context, "Please enter your complete registration information!");
       return;
     }
 
-    if (passwordController.text != confirmPasswordController.text) {
-      AppSnackBar.showError(context, "Mật khẩu xác nhận không trùng khớp.");
+    if(!isChecked){
+      AppSnackBar.showError(context, "Please, Agree with our terms & conditions!");
       return;
     }
 
@@ -38,10 +41,10 @@ class _RegisterScreen extends State<RegisterScreen> {
 
     try{
       final result = await UserService().signUp(
-          fullName: fullnameController.text.trim(),
+          fullName: fullNameController.text.trim(),
           email: emailController.text.trim(),
           password: passwordController.text.trim()
-      );
+      ).timeout(Duration(seconds: 5));
 
       if(!mounted) return;
 
@@ -51,10 +54,10 @@ class _RegisterScreen extends State<RegisterScreen> {
       if(resResult == 'failed' || resResult == 'BAD REQUEST'){
         AppSnackBar.showError(context,message);
       }else{
-        AppSnackBar.showSuccess(context,message.isNotEmpty ? message : "Đăng ký tài khoản thành công!");
-        Future.delayed(Duration(seconds: 2),() {
+        AppSnackBar.showSuccess(context,message.isNotEmpty ? message : "Register successfully");
+        Future.delayed(Duration(milliseconds: 800),() {
           if (mounted) {
-            context.go(
+            context.push(
               "/verify-otp",
               extra: {'email': emailController.text},
             );
@@ -63,7 +66,7 @@ class _RegisterScreen extends State<RegisterScreen> {
         );
       }
     }catch(e){
-      AppSnackBar.showError(context,"Đã có lỗi xảy ra khi đăng ký: $e");
+      AppSnackBar.showError(context,"Error at _handlerRegister: $e");
     }finally{
       if (mounted) {
         setState(() {
@@ -75,7 +78,7 @@ class _RegisterScreen extends State<RegisterScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    fullnameController.dispose();
+    fullNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -84,9 +87,6 @@ class _RegisterScreen extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3D5CFF),
-      ),
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -100,31 +100,61 @@ class _RegisterScreen extends State<RegisterScreen> {
                 child: Column(
                     children: [
                       Container(
-                        height: 130,
                         width: double.infinity,
-                        alignment: Alignment.bottomCenter,
-                        color: const Color(0xFF3D5CFF),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Create an account",
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF3D5CFF),
+                              Color(0xFF5B7CFF),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(32),
+                            bottomRight: Radius.circular(32),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                          child: Column(
+                            children: [
+                              // Logo/Icon
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.assignment_ind,
+                                  size: 45,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 10,),
-                            Text(
-                              "Connect with IMPEnglish today!",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey.shade400,
-                                  fontWeight: FontWeight.w500
+                              const SizedBox(height: 20),
+                              const Text(
+                                "Create An Account",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 32,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                "Sign Up For Free",
+                                style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.5
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // ---------- HEADER ----------
@@ -138,12 +168,12 @@ class _RegisterScreen extends State<RegisterScreen> {
                                 CustomTextField(
                                   nameTextField: "Full Name",
                                   hintText: "Enter your full name",
-                                  controller: fullnameController,
+                                  controller: fullNameController,
                                   prefixIcon: Icons.account_box,
                                   isPassword: false,
                                   titleSize: 15,
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 12),
                                 CustomTextField(
                                   nameTextField: "Email",
                                   hintText: "Enter your email",
@@ -152,7 +182,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                                   isPassword: false,
                                   titleSize: 15,
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 12),
                                 CustomTextField(
                                   nameTextField: "Password",
                                   hintText: "Enter password for your account",
@@ -161,7 +191,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                                   isPassword: true,
                                   titleSize: 15,
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 12),
                                 CustomTextField(
                                   nameTextField: "Confirm Password",
                                   hintText: "Password confirm",
@@ -170,7 +200,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                                   isPassword: true,
                                   titleSize: 15,
                                 ),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 16),
                                 SizedBox(
                                   width: double.infinity,
                                   height: 55,
@@ -193,7 +223,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 12),
                                 SizedBox(
                                   width: double.infinity,
                                   child: CheckboxListTile(
@@ -219,7 +249,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                                         borderRadius: BorderRadius.circular(4)),
                                   ),
                                 ),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 12),
                                 RichText(
                                   text: TextSpan(
                                     children: <TextSpan>[

@@ -31,7 +31,7 @@ class AuthService {
         headers: headers,
         body: body,
       ).timeout(const Duration(seconds: 10));
-      if(response.statusCode == 200){
+
         final data = json.decode(response.body);
 
         final accessToken = data['accessToken'];
@@ -43,9 +43,6 @@ class AuthService {
         await storage.write(key: 'user', value: json.encode(user));
 
         return json.decode(response.body);
-      }else{
-        throw Exception("Login failed");
-      }
     }catch(e){
       throw Exception("Error in processing login: $e");
     }

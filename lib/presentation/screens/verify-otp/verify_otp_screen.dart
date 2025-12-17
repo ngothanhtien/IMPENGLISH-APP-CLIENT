@@ -25,7 +25,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await UserService().veryfyOtp(
+      final response = await UserService().verifyOtp(
         email: widget.email.toString().trim(),
         otp: int.parse(otpCode),
       );

@@ -92,7 +92,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
 
       final response = await QuizResultService().createQuizResult(
         quiz: quizResult,
-        userId: '68cd5981cf94a9641d3e9391',
       );
 
       if (!mounted) return null;
@@ -133,7 +132,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
 
     if (mounted) Navigator.of(context).pop();
 
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 400));
 
     if (mounted) {
       context.push(
@@ -285,6 +284,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen>
       onOk: (){_finishQuiz(questions);},
       animType: AnimType.scale,
       primaryColor: Colors.deepOrange,
+      titleColor: Colors.deepOrange,
       dismissOntouchOnside: false,
       align: TextAlign.center,
       hideBtnCancel: true

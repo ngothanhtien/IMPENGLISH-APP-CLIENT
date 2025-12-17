@@ -182,6 +182,8 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1E293B),
+                          height: 1.5,
+                          letterSpacing: -0.2
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -190,7 +192,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                       Text(
                         'Test your knowledge in ${widget.category} with ${widget.totalQuestions} exciting questions!',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           color: const Color(0xFF4C525A),
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0.3,
@@ -207,6 +209,8 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1E293B),
+                          height: 1.5,
+                          letterSpacing: -0.2
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -266,7 +270,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                         timeLimit: widget.timeLimit,
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -322,7 +326,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 6),
 
                           // Edit Filters Button
                           SizedBox(

@@ -75,7 +75,7 @@ class UserService {
   }
 
   // xác thực otp sau khi đăng ký
-  Future<Map<String, dynamic>> veryfyOtp({
+  Future<Map<String, dynamic>> verifyOtp({
     required String email,
     required int otp
   }) async {

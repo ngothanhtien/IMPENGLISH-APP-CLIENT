@@ -20,14 +20,15 @@ class QuizService {
   }) async {
     try{
       final response = await http.get(
-        Uri.parse('$baseUrl/quiz?level=$level&topic=$topic'),
+        Uri.parse('$baseUrl/quiz?level=$level&topic=$topic&limit=$numberQuestions'),
         headers: headers,
       );
       if(response.statusCode == 200){
         final dataResponse = json.decode(response.body);
         return Quiz.fromJson(dataResponse);
       }else {
-        throw Exception('Failed to load quiz. StatusCode: ${response.statusCode}');
+        final dataResponse = json.decode(response.body);
+        throw Exception('Failed to load quiz: message: ${dataResponse['message']}/${response.statusCode}');
       }
     }catch(e){
       throw Exception('Error at fetch Quiz: $e');

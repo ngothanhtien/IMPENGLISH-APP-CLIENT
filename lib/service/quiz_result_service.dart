@@ -4,9 +4,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_app_client/model/quiz_result/quiz_result.dart';
+import 'package:learning_app_client/service/request_auth.dart';
 class QuizResultService{
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
-  final _storage = FlutterSecureStorage();
 
   static const Map<String, String> _defaultHeaders = {
     'Content-type': 'application/json',
@@ -15,7 +15,6 @@ class QuizResultService{
 
   Future<Map<String,dynamic>> createQuizResult ({
     required QuizResult? quiz,
-    required String? userId
   }) async {
     try{
       final body = {
@@ -25,22 +24,29 @@ class QuizResultService{
         "correctAnswers": quiz?.correctAnswers,
         "incorrectAnswers": quiz?.incorrectAnswers,
         "questions": quiz?.questions?.map((e){
-            final map = e.toJson();
-            map.remove("_id");
-            return map;
-          }
+          final map = e.toJson();
+          map.remove("_id");
+          return map;
+        }
         ).toList(),
         "statusFinish": quiz?.statusFinish,
       };
-      final response = await http.post(
-        Uri.parse("$baseUrl/quiz-results/create/$userId"),
-        headers: _defaultHeaders,
-        body: json.encode(body)
-      );
+      final response = await requestWithAuth((token) async {
+        final request = await http.post(
+            Uri.parse("$baseUrl/quiz-results/create"),
+            headers: {
+              "Content-type": "application/json",
+              "Authorization": "Bearer $token"
+            },
+            body: json.encode(body)
+        );
+        return request;
+      });
+
       if(response.statusCode == 200){
         final Map<String,dynamic> result = json.decode(response.body);
         return result;
-      }else {
+      }else{
         final Map<String,dynamic> result = json.decode(response.body);
         throw("Error in function create quiz result at service: ${result['message']}");
       }
@@ -56,6 +62,7 @@ class QuizResultService{
           Uri.parse("$baseUrl/quiz-results/user/$userId"),
           headers: _defaultHeaders,
       );
+
       if(response.statusCode == 200){
         final data = json.decode(response.body);
         final List<QuizResult> result = data['data'];

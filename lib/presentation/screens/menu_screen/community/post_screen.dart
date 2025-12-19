@@ -85,13 +85,9 @@ class _PostScreen extends State<PostScreen> {
       return false;
     }
 
-    if (listTags.length > 5) {
-      AppSnackBar.showError(context, "You can only add up to 5 tags!");
-      return false;
-    }
-
     return true;
   }
+
   void resetAll(){
     titleController.clear();
     contentController.clear();
@@ -99,6 +95,7 @@ class _PostScreen extends State<PostScreen> {
     categorySelected = '';
     titleCount = 0;
     contentCount = 0;
+    listTags.clear();
   }
 
   Future<void> _onPublish() async {
@@ -111,20 +108,25 @@ class _PostScreen extends State<PostScreen> {
       category: categorySelected,
       content: contentController.text,
       tags: listTags,
-      userId: UserPost(id: "68cd5981cf94a9641d3e9391"),
     );
     try{
       final response = await PostService().createPost(post: post).timeout(Duration(seconds: 5));
+
       await Future.delayed(const Duration(milliseconds: 1500));
-
-      if(!mounted) return;
-
-      setState(() {
-        isLoading = false;
-        resetAll();
-      });
-
-      AppSnackBar.showSuccess(context, "Post created successfully!");
+      if(response['status'] == "Success"){
+        setState(() {
+          isLoading = false;
+          resetAll();
+        });
+        if(!mounted) return;
+        AppSnackBar.showSuccess(context, "Post created successfully!");
+      }else {
+        if(!mounted) return;
+        AppSnackBar.showError(context, "Can't create post. Please try again!");
+        setState(() {
+          isLoading = false;
+        });
+      }
     }catch(e){
       await Future.delayed(const Duration(milliseconds: 1500));
 
@@ -134,6 +136,20 @@ class _PostScreen extends State<PostScreen> {
       debugPrint("Error at create post screen: $e");
       AppSnackBar.showError(context, "Failed to create post!");
     }
+  }
+
+  void addTag(){
+    if(listTags.length >= 5){
+      AppSnackBar.showError(context, "You can only add a maximum of 5 tags!");
+      return;
+    }
+
+    if(tagController.text.trim().isEmpty) return;
+
+    setState(() {
+      listTags.add(tagController.text.trim());
+      tagController.clear();
+    });
   }
   @override
   void dispose() {
@@ -154,17 +170,25 @@ class _PostScreen extends State<PostScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
         ),
         leading: IconButton(
+          style: IconButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(12),
+            ),
+            padding: EdgeInsets.all(8),
+            backgroundColor: Colors.white.withValues(alpha: 0.3)
+          ),
           icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
           onPressed: () => context.pop(),
         ),
         actions: [
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: _onPublish,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text(
+            icon: Icon(Icons.publish_rounded,size: 18,color: Colors.white,),
+            label: const Text(
               "Publish",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
             ),
@@ -178,7 +202,7 @@ class _PostScreen extends State<PostScreen> {
           SingleChildScrollView(
             padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -189,7 +213,7 @@ class _PostScreen extends State<PostScreen> {
                     isPassword: false,
                     titleColor: const Color(0xFF1E293B),
                     titleSize: 16,
-                    prefixIcon: Icons.title,
+                    prefixIcon: Icons.edit_note_rounded,
                     onchanged: (value) {
                       setState(() => titleCount = value.length);
                     },
@@ -199,15 +223,20 @@ class _PostScreen extends State<PostScreen> {
                     alignment: Alignment.centerRight,
                     child: Text(
                       "$titleCount/100",
-                      style: TextStyle(color: Colors.grey.shade800, fontSize: 14),
+                      style: TextStyle(
+                        color: titleCount > 100
+                            ? Colors.red
+                            : Colors.grey.shade600,
+                        fontSize: 14
+                      ),
                     ),
                   ),
 
                   const SizedBox(height: 12),
 
-                  const Text(
-                    "Category",
-                    style: TextStyle(fontSize: 16, color: Color(0xFF1E293B), fontWeight: FontWeight.w700),
+                  _buildTitle(
+                    Icons.category_rounded,
+                    "Category"
                   ),
                   const SizedBox(height: 12),
 
@@ -222,109 +251,192 @@ class _PostScreen extends State<PostScreen> {
 
                   const SizedBox(height: 20),
 
-                  const Text(
-                    "Content",
-                    style: TextStyle(fontSize: 16, color: Color(0xFF1E293B), fontWeight: FontWeight.w700),
+                  _buildTitle(
+                      Icons.article_rounded,
+                      "Content"
                   ),
+
                   const SizedBox(height: 12),
 
-                  Container(
-                    height: 250,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          offset: Offset(0, 2),
-                          blurRadius: 10,
-                        )
-                      ],
-                    ),
-                    child: TextField(
-                      controller: contentController,
-                      expands: true,
-                      maxLines: null,
-                      minLines: null,
-                      style: const TextStyle(fontSize: 16),
-                      onChanged: (value) {
-                        setState(() => contentCount = value.length);
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Write your content here...",
-                        hintStyle: const TextStyle(color: Color(0xFF858597),fontSize: 15),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(width: 1,color: Colors.black26)
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(width: 1.3,color: const Color(0xFF4F46E5))
-                        )
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "$contentCount/1000",
-                      style: TextStyle(color: Colors.grey.shade800, fontSize: 14),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  Column(
                     children: [
-                      Expanded(
-                        child: CustomTextField(
-                          nameTextField: "Tags (Optional)",
-                          hintText: "Add tag (max 5)...",
-                          controller: tagController,
-                          isPassword: false,
-                          prefixIcon: Icons.tag,
-                          titleSize: 16,
+                      Container(
+                        height: 220,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: contentController,
+                          expands: true,
+                          maxLines: null,
+                          minLines: null,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            height: 1.5,
+                            color: Colors.black
+                          ),
+                          onChanged: (value) {
+                            setState(() => contentCount = value.length);
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Share your thoughts, questions, or knowledge...",
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 14,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(color: Colors.grey,width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(color: Color(0xFF4F46E5),width: 2.2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-
-                      SizedBox(
-                        height: 55,
-                        width: 75,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (listTags.length >= 5) {
-                              AppSnackBar.showError(context, "Max 5 tags allowed!");
-                              return;
-                            }
-
-                            if (tagController.text.trim().isEmpty) return;
-
-                            setState(() {
-                              listTags.add(tagController.text.trim());
-                              tagController.clear();
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4F46E5),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "$contentCount/1000",
+                          style: TextStyle(
+                            color: contentCount > 1000
+                                ? Colors.red
+                                : Colors.grey.shade600,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            height: 1.5
                           ),
-                          child: const Text("Add", style: TextStyle(color: Colors.white,fontSize: 13)),
                         ),
-                      )
+                      ),
                     ],
                   ),
 
+                  const SizedBox(height: 20),
+                  _buildTitle(
+                      Icons.tag_rounded,
+                      "Tags(max 5 tags)"
+                  ),
+                  SizedBox(height: 12,),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: tagController,
+                            style: const TextStyle(fontSize: 15),
+                            decoration: InputDecoration(
+                              hintText: "Add a tag...",
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.tag_rounded,
+                                color: Colors.grey.shade600,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(color: Colors.grey,width: 1),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(color: Color(0xFF4F46E5),width: 2.2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: addTag,
+                          child: Container(
+                            height: 56,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF4F46E5),
+                                  Color(0xFF7C3AED),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Add",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 6,),
                   Wrap(
                     spacing: 6,
                     children: listTags.map((tag) {
                       return Chip(
-                        label: Text("#$tag", style: const TextStyle(color: Colors.white)),
-                        backgroundColor: Colors.blue.shade600,
-                        deleteIcon: const Icon(Icons.close, color: Colors.white),
+                        label: Text("#$tag",
+                          style: const TextStyle(
+                            color: Color(0xFF4F46E5),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          )
+                        ),
+                        backgroundColor: Color(0xFF4F46E5).withValues(alpha: 0.15),
+                        deleteIcon: const Icon(Icons.close, color: Color(0xFF4F46E5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: const Color(0xFF4F46E5).withValues(alpha: 0.6),
+                            width: 1.5
+                          )
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         onDeleted: () {
                           setState(() => listTags.remove(tag));
                         },
@@ -333,17 +445,48 @@ class _PostScreen extends State<PostScreen> {
                   ),
 
                   const SizedBox(height: 20),
-                  _buildAddToPostSection(),
+                  _buildComingSoonSection(),
                   const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
-          if(isLoading)
+          if (isLoading)
             Container(
-              color: Colors.black12,
-              child: const Center(
-                child: CircularProgressIndicator(strokeWidth: 3,),
+              color: Colors.black.withValues(alpha: 0.5),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Colors.grey.shade500,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Publishing your post...",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
         ],
@@ -351,37 +494,79 @@ class _PostScreen extends State<PostScreen> {
     );
   }
 
-  Widget _buildAddToPostSection() {
+  Widget _buildComingSoonSection() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white60,
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
-            offset: Offset(0, 4),
-            blurRadius: 4,
-          )
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
-        border: Border.all(color: Colors.black26,width: 0.5,)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Add to your post",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B))
-          ),
-          const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: _buildAddCard(Icons.image, "Image")),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.add_circle_outline_rounded,
+                  size: 20,
+                  color: Colors.grey.shade600,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildAddCard(Icons.link, "Link")),
+              Text(
+                "Add to your post",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade800,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          const Text("Coming soon!", style: TextStyle(color: Colors.black54)),
+          const SizedBox(height: 16),
+          _buildAddCard(Icons.image_rounded, "Image"),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.amber.shade200,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.schedule_rounded,
+                  size: 16,
+                  color: Colors.amber.shade700,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "Coming soon!",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.amber.shade900,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -397,6 +582,40 @@ class _PostScreen extends State<PostScreen> {
         leading: Icon(icon, size: 24),
         title: Text(text, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
       ),
+    );
+  }
+
+  Widget _buildTitle(IconData icon,String title){
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF4F46E5),
+                    Color(0xFF7C3AED),
+                  ]
+              ),
+              borderRadius: BorderRadius.circular(12)
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(width: 8,),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1F2937),
+            letterSpacing: -0.3,
+          ),
+        ),
+      ],
     );
   }
 }

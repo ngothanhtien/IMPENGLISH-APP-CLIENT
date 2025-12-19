@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:learning_app_client/model/post/post.dart';
 import 'package:learning_app_client/model/post/post_detail_response.dart';
 import 'package:learning_app_client/model/post/post_response.dart';
+import 'package:learning_app_client/service/request_auth.dart';
 
 class PostService {
   static String? baseUrl =  dotenv.env['BASE_URL_SML_3'];
@@ -40,22 +41,29 @@ class PostService {
     }
   }
 
-  Future<Post> createPost({required Post post}) async {
+  Future<Map<String,dynamic>> createPost({required Post post}) async {
     try{
-      final response  = await http.post(
-          Uri.parse("$baseUrl/posts/create/${post.userId?.id}"),
-          headers: _defaultHeaders,
-          body: json.encode({
-            "title" : post.title ?? '',
-            "category": post.category ?? '',
-            "content": post.content ?? '',
-            "tags": post.tags ?? [],
-          })
-      );
+      final body = {
+        "title" : post.title ?? '',
+        "category": post.category ?? '',
+        "content": post.content ?? '',
+        "tags": post.tags ?? [],
+      };
+
+      final response  = await requestWithAuth((token) async {
+        return await http.post(
+            Uri.parse("$baseUrl/posts/create"),
+            headers: {
+              "Content-type": "Application/json",
+              "Authorization": "Bearer $token"
+            },
+            body: json.encode(body)
+        );
+      });
+
       if(response.statusCode == 200){
         final dataResponse = json.decode(response.body);
-        final postResults = Post.fromJson(dataResponse);
-        return postResults;
+        return dataResponse;
       }else{
         throw Exception("Failed with status ${response.statusCode}");
       }
